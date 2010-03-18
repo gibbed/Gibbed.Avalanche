@@ -1,0 +1,264 @@
+﻿using System;
+using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Windows.Forms;
+using Gibbed.Helpers;
+using Gibbed.Avalanche.FileFormats;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+
+namespace Gibbed.Avalanche.ArchiveViewer
+{
+	public partial class SaveAllProgress : Form
+	{
+		public SaveAllProgress()
+		{
+			this.InitializeComponent();
+		}
+
+		delegate void SetStatusDelegate(string status, int percent);
+		private void SetStatus(string status, int percent)
+		{
+			if (this.progressBar.InvokeRequired || this.statusLabel.InvokeRequired)
+			{
+				SetStatusDelegate callback = new SetStatusDelegate(SetStatus);
+				this.Invoke(callback, new object[] { status, percent });
+				return;
+			}
+
+			this.statusLabel.Text = status;
+			this.progressBar.Value = percent;
+		}
+
+		delegate void SaveDoneDelegate();
+		private void SaveDone()
+		{
+			if (this.InvokeRequired)
+			{
+				SaveDoneDelegate callback = new SaveDoneDelegate(SaveDone);
+				this.Invoke(callback);
+				return;
+			}
+
+			this.Close();
+		}
+
+		public void SaveAll(object oinfo)
+		{
+			SaveAllInformation info = (SaveAllInformation)oinfo;
+			Dictionary<uint, string> UsedNames = new Dictionary<uint, string>();
+
+            IEnumerable<uint> saving;
+
+            if (info.Saving == null)
+            {
+                saving = info.Table.Keys;
+            }
+            else
+            {
+                saving = info.Saving;
+            }
+
+            this.SetStatus("", 0);
+
+            int total = saving.Count();
+            int current = 0;
+
+            byte[] buffer = new byte[0x4000];
+			foreach (var hash in saving)
+			{
+                current++;
+
+                ArchiveTableFile.Entry index = info.Table.Get(hash);
+				string fileName = null;
+
+                bool decompressing = false;
+                if (info.FileNames.ContainsKey(hash))
+				{
+					fileName = info.FileNames[hash];
+					UsedNames[hash] = info.FileNames[hash];
+				}
+				else
+				{
+					if (info.SaveOnlyKnownFiles)
+					{
+                        this.SetStatus("Skipping...", (int)(((float)current / (float)total) * 100.0f));
+						continue;
+					}
+
+					fileName = hash.ToString("X8");
+
+                    if (true)
+                    {
+                        info.Archive.Seek(index.Offset, SeekOrigin.Begin);
+                        byte[] guess = new byte[16];
+                        int read = info.Archive.Read(guess, 0, guess.Length);
+
+                        if (read >= 2 && guess[0] == 0x78 && guess[1] == 0x01)
+                        {
+                            if (info.DecompressUnknownFiles == true)
+                            {
+                                fileName = Path.ChangeExtension(fileName, ".o");
+                                fileName = Path.Combine(Path.Combine("uncompressed", fileName.Substring(0, 1)), fileName);
+                                decompressing = true;
+                            }
+                            else
+                            {
+                                fileName = Path.ChangeExtension(fileName, ".z");
+                                fileName = Path.Combine(Path.Combine("compressed", fileName.Substring(0, 1)), fileName);
+                            }
+                        }
+                        else if (
+                            read >= 3 &&
+                            (guess[0] == 1 || guess[0] == 2) &&
+                            (guess[1] == 4 || guess[1] == 5) &&
+                            guess[2] == 0)
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".bin");
+                            fileName = Path.Combine("bins", fileName);
+                        }
+                        else if (read >= 2 && Encoding.ASCII.GetString(guess, 0, 2) == "BM")
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".bmp");
+                            fileName = Path.Combine("images", fileName);
+                        }
+                        else if (read >= 3 && Encoding.ASCII.GetString(guess, 0, 3) == "FSB")
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".fsb");
+                            fileName = Path.Combine("sounds", fileName);
+                        }
+                        else if (read >= 3 && Encoding.ASCII.GetString(guess, 0, 3) == "FEV")
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".fev");
+                            fileName = Path.Combine("sounds", fileName);
+                        }
+                        else if (read >= 3 && Encoding.ASCII.GetString(guess, 0, 3) == "DDS")
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".dds");
+                            fileName = Path.Combine("images", fileName);
+                        }
+                        else if (
+                            read >= 8 &&
+                            guess[0] == 4 &&
+                            guess[1] == 0 &&
+                            guess[2] == 0 &&
+                            guess[3] == 0 &&
+                            Encoding.ASCII.GetString(guess, 4, 4) == "SARC")
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".sarc");
+                            fileName = Path.Combine("misc", fileName);
+                        }
+                        else if (
+                            read >= 16 &&
+                            BitConverter.ToUInt32(guess, 0) == 0 &&
+                            BitConverter.ToUInt32(guess, 4) == 0x1C &&
+                            Encoding.ASCII.GetString(guess, 8, 8) == "AnarkBGF")
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".agui");
+                            fileName = Path.Combine("Anark GUI", fileName);
+                        }
+                        else
+                        {
+                            fileName = Path.Combine("unknown", fileName);
+                        }
+                    }
+
+                    fileName = Path.Combine("__UNKNOWN", fileName);
+				}
+
+                this.SetStatus(fileName, (int)(((float)current / (float)total) * 100.0f));
+
+				Directory.CreateDirectory(Path.Combine(info.BasePath, Path.GetDirectoryName(fileName)));
+
+				string path = Path.Combine(info.BasePath, fileName);
+
+                info.Archive.Seek(index.Offset, SeekOrigin.Begin);
+
+				FileStream output = new FileStream(path, FileMode.Create);
+
+                if (decompressing == true)
+                {
+                    MemoryStream memory = info.Archive.ReadToMemoryStream(index.Size);
+                    var zlib = new InflaterInputStream(memory);
+                    while (true)
+                    {
+                        int read = zlib.Read(buffer, 0, buffer.Length);
+                        if (read < 0)
+                        {
+                            throw new InvalidOperationException("zlib error");
+                        }
+                        else if (read == 0)
+                        {
+                            break;
+                        }
+                        output.Write(buffer, 0, read);
+                    }
+                    zlib.Close();
+                    memory.Close();
+                }
+                else
+                {
+                    int left = (int)index.Size;
+                    while (left > 0)
+                    {
+                        int read = info.Archive.Read(buffer, 0, Math.Min(left, buffer.Length));
+                        if (read == 0)
+                        {
+                            break;
+                        }
+                        output.Write(buffer, 0, read);
+                        left -= read;
+                    }
+                }
+
+				output.Close();
+			}
+
+			this.SaveDone();
+		}
+
+		private struct SaveAllInformation
+		{
+			public string BasePath;
+			public Stream Archive;
+			public ArchiveTableFile Table;
+            public List<uint> Saving;
+			public Dictionary<uint, string> FileNames;
+			public bool SaveOnlyKnownFiles;
+            public bool DecompressUnknownFiles;
+		}
+
+		private Thread SaveThread;
+		public void ShowSaveProgress(IWin32Window owner, Stream archive, ArchiveTableFile table, List<uint> saving, Dictionary<uint, string> fileNames, string basePath, bool saveOnlyKnown, bool decompressUnknowns)
+		{
+			SaveAllInformation info;
+			info.BasePath = basePath;
+			info.Archive = archive;
+			info.Table = table;
+            info.Saving = saving;
+			info.FileNames = fileNames;
+			info.SaveOnlyKnownFiles = saveOnlyKnown;
+            info.DecompressUnknownFiles = decompressUnknowns;
+
+			this.progressBar.Value = 0;
+			this.progressBar.Maximum = 100;
+
+			this.SaveThread = new Thread(new ParameterizedThreadStart(SaveAll));
+			this.SaveThread.Start(info);
+			this.ShowDialog(owner);
+		}
+
+		private void OnCancel(object sender, EventArgs e)
+		{
+			if (this.SaveThread != null)
+			{
+				this.SaveThread.Abort();
+			}
+
+			this.Close();
+		}
+	}
+}

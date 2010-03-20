@@ -191,12 +191,12 @@ namespace Gibbed.Avalanche.bin2xml
 
         private static string GetExecutablePath()
         {
-            return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+            return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         }
 
         private static string GetExecutableName()
         {
-            return Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
+            return Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         }
 
         public static void Main(string[] args)

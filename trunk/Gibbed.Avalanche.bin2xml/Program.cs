@@ -34,9 +34,13 @@ namespace Gibbed.Avalanche.bin2xml
                     line = line.Trim();
                     uint hash = Path.GetFileName(line).HashJenkins();
 
-                    if (Names.ContainsKey(hash) == true && Names[hash] != line)
+                    if (Names.ContainsKey(hash) == true)
                     {
-                        throw new Exception();
+                        string other = Names[hash];
+                        if (other != line)
+                        {
+                            throw new Exception();
+                        }
                     }
 
                     Names[hash] = line;
@@ -62,7 +66,17 @@ namespace Gibbed.Avalanche.bin2xml
             else if (value is string)
             {
                 writer.WriteAttributeString("type", "string");
-                writer.WriteValue((string)value);
+
+                string text = (string)value;
+                if (text.IndexOf('\x07') >= 0)
+                {
+                    writer.WriteAttributeString("filtered", "0x07");
+                    writer.WriteValue(text.Replace('\x07', '_'));
+                }
+                else
+                {
+                    writer.WriteValue(text);
+                }
             }
             else if (value is Vector2)
             {

@@ -136,5 +136,16 @@ namespace Gibbed.Avalanche.FileFormats
             byte[] data = Encoding.ASCII.GetBytes(input);
             return HashJenkins(data, 0, data.Length, 0);
         }
+
+        public static string StripJunk(this string input)
+        {
+            int index = input.IndexOf('\0');
+            if (index >= 0)
+            {
+                return input.Substring(0, index);
+            }
+
+            return input;
+        }
     }
 }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Viewer));
             this.mainToolStrip = new System.Windows.Forms.ToolStrip();
             this.openButton = new System.Windows.Forms.ToolStripButton();
             this.saveAllButton = new System.Windows.Forms.ToolStripSplitButton();
@@ -80,7 +81,9 @@
             // 
             // decompressUnknownFilesMenuItem
             // 
+            this.decompressUnknownFilesMenuItem.Checked = true;
             this.decompressUnknownFilesMenuItem.CheckOnClick = true;
+            this.decompressUnknownFilesMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.decompressUnknownFilesMenuItem.Name = "decompressUnknownFilesMenuItem";
             this.decompressUnknownFilesMenuItem.Size = new System.Drawing.Size(216, 22);
             this.decompressUnknownFilesMenuItem.Text = "&Decompress unknown files";
@@ -108,6 +111,7 @@
             this.ClientSize = new System.Drawing.Size(640, 320);
             this.Controls.Add(this.fileList);
             this.Controls.Add(this.mainToolStrip);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Viewer";
             this.Text = "Gibbed\'s Just Cause 2 Archive Viewer";
             this.Load += new System.EventHandler(this.OnLoad);

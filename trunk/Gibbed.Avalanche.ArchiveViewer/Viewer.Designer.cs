@@ -32,10 +32,10 @@
             this.openButton = new System.Windows.Forms.ToolStripButton();
             this.saveAllButton = new System.Windows.Forms.ToolStripSplitButton();
             this.saveOnlyknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.decompressUnknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileList = new System.Windows.Forms.TreeView();
             this.openDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveAllFolderDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.decompressUnknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -52,24 +52,22 @@
             // 
             // openButton
             // 
-            this.openButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.openButton.Image = global::Gibbed.Avalanche.ArchiveViewer.Properties.Resources.OpenArchive;
             this.openButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.openButton.Name = "openButton";
-            this.openButton.Size = new System.Drawing.Size(23, 22);
+            this.openButton.Size = new System.Drawing.Size(56, 22);
             this.openButton.Text = "Open";
             this.openButton.Click += new System.EventHandler(this.OnOpen);
             // 
             // saveAllButton
             // 
-            this.saveAllButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.saveAllButton.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveOnlyknownFilesMenuItem,
             this.decompressUnknownFilesMenuItem});
             this.saveAllButton.Image = global::Gibbed.Avalanche.ArchiveViewer.Properties.Resources.SaveAllFiles;
             this.saveAllButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.saveAllButton.Name = "saveAllButton";
-            this.saveAllButton.Size = new System.Drawing.Size(32, 22);
+            this.saveAllButton.Size = new System.Drawing.Size(80, 22);
             this.saveAllButton.Text = "Save All";
             this.saveAllButton.ButtonClick += new System.EventHandler(this.OnSaveAll);
             // 
@@ -79,6 +77,13 @@
             this.saveOnlyknownFilesMenuItem.Name = "saveOnlyknownFilesMenuItem";
             this.saveOnlyknownFilesMenuItem.Size = new System.Drawing.Size(216, 22);
             this.saveOnlyknownFilesMenuItem.Text = "Save only &known files";
+            // 
+            // decompressUnknownFilesMenuItem
+            // 
+            this.decompressUnknownFilesMenuItem.CheckOnClick = true;
+            this.decompressUnknownFilesMenuItem.Name = "decompressUnknownFilesMenuItem";
+            this.decompressUnknownFilesMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.decompressUnknownFilesMenuItem.Text = "&Decompress unknown files";
             // 
             // fileList
             // 
@@ -95,13 +100,6 @@
             // saveAllFolderDialog
             // 
             this.saveAllFolderDialog.Description = "Select a directory to save all files from the archive to.";
-            // 
-            // decompressUnknownFilesMenuItem
-            // 
-            this.decompressUnknownFilesMenuItem.CheckOnClick = true;
-            this.decompressUnknownFilesMenuItem.Name = "decompressUnknownFilesMenuItem";
-            this.decompressUnknownFilesMenuItem.Size = new System.Drawing.Size(216, 22);
-            this.decompressUnknownFilesMenuItem.Text = "&Decompress unknown files";
             // 
             // Viewer
             // 

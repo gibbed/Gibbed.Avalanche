@@ -14,6 +14,51 @@ namespace Gibbed.Avalanche.FileFormats
         public Dictionary<uint, object> ValuesByHash;
         public byte[] Unknown3;
 
+        public uint GetUInt32(uint id)
+        {
+            if (!(this.ValuesByHash[id] is int))
+            {
+                throw new InvalidOperationException();
+            }
+
+            return (uint)((int)this.ValuesByHash[id]);
+        }
+
+        public uint GetUInt32(string id)
+        {
+            return this.GetUInt32(id.HashJenkins());
+        }
+
+        public string GetString(uint id)
+        {
+            if (!(this.ValuesByHash[id] is string))
+            {
+                throw new InvalidOperationException();
+            }
+
+            return (string)this.ValuesByHash[id];
+        }
+
+        public string GetString(string id)
+        {
+            return this.GetString(id.HashJenkins());
+        }
+
+        public Matrix GetMatrix(uint id)
+        {
+            if (!(this.ValuesByHash[id] is Matrix))
+            {
+                throw new InvalidOperationException();
+            }
+
+            return (Matrix)this.ValuesByHash[id];
+        }
+
+        public Matrix GetMatrix(string id)
+        {
+            return this.GetMatrix(id.HashJenkins());
+        }
+
         public void Serialize(Stream output, bool littleEndian)
         {
             byte count = 0;

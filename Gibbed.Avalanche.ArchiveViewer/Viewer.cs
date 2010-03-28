@@ -33,7 +33,8 @@ namespace Gibbed.Avalanche.ArchiveViewer
         private void OnLoad(object sender, EventArgs e)
         {
             string path;
-            path = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 35110", "InstallLocation", null);
+            //path = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 35110", "InstallLocation", null);
+            path = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 8190", "InstallLocation", null);
             if (string.IsNullOrEmpty(path) != true)
             {
                 this.openDialog.InitialDirectory = Path.Combine(path, "archives_win32");

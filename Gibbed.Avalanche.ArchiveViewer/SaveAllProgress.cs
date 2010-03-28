@@ -97,28 +97,33 @@ namespace Gibbed.Avalanche.ArchiveViewer
                         byte[] guess = new byte[16];
                         int read = info.Archive.Read(guess, 0, guess.Length);
 
-                        if (read >= 2 && guess[0] == 0x78 && guess[1] == 0x01)
+                        if (read >= 2 && guess[0] == 0x78 && guess[1] == 0x01
+                            && info.DecompressUnknownFiles == true)
                         {
-                            if (info.DecompressUnknownFiles == true)
+                            info.Archive.Seek(index.Offset, SeekOrigin.Begin);
+
+                            decompressing = true;
+                            MemoryStream memory = info.Archive.ReadToMemoryStream(index.Size);
+                            var zlib = new InflaterInputStream(memory);
+                            read = zlib.Read(guess, 0, guess.Length);
+                            if (read < 0)
                             {
-                                fileName = Path.ChangeExtension(fileName, ".o");
-                                fileName = Path.Combine(Path.Combine("uncompressed", fileName.Substring(0, 1)), fileName);
-                                decompressing = true;
+                                throw new InvalidOperationException("zlib error");
                             }
-                            else
-                            {
-                                fileName = Path.ChangeExtension(fileName, ".z");
-                                fileName = Path.Combine(Path.Combine("compressed", fileName.Substring(0, 1)), fileName);
-                            }
+                            zlib.Close();
+                            memory.Close();
                         }
-                        else if (
-                            read >= 3 &&
-                            (guess[0] == 1 || guess[0] == 2) &&
-                            (guess[1] == 4 || guess[1] == 5) &&
-                            guess[2] == 0)
+
+                        if (read >= 2 && guess[0] == 0x78 && guess[1] == 0x01
+                            && info.DecompressUnknownFiles == false)
                         {
-                            fileName = Path.ChangeExtension(fileName, ".bin");
-                            fileName = Path.Combine("bins", fileName);
+                            fileName = Path.ChangeExtension(fileName, ".z");
+                            fileName = Path.Combine(Path.Combine("compressed", fileName.Substring(0, 1)), fileName);
+                        }
+                        else if (read >= 2 && Encoding.ASCII.GetString(guess, 0, 2) == "MZ")
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".exe");
+                            fileName = Path.Combine("executables", fileName);
                         }
                         else if (read >= 2 && Encoding.ASCII.GetString(guess, 0, 2) == "BM")
                         {
@@ -140,6 +145,29 @@ namespace Gibbed.Avalanche.ArchiveViewer
                             fileName = Path.ChangeExtension(fileName, ".dds");
                             fileName = Path.Combine("images", fileName);
                         }
+                        else if (read >= 5 && Encoding.ASCII.GetString(guess, 0, 5) == "<?xml")
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".xml");
+                            fileName = Path.Combine("xml", fileName);
+                        }
+                        else if (read >= 7 && Encoding.ASCII.GetString(guess, 0, 7) == "<object")
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".xml");
+                            fileName = Path.Combine("bins", fileName);
+                        }
+                        else if (read >= 16 && Encoding.ASCII.GetString(guess, 8, 4) == "CTAB")
+                        {
+                            fileName = Path.Combine("shaders", fileName);
+                        }
+                        else if (
+                            read >= 3 &&
+                            (guess[0] == 1 || guess[0] == 2) &&
+                            (guess[1] == 1 || guess[1] == 4 || guess[1] == 5) &&
+                            guess[2] == 0)
+                        {
+                            fileName = Path.ChangeExtension(fileName, ".bin");
+                            fileName = Path.Combine("bins", fileName);
+                        }
                         else if (
                             read >= 8 &&
                             guess[0] == 4 &&
@@ -149,7 +177,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                             Encoding.ASCII.GetString(guess, 4, 4) == "SARC")
                         {
                             fileName = Path.ChangeExtension(fileName, ".sarc");
-                            fileName = Path.Combine("misc", fileName);
+                            fileName = Path.Combine("archives", fileName);
                         }
                         else if (
                             read >= 16 &&
@@ -158,10 +186,20 @@ namespace Gibbed.Avalanche.ArchiveViewer
                             Encoding.ASCII.GetString(guess, 8, 8) == "AnarkBGF")
                         {
                             fileName = Path.ChangeExtension(fileName, ".agui");
-                            fileName = Path.Combine("Anark GUI", fileName);
+                            fileName = Path.Combine("anark", fileName);
+                        }
+                        else if (
+                            read >= 4 &&
+                            (guess[0] == 9 || guess[0] == 12) &&
+                            guess[1] == 0 &&
+                            guess[2] == 0 &&
+                            guess[3] == 0)
+                        {
+                            fileName = Path.Combine("heightmap", fileName);
                         }
                         else
                         {
+                            //fileName = Path.Combine(Path.Combine("unknown", fileName.Substring(0, 1)), fileName);
                             fileName = Path.Combine("unknown", fileName);
                         }
                     }

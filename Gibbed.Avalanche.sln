@@ -13,13 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.bin2xml", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.xml2bin", "Gibbed.Avalanche.xml2bin\Gibbed.Avalanche.xml2bin.csproj", "{74C28550-BEF5-4109-9888-4B6BE7F1D057}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.BruteJenkins", "Gibbed.Avalanche.BruteJenkins\Gibbed.Avalanche.BruteJenkins.csproj", "{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NDesk.Options", "NDesk.Options\NDesk.Options.csproj", "{C98A6CD6-9422-4B35-8B7A-F520D75534D1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.SmallUnpack", "Gibbed.Avalanche.SmallUnpack\Gibbed.Avalanche.SmallUnpack.csproj", "{29BAF37F-38ED-444B-864A-1E73090D15A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.SmallPack", "Gibbed.Avalanche.SmallPack\Gibbed.Avalanche.SmallPack.csproj", "{45C71512-791C-4FA0-BCB9-DCACEBD1CC4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.Setup", "Gibbed.Avalanche.Setup\Gibbed.Avalanche.Setup.csproj", "{AB016DF6-6176-442C-A189-E513DD673AC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,16 +91,6 @@ Global
 		{74C28550-BEF5-4109-9888-4B6BE7F1D057}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{74C28550-BEF5-4109-9888-4B6BE7F1D057}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{74C28550-BEF5-4109-9888-4B6BE7F1D057}.Release|Win32.ActiveCfg = Release|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Debug|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Debug|Mixed Platforms.Build.0 = Release|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{AAB38CBC-200B-4BE7-AC9D-613DB7E4BFF1}.Release|Win32.ActiveCfg = Release|Any CPU
 		{C98A6CD6-9422-4B35-8B7A-F520D75534D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C98A6CD6-9422-4B35-8B7A-F520D75534D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C98A6CD6-9422-4B35-8B7A-F520D75534D1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -131,6 +121,16 @@ Global
 		{45C71512-791C-4FA0-BCB9-DCACEBD1CC4C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{45C71512-791C-4FA0-BCB9-DCACEBD1CC4C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{45C71512-791C-4FA0-BCB9-DCACEBD1CC4C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AB016DF6-6176-442C-A189-E513DD673AC2}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

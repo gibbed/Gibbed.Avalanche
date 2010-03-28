@@ -63,8 +63,8 @@ namespace Gibbed.Avalanche.xml2bin
                 string type = current.GetAttribute("type", "");
                 switch (type)
                 {
-                    case "int": value = current.ValueAsInt; break;
-                    case "float": value = current.ValueAs(typeof(float)); break;
+                    case "int": value = int.Parse(current.Value, CultureInfo.InvariantCulture); break;
+                    case "float": value = float.Parse(current.Value, CultureInfo.InvariantCulture); break;
                     case "string": value = current.Value; break;
                     case "vec2":
                     {
@@ -74,8 +74,8 @@ namespace Gibbed.Avalanche.xml2bin
                             throw new InvalidOperationException("vec2 requires two float values delimited by a comma");
                         }
                         Vector2 vector = new Vector2();
-                        vector.X = float.Parse(parts[0]);
-                        vector.Y = float.Parse(parts[1]);
+                        vector.X = float.Parse(parts[0], CultureInfo.InvariantCulture);
+                        vector.Y = float.Parse(parts[1], CultureInfo.InvariantCulture);
                         value = vector;
                         break;
                     }
@@ -87,9 +87,9 @@ namespace Gibbed.Avalanche.xml2bin
                             throw new InvalidOperationException("vec requires two float values delimited by a comma");
                         }
                         Vector3 vector = new Vector3();
-                        vector.X = float.Parse(parts[0]);
-                        vector.Y = float.Parse(parts[1]);
-                        vector.Z = float.Parse(parts[2]);
+                        vector.X = float.Parse(parts[0], CultureInfo.InvariantCulture);
+                        vector.Y = float.Parse(parts[1], CultureInfo.InvariantCulture);
+                        vector.Z = float.Parse(parts[2], CultureInfo.InvariantCulture);
                         value = vector;
                         break;
                     }
@@ -101,10 +101,10 @@ namespace Gibbed.Avalanche.xml2bin
                             throw new InvalidOperationException("vec4 requires three float values delimited by a comma");
                         }
                         Vector4 vector = new Vector4();
-                        vector.X = float.Parse(parts[0]);
-                        vector.Y = float.Parse(parts[1]);
-                        vector.Z = float.Parse(parts[2]);
-                        vector.W = float.Parse(parts[3]);
+                        vector.X = float.Parse(parts[0], CultureInfo.InvariantCulture);
+                        vector.Y = float.Parse(parts[1], CultureInfo.InvariantCulture);
+                        vector.Z = float.Parse(parts[2], CultureInfo.InvariantCulture);
+                        vector.W = float.Parse(parts[3], CultureInfo.InvariantCulture);
                         value = vector;
                         break;
                     }
@@ -117,18 +117,18 @@ namespace Gibbed.Avalanche.xml2bin
                         }
 
                         Matrix matrix = new Matrix();
-                        matrix.A = float.Parse(parts[0]);
-                        matrix.B = float.Parse(parts[1]);
-                        matrix.C = float.Parse(parts[2]);
-                        matrix.D = float.Parse(parts[3]);
-                        matrix.E = float.Parse(parts[4]);
-                        matrix.F = float.Parse(parts[5]);
-                        matrix.G = float.Parse(parts[6]);
-                        matrix.H = float.Parse(parts[7]);
-                        matrix.I = float.Parse(parts[8]);
-                        matrix.J = float.Parse(parts[9]);
-                        matrix.K = float.Parse(parts[10]);
-                        matrix.L = float.Parse(parts[11]);
+                        matrix.A = float.Parse(parts[0], CultureInfo.InvariantCulture);
+                        matrix.B = float.Parse(parts[1], CultureInfo.InvariantCulture);
+                        matrix.C = float.Parse(parts[2], CultureInfo.InvariantCulture);
+                        matrix.D = float.Parse(parts[3], CultureInfo.InvariantCulture);
+                        matrix.E = float.Parse(parts[4], CultureInfo.InvariantCulture);
+                        matrix.F = float.Parse(parts[5], CultureInfo.InvariantCulture);
+                        matrix.G = float.Parse(parts[6], CultureInfo.InvariantCulture);
+                        matrix.H = float.Parse(parts[7], CultureInfo.InvariantCulture);
+                        matrix.I = float.Parse(parts[8], CultureInfo.InvariantCulture);
+                        matrix.J = float.Parse(parts[9], CultureInfo.InvariantCulture);
+                        matrix.K = float.Parse(parts[10], CultureInfo.InvariantCulture);
+                        matrix.L = float.Parse(parts[11], CultureInfo.InvariantCulture);
                         value = matrix;
                         break;
 

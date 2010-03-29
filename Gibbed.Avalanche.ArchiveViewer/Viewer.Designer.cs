@@ -30,13 +30,14 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Viewer));
             this.mainToolStrip = new System.Windows.Forms.ToolStrip();
+            this.fileList = new System.Windows.Forms.TreeView();
+            this.openDialog = new System.Windows.Forms.OpenFileDialog();
+            this.saveAllFolderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.openButton = new System.Windows.Forms.ToolStripButton();
             this.saveAllButton = new System.Windows.Forms.ToolStripSplitButton();
             this.saveOnlyknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decompressUnknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fileList = new System.Windows.Forms.TreeView();
-            this.openDialog = new System.Windows.Forms.OpenFileDialog();
-            this.saveAllFolderDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.reloadListsButton = new System.Windows.Forms.ToolStripButton();
             this.mainToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -44,12 +45,29 @@
             // 
             this.mainToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openButton,
-            this.saveAllButton});
+            this.saveAllButton,
+            this.reloadListsButton});
             this.mainToolStrip.Location = new System.Drawing.Point(0, 0);
             this.mainToolStrip.Name = "mainToolStrip";
             this.mainToolStrip.Size = new System.Drawing.Size(640, 25);
             this.mainToolStrip.TabIndex = 0;
             this.mainToolStrip.Text = "toolStrip1";
+            // 
+            // fileList
+            // 
+            this.fileList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fileList.Location = new System.Drawing.Point(0, 25);
+            this.fileList.Name = "fileList";
+            this.fileList.Size = new System.Drawing.Size(640, 295);
+            this.fileList.TabIndex = 1;
+            // 
+            // openDialog
+            // 
+            this.openDialog.Filter = "Just Cause 2 Archive Tables (*.tab)|*.tab|All Files (*.*)|*.*";
+            // 
+            // saveAllFolderDialog
+            // 
+            this.saveAllFolderDialog.Description = "Select a directory to save all files from the archive to.";
             // 
             // openButton
             // 
@@ -88,21 +106,14 @@
             this.decompressUnknownFilesMenuItem.Size = new System.Drawing.Size(216, 22);
             this.decompressUnknownFilesMenuItem.Text = "&Decompress unknown files";
             // 
-            // fileList
+            // reloadListsButton
             // 
-            this.fileList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fileList.Location = new System.Drawing.Point(0, 25);
-            this.fileList.Name = "fileList";
-            this.fileList.Size = new System.Drawing.Size(640, 295);
-            this.fileList.TabIndex = 1;
-            // 
-            // openDialog
-            // 
-            this.openDialog.Filter = "Just Cause 2 Archive Tables (*.tab)|*.tab|All Files (*.*)|*.*";
-            // 
-            // saveAllFolderDialog
-            // 
-            this.saveAllFolderDialog.Description = "Select a directory to save all files from the archive to.";
+            this.reloadListsButton.Image = global::Gibbed.Avalanche.ArchiveViewer.Properties.Resources.ReloadLists;
+            this.reloadListsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.reloadListsButton.Name = "reloadListsButton";
+            this.reloadListsButton.Size = new System.Drawing.Size(89, 22);
+            this.reloadListsButton.Text = "Reload Lists";
+            this.reloadListsButton.Click += new System.EventHandler(this.OnReloadLists);
             // 
             // Viewer
             // 
@@ -132,6 +143,7 @@
         private System.Windows.Forms.ToolStripSplitButton saveAllButton;
         private System.Windows.Forms.ToolStripMenuItem saveOnlyknownFilesMenuItem;
         private System.Windows.Forms.ToolStripMenuItem decompressUnknownFilesMenuItem;
+        private System.Windows.Forms.ToolStripButton reloadListsButton;
     }
 }
 

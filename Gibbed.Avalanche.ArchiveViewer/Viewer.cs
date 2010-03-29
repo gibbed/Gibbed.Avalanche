@@ -16,12 +16,15 @@ namespace Gibbed.Avalanche.ArchiveViewer
         public Viewer()
         {
             this.InitializeComponent();
+            this.LoadFileLists();
+        }
 
+        private void LoadFileLists()
+        {
             this.FileNames = new Dictionary<uint, string>();
             if (Directory.Exists(Path.Combine(Application.StartupPath, "lists")))
             {
                 //this.saveFileListDialog.InitialDirectory = Path.Combine(Application.StartupPath, "filelists");
-
                 var listPaths = Directory.GetFiles(Path.Combine(Application.StartupPath, "lists"), "*.filelist", SearchOption.AllDirectories);
                 foreach (string listPath in listPaths)
                 {
@@ -72,6 +75,88 @@ namespace Gibbed.Avalanche.ArchiveViewer
         }
 
         private ArchiveTableFile Table;
+        private void BuildFileTree()
+        {
+            this.fileList.Nodes.Clear();
+            this.fileList.BeginUpdate();
+
+            if (this.Table != null)
+            {
+                Dictionary<string, TreeNode> dirNodes = new Dictionary<string, TreeNode>();
+
+
+                TreeNode baseNode = new TreeNode(Path.GetFileName(this.openDialog.FileName), 0, 0);
+                TreeNode knownNode = new TreeNode("Known", 1, 1);
+                TreeNode unknownNode = new TreeNode("Unknown", 1, 1);
+
+                foreach (uint hash in this.Table.Keys
+                    .OrderBy(k => k, new FileNameHashComparer(this.FileNames)))
+                {
+                    ArchiveTableFile.Entry entry = this.Table[hash];
+                    TreeNode node = null;
+
+                    if (this.FileNames.ContainsKey(hash) == true)
+                    {
+                        string fileName = this.FileNames[hash];
+                        string pathName = Path.GetDirectoryName(fileName);
+                        TreeNodeCollection parentNodes = knownNode.Nodes;
+
+                        if (pathName.Length > 0)
+                        {
+                            string[] dirs = pathName.Split(new char[] { '\\' });
+
+                            foreach (string dir in dirs)
+                            {
+                                if (parentNodes.ContainsKey(dir))
+                                {
+                                    parentNodes = parentNodes[dir].Nodes;
+                                }
+                                else
+                                {
+                                    TreeNode parentNode = parentNodes.Add(dir, dir, 2, 2);
+                                    parentNodes = parentNode.Nodes;
+                                }
+                            }
+                        }
+
+                        node = parentNodes.Add(null, Path.GetFileName(fileName), 3, 3);
+                    }
+                    else
+                    {
+                        node = unknownNode.Nodes.Add(null, hash.ToString("X8"), 3, 3);
+                    }
+
+                    node.Tag = hash;
+                }
+
+                if (knownNode.Nodes.Count > 0)
+                {
+                    baseNode.Nodes.Add(knownNode);
+                }
+
+                if (unknownNode.Nodes.Count > 0)
+                {
+                    baseNode.Nodes.Add(unknownNode);
+                    unknownNode.Text = "Unknown (" + unknownNode.Nodes.Count.ToString() + ")";
+                }
+
+                if (knownNode.Nodes.Count > 0)
+                {
+                    knownNode.Expand();
+                }
+                else if (unknownNode.Nodes.Count > 0)
+                {
+                    unknownNode.Expand();
+                }
+
+                baseNode.Expand();
+                this.fileList.Nodes.Add(baseNode);
+            }
+
+            //this.fileList.Sort();
+            this.fileList.EndUpdate();
+        }
+
         private void OnOpen(object sender, EventArgs e)
         {
             if (this.openDialog.ShowDialog() != DialogResult.OK)
@@ -100,80 +185,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
             writer.Close();
             */
 
-            Dictionary<string, TreeNode> dirNodes = new Dictionary<string, TreeNode>();
-
-            this.fileList.Nodes.Clear();
-            this.fileList.BeginUpdate();
-
-            TreeNode baseNode = new TreeNode(Path.GetFileName(this.openDialog.FileName), 0, 0);
-            TreeNode knownNode = new TreeNode("Known", 1, 1);
-            TreeNode unknownNode = new TreeNode("Unknown", 1, 1);
-
-            foreach (uint hash in table.Keys
-                .OrderBy(k => k, new FileNameHashComparer(this.FileNames)))
-            {
-                ArchiveTableFile.Entry entry = table[hash];
-                TreeNode node = null;
-
-                if (this.FileNames.ContainsKey(hash) == true)
-                {
-                    string fileName = this.FileNames[hash];
-                    string pathName = Path.GetDirectoryName(fileName);
-                    TreeNodeCollection parentNodes = knownNode.Nodes;
-
-                    if (pathName.Length > 0)
-                    {
-                        string[] dirs = pathName.Split(new char[] { '\\' });
-
-                        foreach (string dir in dirs)
-                        {
-                            if (parentNodes.ContainsKey(dir))
-                            {
-                                parentNodes = parentNodes[dir].Nodes;
-                            }
-                            else
-                            {
-                                TreeNode parentNode = parentNodes.Add(dir, dir, 2, 2);
-                                parentNodes = parentNode.Nodes;
-                            }
-                        }
-                    }
-
-                    node = parentNodes.Add(null, Path.GetFileName(fileName), 3, 3);
-                }
-                else
-                {
-                    node = unknownNode.Nodes.Add(null, hash.ToString("X8"), 3, 3);
-                }
-
-                node.Tag = hash;
-            }
-
-            if (knownNode.Nodes.Count > 0)
-            {
-                baseNode.Nodes.Add(knownNode);
-            }
-
-            if (unknownNode.Nodes.Count > 0)
-            {
-                baseNode.Nodes.Add(unknownNode);
-                unknownNode.Text = "Unknown (" + unknownNode.Nodes.Count.ToString() + ")";
-            }
-
-            if (knownNode.Nodes.Count > 0)
-            {
-                knownNode.Expand();
-            }
-            else if (unknownNode.Nodes.Count > 0)
-            {
-                unknownNode.Expand();
-            }
-
-            baseNode.Expand();
-
-            this.fileList.Nodes.Add(baseNode);
-            //this.fileList.Sort();
-            this.fileList.EndUpdate();
+            this.BuildFileTree();
         }
 
         private void OnSaveAll(object sender, EventArgs e)
@@ -196,6 +208,12 @@ namespace Gibbed.Avalanche.ArchiveViewer
             progress.ShowSaveProgress(this, input, this.Table, null, this.FileNames, basePath, this.saveOnlyknownFilesMenuItem.Checked, this.decompressUnknownFilesMenuItem.Checked);
 
             input.Close();
+        }
+
+        private void OnReloadLists(object sender, EventArgs e)
+        {
+            this.LoadFileLists();
+            this.BuildFileTree();
         }
     }
 }

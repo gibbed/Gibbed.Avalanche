@@ -42,6 +42,23 @@ namespace Gibbed.Avalanche.FileFormats.Model
                 this.TexCoord2D = input.ReadValueU8();
             }
 
+            public void Serialize(Stream output)
+            {
+                output.WriteValueF32(this.PositionX);
+                output.WriteValueF32(this.PositionY);
+                output.WriteValueF32(this.PositionZ);
+
+                output.WriteValueU8(this.TexCoord1A);
+                output.WriteValueU8(this.TexCoord1B);
+                output.WriteValueU8(this.TexCoord1C);
+                output.WriteValueU8(this.TexCoord1D);
+
+                output.WriteValueU8(this.TexCoord2A);
+                output.WriteValueU8(this.TexCoord2B);
+                output.WriteValueU8(this.TexCoord2C);
+                output.WriteValueU8(this.TexCoord2D);
+            }
+
             public override string ToString()
             {
                 return string.Format("{0},{1},{2}",
@@ -102,6 +119,33 @@ namespace Gibbed.Avalanche.FileFormats.Model
                 this.TexCoord4B = input.ReadValueU8();
                 this.TexCoord4C = input.ReadValueU8();
                 this.TexCoord4D = input.ReadValueU8();
+            }
+
+            public void Serialize(Stream output)
+            {
+                output.WriteValueF32(this.PositionX);
+                output.WriteValueF32(this.PositionY);
+                output.WriteValueF32(this.PositionZ);
+
+                output.WriteValueU8(this.TexCoord1A);
+                output.WriteValueU8(this.TexCoord1B);
+                output.WriteValueU8(this.TexCoord1C);
+                output.WriteValueU8(this.TexCoord1D);
+
+                output.WriteValueU8(this.TexCoord2A);
+                output.WriteValueU8(this.TexCoord2B);
+                output.WriteValueU8(this.TexCoord2C);
+                output.WriteValueU8(this.TexCoord2D);
+
+                output.WriteValueU8(this.TexCoord3A);
+                output.WriteValueU8(this.TexCoord3B);
+                output.WriteValueU8(this.TexCoord3C);
+                output.WriteValueU8(this.TexCoord3D);
+
+                output.WriteValueU8(this.TexCoord4A);
+                output.WriteValueU8(this.TexCoord4B);
+                output.WriteValueU8(this.TexCoord4C);
+                output.WriteValueU8(this.TexCoord4D);
             }
         }
 

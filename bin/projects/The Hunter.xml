@@ -1,0 +1,17 @@
+<project>
+	<name>The Hunter</name>
+	<dependencies>
+		<dependency>Shared</dependency>
+	</dependencies>
+	<list_location>The Hunter</list_location>
+	<install_locations>
+		<install_location>
+			<action type="registry" key="HKEY_CLASSES_ROOT\Emote\DefaultIcon" />
+			<action type="directory_name" />
+			<action type="directory_name" />
+			<action type="combine">hunter</action>
+			<action type="combine">2009072101</action>
+			<action type="combine">archives_win32</action>
+		</install_location>
+	</install_locations>
+</project>

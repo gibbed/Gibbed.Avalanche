@@ -1,0 +1,22 @@
+<project>
+	<name>Just Cause 2 Demo</name>
+	<dependencies>
+		<dependency>Shared</dependency>
+		<dependency>Just Cause 2</dependency>
+	</dependencies>
+	<list_location>Just Cause 2 Demo</list_location>
+	<install_locations>
+		<install_location>
+			<action type="registry" key="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 35110" value="InstallLocation" />
+			<action type="combine">archives_win32</action>
+		</install_location>
+		<install_location>
+			<action type="registry" key="HKEY_CURRENT_USER\Software\Valve\Steam" value="SteamPath" />
+			<action type="fix" />
+			<action type="combine">steamapps</action>
+			<action type="combine">common</action>
+			<action type="combine">just cause 2 demo</action>
+			<action type="combine">archives_win32</action>
+		</install_location>
+	</install_locations>
+</project>

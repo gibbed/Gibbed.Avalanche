@@ -13,44 +13,6 @@ namespace Gibbed.Avalanche.bin2xml
     internal class Program
     {
         private static Dictionary<uint, string> Names = new Dictionary<uint, string>();
-        private static void LoadNamesFromPath(string path)
-        {
-            if (File.Exists(path))
-            {
-                TextReader reader = new StreamReader(path);
-
-                while (true)
-                {
-                    string line = reader.ReadLine();
-                    if (line == null)
-                    {
-                        break;
-                    }
-
-                    if (line.Length <= 0)
-                    {
-                        continue;
-                    }
-
-                    line = line.Trim();
-                    uint hash = Path.GetFileName(line).HashJenkins();
-
-                    if (Names.ContainsKey(hash) == true)
-                    {
-                        string other = Names[hash];
-                        if (other != line)
-                        {
-                            throw new Exception();
-                        }
-                    }
-
-                    Names[hash] = line;
-                    //Names.Add(hash, line);
-                }
-
-                reader.Close();
-            }
-        }
 
         private static void WriteProperty(XmlWriter writer, object value)
         {
@@ -272,12 +234,16 @@ namespace Gibbed.Avalanche.bin2xml
             }
 
             string listsPath = Path.Combine(GetExecutablePath(), "lists");
-            if (Directory.Exists(listsPath))
+
+            var manager = Setup.Manager.Load();
+            if (manager.ActiveProject != null)
             {
-                foreach (string listPath in Directory.GetFiles(listsPath, "*.namelist", SearchOption.AllDirectories))
-                {
-                    LoadNamesFromPath(listPath);
-                }
+                manager.ActiveProject.Load();
+                Names = manager.ActiveProject.NameHashLookup;
+            }
+            else
+            {
+                Console.WriteLine("Warning: no active project loaded.");
             }
 
             string binPath = extra[0];

@@ -16,9 +16,9 @@ namespace Gibbed.Avalanche.ArchiveViewer
 
         public int Compare(uint x, uint y)
         {
-            if (this.FileNames.ContainsKey(x) == false)
+            if (this.FileNames == null || this.FileNames.ContainsKey(x) == false)
             {
-                if (this.FileNames.ContainsKey(y) == false)
+                if (this.FileNames == null || this.FileNames.ContainsKey(y) == false)
                 {
                     if (x == y)
                     {
@@ -34,7 +34,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
             }
             else
             {
-                if (this.FileNames.ContainsKey(y) == false)
+                if (this.FileNames == null || this.FileNames.ContainsKey(y) == false)
                 {
                     return 1;
                 }

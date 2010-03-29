@@ -30,20 +30,22 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Viewer));
             this.mainToolStrip = new System.Windows.Forms.ToolStrip();
-            this.fileList = new System.Windows.Forms.TreeView();
-            this.openDialog = new System.Windows.Forms.OpenFileDialog();
-            this.saveAllFolderDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.projectComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.openButton = new System.Windows.Forms.ToolStripButton();
             this.saveAllButton = new System.Windows.Forms.ToolStripSplitButton();
             this.saveOnlyknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decompressUnknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reloadListsButton = new System.Windows.Forms.ToolStripButton();
+            this.fileList = new System.Windows.Forms.TreeView();
+            this.openDialog = new System.Windows.Forms.OpenFileDialog();
+            this.saveAllFolderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.mainToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainToolStrip
             // 
             this.mainToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.projectComboBox,
             this.openButton,
             this.saveAllButton,
             this.reloadListsButton});
@@ -53,21 +55,14 @@
             this.mainToolStrip.TabIndex = 0;
             this.mainToolStrip.Text = "toolStrip1";
             // 
-            // fileList
+            // projectComboBox
             // 
-            this.fileList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fileList.Location = new System.Drawing.Point(0, 25);
-            this.fileList.Name = "fileList";
-            this.fileList.Size = new System.Drawing.Size(640, 295);
-            this.fileList.TabIndex = 1;
-            // 
-            // openDialog
-            // 
-            this.openDialog.Filter = "Just Cause 2 Archive Tables (*.tab)|*.tab|All Files (*.*)|*.*";
-            // 
-            // saveAllFolderDialog
-            // 
-            this.saveAllFolderDialog.Description = "Select a directory to save all files from the archive to.";
+            this.projectComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.projectComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.projectComboBox.Name = "projectComboBox";
+            this.projectComboBox.Size = new System.Drawing.Size(121, 25);
+            this.projectComboBox.Sorted = true;
+            this.projectComboBox.SelectedIndexChanged += new System.EventHandler(this.OnProjectSelected);
             // 
             // openButton
             // 
@@ -115,6 +110,22 @@
             this.reloadListsButton.Text = "Reload Lists";
             this.reloadListsButton.Click += new System.EventHandler(this.OnReloadLists);
             // 
+            // fileList
+            // 
+            this.fileList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fileList.Location = new System.Drawing.Point(0, 25);
+            this.fileList.Name = "fileList";
+            this.fileList.Size = new System.Drawing.Size(640, 295);
+            this.fileList.TabIndex = 1;
+            // 
+            // openDialog
+            // 
+            this.openDialog.Filter = "Avalanche Archives (*.tab)|*.tab|All Files (*.*)|*.*";
+            // 
+            // saveAllFolderDialog
+            // 
+            this.saveAllFolderDialog.Description = "Select a directory to save all files from the archive to.";
+            // 
             // Viewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -124,7 +135,7 @@
             this.Controls.Add(this.mainToolStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Viewer";
-            this.Text = "Gibbed\'s Just Cause 2 Archive Viewer";
+            this.Text = "Gibbed\'s Avalanche Archive Viewer";
             this.Load += new System.EventHandler(this.OnLoad);
             this.mainToolStrip.ResumeLayout(false);
             this.mainToolStrip.PerformLayout();
@@ -144,6 +155,7 @@
         private System.Windows.Forms.ToolStripMenuItem saveOnlyknownFilesMenuItem;
         private System.Windows.Forms.ToolStripMenuItem decompressUnknownFilesMenuItem;
         private System.Windows.Forms.ToolStripButton reloadListsButton;
+        private System.Windows.Forms.ToolStripComboBox projectComboBox;
     }
 }
 

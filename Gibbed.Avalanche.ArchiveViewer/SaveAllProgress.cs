@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Text;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using Gibbed.Helpers;
 using Gibbed.Avalanche.FileFormats;
+using Gibbed.Helpers;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace Gibbed.Avalanche.ArchiveViewer

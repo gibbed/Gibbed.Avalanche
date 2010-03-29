@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Gibbed.Avalanche.FileFormats;
 
@@ -16,62 +12,35 @@ namespace Gibbed.Avalanche.ArchiveViewer
         public Viewer()
         {
             this.InitializeComponent();
-            this.LoadFileLists();
+            this.LoadProject();
         }
 
-        private void LoadFileLists()
+        private Setup.Manager Manager;
+
+        private void LoadProject()
         {
-            this.FileNames = new Dictionary<uint, string>();
-            if (Directory.Exists(Path.Combine(Application.StartupPath, "lists")))
+            this.Manager = Setup.Manager.Load();
+            this.projectComboBox.Items.AddRange(this.Manager.ToArray());
+            this.SetProject(this.Manager.ActiveProject);
+        }
+
+        private void SetProject(Setup.Project project)
+        {
+            if (project != this.Manager.ActiveProject)
             {
-                //this.saveFileListDialog.InitialDirectory = Path.Combine(Application.StartupPath, "filelists");
-                var listPaths = Directory.GetFiles(Path.Combine(Application.StartupPath, "lists"), "*.filelist", SearchOption.AllDirectories);
-                foreach (string listPath in listPaths)
-                {
-                    this.LoadFileNames(listPath);
-                }
+                this.Manager.ActiveProject = project;
+            }
+
+            this.projectComboBox.SelectedItem = project;
+            if (project != null)
+            {
+                project.Load();
+                this.openDialog.InitialDirectory = project.InstallPath;
             }
         }
 
         private void OnLoad(object sender, EventArgs e)
         {
-            string path;
-            //path = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 35110", "InstallLocation", null);
-            path = (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 8190", "InstallLocation", null);
-            if (string.IsNullOrEmpty(path) != true)
-            {
-                this.openDialog.InitialDirectory = Path.Combine(path, "archives_win32");
-            }
-        }
-
-        private Dictionary<uint, string> FileNames;
-        private void LoadFileNames(string path)
-        {
-            if (File.Exists(path))
-            {
-                TextReader reader = new StreamReader(path);
-
-                while (true)
-                {
-                    string line = reader.ReadLine();
-                    if (line == null)
-                    {
-                        break;
-                    }
-
-                    if (line.Length <= 0)
-                    {
-                        continue;
-                    }
-
-                    line = line.Replace('/', '\\');
-                    line = line.ToLowerInvariant();
-                    uint hash = Path.GetFileName(line).HashJenkinsFileName();
-                    this.FileNames.Add(hash, line);
-                }
-
-                reader.Close();
-            }
         }
 
         private ArchiveTableFile Table;
@@ -89,15 +58,18 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 TreeNode knownNode = new TreeNode("Known", 1, 1);
                 TreeNode unknownNode = new TreeNode("Unknown", 1, 1);
 
+                Dictionary<uint, string> lookup = 
+                    this.Manager.ActiveProject == null ? null : this.Manager.ActiveProject.FileHashLookup;
+
                 foreach (uint hash in this.Table.Keys
-                    .OrderBy(k => k, new FileNameHashComparer(this.FileNames)))
+                    .OrderBy(k => k, new FileNameHashComparer(lookup)))
                 {
                     ArchiveTableFile.Entry entry = this.Table[hash];
                     TreeNode node = null;
 
-                    if (this.FileNames.ContainsKey(hash) == true)
+                    if (lookup != null && lookup.ContainsKey(hash) == true)
                     {
-                        string fileName = this.FileNames[hash];
+                        string fileName = lookup[hash];
                         string pathName = Path.GetDirectoryName(fileName);
                         TreeNodeCollection parentNodes = knownNode.Nodes;
 
@@ -146,7 +118,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 }
                 else if (unknownNode.Nodes.Count > 0)
                 {
-                    unknownNode.Expand();
+                    //unknownNode.Expand();
                 }
 
                 baseNode.Expand();
@@ -204,15 +176,35 @@ namespace Gibbed.Avalanche.ArchiveViewer
 
             string basePath = this.saveAllFolderDialog.SelectedPath;
 
+            Dictionary<uint, string> lookup =
+                this.Manager.ActiveProject == null ? null : this.Manager.ActiveProject.FileHashLookup;
+
             SaveAllProgress progress = new SaveAllProgress();
-            progress.ShowSaveProgress(this, input, this.Table, null, this.FileNames, basePath, this.saveOnlyknownFilesMenuItem.Checked, this.decompressUnknownFilesMenuItem.Checked);
+            progress.ShowSaveProgress(this, input, this.Table, null, lookup, basePath, this.saveOnlyknownFilesMenuItem.Checked, this.decompressUnknownFilesMenuItem.Checked);
 
             input.Close();
         }
 
         private void OnReloadLists(object sender, EventArgs e)
         {
-            this.LoadFileLists();
+            if (this.Manager.ActiveProject != null)
+            {
+                this.Manager.ActiveProject.Reload();
+            }
+
+            this.BuildFileTree();
+        }
+
+        private void OnProjectSelected(object sender, EventArgs e)
+        {
+            this.projectComboBox.Invalidate();
+            var project = this.projectComboBox.SelectedItem as Setup.Project;
+            if (project == null)
+            {
+                this.projectComboBox.Items.Remove(this.projectComboBox.SelectedItem);
+            }
+
+            this.SetProject(project);
             this.BuildFileTree();
         }
     }

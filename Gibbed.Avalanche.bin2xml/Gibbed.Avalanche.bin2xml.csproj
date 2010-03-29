@@ -55,6 +55,10 @@
       <Project>{B37ED973-5452-434E-9330-C13B14FBED6F}</Project>
       <Name>Gibbed.Avalanche.FileFormats</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Gibbed.Avalanche.Setup\Gibbed.Avalanche.Setup.csproj">
+      <Project>{AB016DF6-6176-442C-A189-E513DD673AC2}</Project>
+      <Name>Gibbed.Avalanche.Setup</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Gibbed.Helpers\Gibbed.Helpers.csproj">
       <Project>{5162A9FB-4DE1-4BBF-B7A2-5E8116AB0D26}</Project>
       <Name>Gibbed.Helpers</Name>

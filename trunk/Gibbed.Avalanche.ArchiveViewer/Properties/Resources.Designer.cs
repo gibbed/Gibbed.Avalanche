@@ -67,6 +67,13 @@ namespace Gibbed.Avalanche.ArchiveViewer.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap ReloadLists {
+            get {
+                object obj = ResourceManager.GetObject("ReloadLists", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap SaveAllFiles {
             get {
                 object obj = ResourceManager.GetObject("SaveAllFiles", resourceCulture);

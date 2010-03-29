@@ -112,6 +112,7 @@
     <None Include="Resources\SaveAllFiles.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\ReloadLists.png" />
     <Content Include="Resources\scorpio.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

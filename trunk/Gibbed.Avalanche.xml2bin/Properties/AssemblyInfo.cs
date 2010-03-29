@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Gibbed.Avalanche.xml2bin")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("xml2bin")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Gibbed")]
+[assembly: AssemblyCompany("http://gib.me/")]
 [assembly: AssemblyProduct("Gibbed.Avalanche.xml2bin")]
 [assembly: AssemblyCopyright("Copyright © Gibbed 2010")]
 [assembly: AssemblyTrademark("")]

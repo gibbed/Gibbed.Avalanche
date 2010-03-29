@@ -55,11 +55,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileNameHashComparer.cs" />
-    <Compile Include="SaveAllProgress.cs">
+    <Compile Include="SaveProgress.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SaveAllProgress.designer.cs">
-      <DependentUpon>SaveAllProgress.cs</DependentUpon>
+    <Compile Include="SaveProgress.designer.cs">
+      <DependentUpon>SaveProgress.cs</DependentUpon>
     </Compile>
     <Compile Include="Viewer.cs">
       <SubType>Form</SubType>
@@ -69,8 +69,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="SaveAllProgress.resx">
-      <DependentUpon>SaveAllProgress.cs</DependentUpon>
+    <EmbeddedResource Include="SaveProgress.resx">
+      <DependentUpon>SaveProgress.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer.resx">
       <DependentUpon>Viewer.cs</DependentUpon>
@@ -118,6 +118,7 @@
   <ItemGroup>
     <None Include="Resources\ReloadLists.png" />
     <Content Include="Resources\scorpio.ico" />
+    <None Include="Resources\Settings.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

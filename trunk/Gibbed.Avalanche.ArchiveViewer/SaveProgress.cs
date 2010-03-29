@@ -11,9 +11,9 @@ using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace Gibbed.Avalanche.ArchiveViewer
 {
-	public partial class SaveAllProgress : Form
+	public partial class SaveProgress : Form
 	{
-		public SaveAllProgress()
+		public SaveProgress()
 		{
 			this.InitializeComponent();
 		}

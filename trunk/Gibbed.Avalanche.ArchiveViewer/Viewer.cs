@@ -159,9 +159,95 @@ namespace Gibbed.Avalanche.ArchiveViewer
             this.BuildFileTree();
         }
 
+        private void OnSave(object sender, EventArgs e)
+        {
+            if (this.fileList.SelectedNode == null)
+            {
+                return;
+            }
+
+            string basePath;
+            Dictionary<uint, string> lookup;
+            List<uint> saving;
+
+            var root = this.fileList.SelectedNode;
+            if (root.Nodes.Count == 0)
+            {
+                this.saveFileDialog.FileName = root.Text;
+
+                if (this.saveFileDialog.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                saving = new List<uint>();
+                saving.Add((uint)root.Tag);
+
+                lookup = new Dictionary<uint, string>();
+                lookup.Add((uint)root.Tag, Path.GetFileName(this.saveFileDialog.FileName));
+                basePath = Path.GetDirectoryName(this.saveFileDialog.FileName);
+            }
+            else
+            {
+                if (this.saveFilesDialog.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                saving = new List<uint>();
+                
+                List<TreeNode> nodes = new List<TreeNode>();
+                nodes.Add(root);
+
+                while (nodes.Count > 0)
+                {
+                    var node = nodes[0];
+                    nodes.RemoveAt(0);
+
+                    if (node.Nodes.Count > 0)
+                    {
+                        foreach (TreeNode child in node.Nodes)
+                        {
+                            if (child.Nodes.Count > 0)
+                            {
+                                nodes.Add(child);
+                            }
+                            else
+                            {
+                                saving.Add((uint)child.Tag);
+                            }
+                        }
+                    }
+                }
+
+                lookup = this.Manager.ActiveProject == null ? null : this.Manager.ActiveProject.FileHashLookup;
+                basePath = this.saveFilesDialog.SelectedPath;
+            }
+
+            Stream input = File.OpenRead(Path.ChangeExtension(this.openDialog.FileName, ".arc"));
+
+            if (input == null)
+            {
+                return;
+            }
+
+            SaveProgress progress = new SaveProgress();
+            progress.ShowSaveProgress(
+                this,
+                input,
+                this.Table,
+                saving,
+                lookup,
+                basePath,
+                false,
+                this.decompressUnknownFilesMenuItem.Checked);
+
+            input.Close();
+        }
+
         private void OnSaveAll(object sender, EventArgs e)
         {
-            if (this.saveAllFolderDialog.ShowDialog() != DialogResult.OK)
+            if (this.saveFilesDialog.ShowDialog() != DialogResult.OK)
             {
                 return;
             }
@@ -173,12 +259,12 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 return;
             }
 
-            string basePath = this.saveAllFolderDialog.SelectedPath;
+            string basePath = this.saveFilesDialog.SelectedPath;
 
             Dictionary<uint, string> lookup =
                 this.Manager.ActiveProject == null ? null : this.Manager.ActiveProject.FileHashLookup;
 
-            SaveAllProgress progress = new SaveAllProgress();
+            SaveProgress progress = new SaveProgress();
             progress.ShowSaveProgress(this, input, this.Table, null, lookup, basePath, this.saveOnlyknownFilesMenuItem.Checked, this.decompressUnknownFilesMenuItem.Checked);
 
             input.Close();

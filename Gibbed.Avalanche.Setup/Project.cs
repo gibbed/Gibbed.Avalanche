@@ -24,6 +24,7 @@ namespace Gibbed.Avalanche.Setup
         private Project()
         {
             this.Dependencies = new List<string>();
+            this.NameHashLookup = new Dictionary<uint, string>();
             this.FileHashLookup = new Dictionary<uint, string>();
             this.Loaded = false;
         }

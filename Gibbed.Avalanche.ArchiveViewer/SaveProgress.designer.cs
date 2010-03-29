@@ -1,6 +1,6 @@
 ﻿namespace Gibbed.Avalanche.ArchiveViewer
 {
-	partial class SaveAllProgress
+	partial class SaveProgress
 	{
 		/// <summary>
 		/// Required designer variable.

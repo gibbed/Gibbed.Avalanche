@@ -53,7 +53,6 @@ namespace Gibbed.Avalanche.ArchiveViewer
             {
                 Dictionary<string, TreeNode> dirNodes = new Dictionary<string, TreeNode>();
 
-
                 TreeNode baseNode = new TreeNode(Path.GetFileName(this.openDialog.FileName), 0, 0);
                 TreeNode knownNode = new TreeNode("Known", 1, 1);
                 TreeNode unknownNode = new TreeNode("Unknown", 1, 1);

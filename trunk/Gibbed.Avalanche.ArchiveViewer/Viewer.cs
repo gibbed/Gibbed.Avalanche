@@ -170,6 +170,12 @@ namespace Gibbed.Avalanche.ArchiveViewer
             Dictionary<uint, string> lookup;
             List<uint> saving;
 
+            SaveProgress.SaveAllSettings settings;
+            settings.DecompressUnknownFiles = this.decompressUnknownFilesMenuItem.Checked;
+            settings.DecompressSmallArchives = this.decompressSmallArchivesMenuItem.Checked;
+            settings.SaveOnlyKnownFiles = false;
+            settings.DontOverwriteFiles = this.dontOverwriteFilesMenuItem.Checked;
+
             var root = this.fileList.SelectedNode;
             if (root.Nodes.Count == 0)
             {
@@ -186,6 +192,8 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 lookup = new Dictionary<uint, string>();
                 lookup.Add((uint)root.Tag, Path.GetFileName(this.saveFileDialog.FileName));
                 basePath = Path.GetDirectoryName(this.saveFileDialog.FileName);
+
+                settings.DontOverwriteFiles = false;
             }
             else
             {
@@ -239,8 +247,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 saving,
                 lookup,
                 basePath,
-                false,
-                this.decompressUnknownFilesMenuItem.Checked);
+                settings);
 
             input.Close();
         }
@@ -264,8 +271,20 @@ namespace Gibbed.Avalanche.ArchiveViewer
             Dictionary<uint, string> lookup =
                 this.Manager.ActiveProject == null ? null : this.Manager.ActiveProject.FileHashLookup;
 
+            SaveProgress.SaveAllSettings settings;
+            settings.DecompressUnknownFiles = this.decompressUnknownFilesMenuItem.Checked;
+            settings.DecompressSmallArchives = this.decompressSmallArchivesMenuItem.Checked;
+            settings.SaveOnlyKnownFiles = this.saveOnlyKnownFilesMenuItem.Checked;
+            settings.DontOverwriteFiles = this.dontOverwriteFilesMenuItem.Checked;
+
             SaveProgress progress = new SaveProgress();
-            progress.ShowSaveProgress(this, input, this.Table, null, lookup, basePath, this.saveOnlyknownFilesMenuItem.Checked, this.decompressUnknownFilesMenuItem.Checked);
+            progress.ShowSaveProgress(
+                this,
+                input,
+                this.Table,
+                null, lookup,
+                basePath,
+                settings);
 
             input.Close();
         }

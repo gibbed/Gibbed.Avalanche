@@ -75,14 +75,26 @@ namespace Gibbed.Avalanche.ArchiveViewer
 				string fileName = null;
 
                 bool decompressing = false;
-                if (info.FileNames.ContainsKey(hash))
+                if (info.FileNames.ContainsKey(hash) == true)
 				{
 					fileName = info.FileNames[hash];
 					UsedNames[hash] = info.FileNames[hash];
+
+                    if (info.Settings.DecompressSmallArchives == true)
+                    {
+                        string extension = Path.GetExtension(fileName);
+                        if (extension == ".blz" ||
+                            extension == ".eez" ||
+                            extension == ".flz" ||
+                            extension == ".nlz")
+                        {
+                            decompressing = true;
+                        }
+                    }
 				}
 				else
 				{
-					if (info.SaveOnlyKnownFiles)
+					if (info.Settings.SaveOnlyKnownFiles)
 					{
                         this.SetStatus("Skipping...", (int)(((float)current / (float)total) * 100.0f));
 						continue;
@@ -97,7 +109,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                         int read = info.Archive.Read(guess, 0, guess.Length);
 
                         if (read >= 2 && guess[0] == 0x78 && guess[1] == 0x01
-                            && info.DecompressUnknownFiles == true)
+                            && info.Settings.DecompressUnknownFiles == true)
                         {
                             info.Archive.Seek(index.Offset, SeekOrigin.Begin);
 
@@ -114,7 +126,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                         }
 
                         if (read >= 2 && guess[0] == 0x78 && guess[1] == 0x01
-                            && info.DecompressUnknownFiles == false)
+                            && info.Settings.DecompressUnknownFiles == false)
                         {
                             fileName = Path.ChangeExtension(fileName, ".z");
                             fileName = Path.Combine(Path.Combine("compressed", fileName.Substring(0, 1)), fileName);
@@ -206,11 +218,17 @@ namespace Gibbed.Avalanche.ArchiveViewer
                     fileName = Path.Combine("__UNKNOWN", fileName);
 				}
 
+				string path = Path.Combine(info.BasePath, fileName);
+                if (File.Exists(path) == true &&
+                    info.Settings.DontOverwriteFiles == true)
+                {
+                    this.SetStatus("Skipping...", (int)(((float)current / (float)total) * 100.0f));
+                    continue;
+                }
+
                 this.SetStatus(fileName, (int)(((float)current / (float)total) * 100.0f));
 
-				Directory.CreateDirectory(Path.Combine(info.BasePath, Path.GetDirectoryName(fileName)));
-
-				string path = Path.Combine(info.BasePath, fileName);
+                Directory.CreateDirectory(Path.Combine(info.BasePath, Path.GetDirectoryName(fileName)));
 
                 info.Archive.Seek(index.Offset, SeekOrigin.Begin);
 
@@ -257,6 +275,14 @@ namespace Gibbed.Avalanche.ArchiveViewer
 			this.SaveDone();
 		}
 
+        public struct SaveAllSettings
+        {
+            public bool SaveOnlyKnownFiles;
+            public bool DecompressUnknownFiles;
+            public bool DecompressSmallArchives;
+            public bool DontOverwriteFiles;
+        }
+
 		private struct SaveAllInformation
 		{
 			public string BasePath;
@@ -264,12 +290,11 @@ namespace Gibbed.Avalanche.ArchiveViewer
 			public ArchiveTableFile Table;
             public List<uint> Saving;
 			public Dictionary<uint, string> FileNames;
-			public bool SaveOnlyKnownFiles;
-            public bool DecompressUnknownFiles;
+            public SaveAllSettings Settings;
 		}
 
 		private Thread SaveThread;
-		public void ShowSaveProgress(IWin32Window owner, Stream archive, ArchiveTableFile table, List<uint> saving, Dictionary<uint, string> fileNames, string basePath, bool saveOnlyKnown, bool decompressUnknowns)
+		public void ShowSaveProgress(IWin32Window owner, Stream archive, ArchiveTableFile table, List<uint> saving, Dictionary<uint, string> fileNames, string basePath, SaveAllSettings settings)
 		{
 			SaveAllInformation info;
 			info.BasePath = basePath;
@@ -277,8 +302,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
 			info.Table = table;
             info.Saving = saving;
 			info.FileNames = fileNames;
-			info.SaveOnlyKnownFiles = saveOnlyKnown;
-            info.DecompressUnknownFiles = decompressUnknowns;
+            info.Settings = settings;
 
 			this.progressBar.Value = 0;
 			this.progressBar.Maximum = 100;

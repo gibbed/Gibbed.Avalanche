@@ -36,7 +36,7 @@
             this.saveAllButton = new System.Windows.Forms.ToolStripButton();
             this.reloadListsButton = new System.Windows.Forms.ToolStripButton();
             this.settingsButton = new System.Windows.Forms.ToolStripDropDownButton();
-            this.saveOnlyknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveOnlyKnownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decompressUnknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fileList = new System.Windows.Forms.TreeView();
             this.fileMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -44,6 +44,8 @@
             this.openDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFilesDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.dontOverwriteFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.decompressSmallArchivesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainToolStrip.SuspendLayout();
             this.fileMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -101,20 +103,22 @@
             // settingsButton
             // 
             this.settingsButton.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveOnlyknownFilesMenuItem,
-            this.decompressUnknownFilesMenuItem});
+            this.saveOnlyKnownFilesMenuItem,
+            this.decompressUnknownFilesMenuItem,
+            this.decompressSmallArchivesMenuItem,
+            this.dontOverwriteFilesMenuItem});
             this.settingsButton.Image = global::Gibbed.Avalanche.ArchiveViewer.Properties.Resources.Settings;
             this.settingsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.settingsButton.Name = "settingsButton";
             this.settingsButton.Size = new System.Drawing.Size(78, 22);
             this.settingsButton.Text = "Settings";
             // 
-            // saveOnlyknownFilesMenuItem
+            // saveOnlyKnownFilesMenuItem
             // 
-            this.saveOnlyknownFilesMenuItem.CheckOnClick = true;
-            this.saveOnlyknownFilesMenuItem.Name = "saveOnlyknownFilesMenuItem";
-            this.saveOnlyknownFilesMenuItem.Size = new System.Drawing.Size(216, 22);
-            this.saveOnlyknownFilesMenuItem.Text = "Save only &known files";
+            this.saveOnlyKnownFilesMenuItem.CheckOnClick = true;
+            this.saveOnlyKnownFilesMenuItem.Name = "saveOnlyKnownFilesMenuItem";
+            this.saveOnlyKnownFilesMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.saveOnlyKnownFilesMenuItem.Text = "Save only &known files";
             // 
             // decompressUnknownFilesMenuItem
             // 
@@ -123,7 +127,7 @@
             this.decompressUnknownFilesMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.decompressUnknownFilesMenuItem.Name = "decompressUnknownFilesMenuItem";
             this.decompressUnknownFilesMenuItem.Size = new System.Drawing.Size(216, 22);
-            this.decompressUnknownFilesMenuItem.Text = "&Decompress unknown files";
+            this.decompressUnknownFilesMenuItem.Text = "Decompress &unknown files";
             // 
             // fileList
             // 
@@ -160,6 +164,22 @@
             // 
             this.saveFileDialog.Filter = "All Files (*.*)|*.*";
             // 
+            // dontOverwriteFilesMenuItem
+            // 
+            this.dontOverwriteFilesMenuItem.CheckOnClick = true;
+            this.dontOverwriteFilesMenuItem.Name = "dontOverwriteFilesMenuItem";
+            this.dontOverwriteFilesMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.dontOverwriteFilesMenuItem.Text = "Don\'t &overwrite files";
+            // 
+            // decompressSmallArchivesMenuItem
+            // 
+            this.decompressSmallArchivesMenuItem.Checked = true;
+            this.decompressSmallArchivesMenuItem.CheckOnClick = true;
+            this.decompressSmallArchivesMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.decompressSmallArchivesMenuItem.Name = "decompressSmallArchivesMenuItem";
+            this.decompressSmallArchivesMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.decompressSmallArchivesMenuItem.Text = "Decompress &small archives";
+            // 
             // Viewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -193,8 +213,10 @@
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
         private System.Windows.Forms.ToolStripButton saveAllButton;
         private System.Windows.Forms.ToolStripDropDownButton settingsButton;
-        private System.Windows.Forms.ToolStripMenuItem saveOnlyknownFilesMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveOnlyKnownFilesMenuItem;
         private System.Windows.Forms.ToolStripMenuItem decompressUnknownFilesMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dontOverwriteFilesMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem decompressSmallArchivesMenuItem;
     }
 }
 

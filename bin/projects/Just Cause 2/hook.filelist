@@ -69,12 +69,12 @@ sound\fmod\dialog_eng.fev
 sound\fmod\dialog_eng.fsb
 sound\fmod\dialog_fre.fev
 sound\fmod\dialog_fre.fsb
-sound\fmod\dialog_spa.fev
-sound\fmod\dialog_spa.fsb
-sound\fmod\dialog_ita.fev
-sound\fmod\dialog_ita.fsb
 sound\fmod\dialog_ger.fev
 sound\fmod\dialog_ger.fsb
+sound\fmod\dialog_ita.fev
+sound\fmod\dialog_ita.fsb
+sound\fmod\dialog_spa.fev
+sound\fmod\dialog_spa.fsb
 sound\fmod\effects.fev
 sound\fmod\effects.fsb
 sound\fmod\gui.fev

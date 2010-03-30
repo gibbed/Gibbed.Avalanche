@@ -1,4 +1,3 @@
-benchmarks\benchmarks.bin
 benchmarks\benchmark_1.blz
 benchmarks\benchmark_1.seq.blz
 benchmarks\benchmark_2.blz
@@ -17,3 +16,4 @@ benchmarks\benchmark_8.blz
 benchmarks\benchmark_8.seq.blz
 benchmarks\benchmark_9.blz
 benchmarks\benchmark_9.seq.blz
+benchmarks\benchmarks.bin

@@ -1,14 +1,7 @@
-settings\texturemanager.bin
-settings\memorylimits.bin
-settings\cutscenes.bin
-settings\cutscenes_overrides.bin
 accomplishments\accomplishments.bin
 accomplishments\count_to_three.bin
-settings\achievements.bin
-settings\ammunition.bin
-settings\blackmarket.bin
-ai\aiheatparams.bin
 ai\aidifficulty.bin
+ai\aiheatparams.bin
 ai\aimovementstyles.bin
 ai\aiparams.bin
 ai\aireactions.bin
@@ -24,7 +17,6 @@ ai\sound\soundeventmap.bin
 animations\ragdoll\ragdoll_params.bin
 areasets\areasets.bin
 areasets\areasets.bmp
-settings\cloudshadows.bin
 climate\common\impostor_top_lod1-at20.bin
 climate\common\impostor_top_lod1-at21.bin
 climate\common\impostor_top_lod1-at22.bin
@@ -571,13 +563,19 @@ gui\pda_database.bin
 locations\conditions.bin
 locations\world.bin
 missions\missiondata.bin
+settings\achievements.bin
+settings\ammunition.bin
+settings\blackmarket.bin
 settings\camera_defaults.bin
 settings\camera_settings.bin
 settings\camera_transitions.bin
 settings\character_expressions.bin
 settings\charactertypes.bin
+settings\cloudshadows.bin
 settings\creatures.bin
 settings\crowd_voiceover.bin
+settings\cutscenes.bin
+settings\cutscenes_overrides.bin
 settings\enemytypespawnsettings.bin
 settings\factions.bin
 settings\game_materials.bin
@@ -593,6 +591,7 @@ settings\keymap_gamepad.bin
 settings\keymap_keyboard.bin
 settings\landscape_effects.bin
 settings\locator.bin
+settings\memorylimits.bin
 settings\parachuteparams.bin
 settings\physicssettings.bin
 settings\player.bin
@@ -603,7 +602,9 @@ settings\roads.bin
 settings\settlements.bin
 settings\sheldonservice.bin
 settings\spawnsettings.bin
+settings\stateruleflags.bin
 settings\terrain.bin
+settings\texturemanager.bin
 settings\triggered_pickup.bin
 settings\turn_taker.bin
 settings\vehicletypes.bin
@@ -627,5 +628,4 @@ sound\settings_smod_sfx_user.bin
 sound\settings_smod_sfx_vehicle.bin
 sound\settings_smod_sfx_weapon.bin
 sound\settings_smod_voiceover.bin
-settings\stateruleflags.bin
 terrain\gamezone.bin

@@ -32,18 +32,18 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Viewer));
             this.mainToolStrip = new System.Windows.Forms.ToolStrip();
             this.projectComboBox = new System.Windows.Forms.ToolStripComboBox();
-            this.fileList = new System.Windows.Forms.TreeView();
-            this.fileMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openDialog = new System.Windows.Forms.OpenFileDialog();
-            this.saveFilesDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openButton = new System.Windows.Forms.ToolStripButton();
             this.saveAllButton = new System.Windows.Forms.ToolStripButton();
             this.reloadListsButton = new System.Windows.Forms.ToolStripButton();
             this.settingsButton = new System.Windows.Forms.ToolStripDropDownButton();
             this.saveOnlyknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decompressUnknownFilesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileList = new System.Windows.Forms.TreeView();
+            this.fileMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openDialog = new System.Windows.Forms.OpenFileDialog();
+            this.saveFilesDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.mainToolStrip.SuspendLayout();
             this.fileMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -71,41 +71,6 @@
             this.projectComboBox.Sorted = true;
             this.projectComboBox.SelectedIndexChanged += new System.EventHandler(this.OnProjectSelected);
             // 
-            // fileList
-            // 
-            this.fileList.ContextMenuStrip = this.fileMenuStrip;
-            this.fileList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fileList.Location = new System.Drawing.Point(0, 25);
-            this.fileList.Name = "fileList";
-            this.fileList.Size = new System.Drawing.Size(640, 295);
-            this.fileList.TabIndex = 1;
-            // 
-            // fileMenuStrip
-            // 
-            this.fileMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveToolStripMenuItem});
-            this.fileMenuStrip.Name = "fileMenuStrip";
-            this.fileMenuStrip.Size = new System.Drawing.Size(99, 26);
-            // 
-            // saveToolStripMenuItem
-            // 
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
-            this.saveToolStripMenuItem.Text = "&Save";
-            this.saveToolStripMenuItem.Click += new System.EventHandler(this.OnSave);
-            // 
-            // openDialog
-            // 
-            this.openDialog.Filter = "Avalanche Archives (*.tab)|*.tab|All Files (*.*)|*.*";
-            // 
-            // saveFilesDialog
-            // 
-            this.saveFilesDialog.Description = "Select a directory to save all files from the archive to.";
-            // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.Filter = "All Files (*.*)|*.*";
-            // 
             // openButton
             // 
             this.openButton.Image = global::Gibbed.Avalanche.ArchiveViewer.Properties.Resources.OpenArchive;
@@ -122,6 +87,7 @@
             this.saveAllButton.Name = "saveAllButton";
             this.saveAllButton.Size = new System.Drawing.Size(68, 22);
             this.saveAllButton.Text = "Save &All";
+            this.saveAllButton.Click += new System.EventHandler(this.OnSaveAll);
             // 
             // reloadListsButton
             // 
@@ -158,6 +124,41 @@
             this.decompressUnknownFilesMenuItem.Name = "decompressUnknownFilesMenuItem";
             this.decompressUnknownFilesMenuItem.Size = new System.Drawing.Size(216, 22);
             this.decompressUnknownFilesMenuItem.Text = "&Decompress unknown files";
+            // 
+            // fileList
+            // 
+            this.fileList.ContextMenuStrip = this.fileMenuStrip;
+            this.fileList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fileList.Location = new System.Drawing.Point(0, 25);
+            this.fileList.Name = "fileList";
+            this.fileList.Size = new System.Drawing.Size(640, 295);
+            this.fileList.TabIndex = 1;
+            // 
+            // fileMenuStrip
+            // 
+            this.fileMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveToolStripMenuItem});
+            this.fileMenuStrip.Name = "fileMenuStrip";
+            this.fileMenuStrip.Size = new System.Drawing.Size(99, 26);
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.saveToolStripMenuItem.Text = "&Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.OnSave);
+            // 
+            // openDialog
+            // 
+            this.openDialog.Filter = "Avalanche Archives (*.tab)|*.tab|All Files (*.*)|*.*";
+            // 
+            // saveFilesDialog
+            // 
+            this.saveFilesDialog.Description = "Select a directory to save all files from the archive to.";
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.Filter = "All Files (*.*)|*.*";
             // 
             // Viewer
             // 

@@ -45,9 +45,6 @@ characters\maincharacters\rico\mc01_lod1-rico.rbm
 characters\maincharacters\rico\mc01_shirt_dif.dds
 characters\maincharacters\rico\mc01_shirt_mpm.dds
 characters\maincharacters\rico\mc01_shirt_nrm.dds
-climate\common\topatlas_dif.dds
-climate\common\trunkatlas_dif.dds
-climate\common\trunkatlas_nrm.dds
 fingerprint4.bin
 global\all_lights.light_info
 gui\frontend_developer_splash_screen.dds

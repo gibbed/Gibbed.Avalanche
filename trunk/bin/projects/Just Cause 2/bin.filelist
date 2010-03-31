@@ -1,5 +1,5 @@
-accomplishments\accomplishments.bin
-accomplishments\count_to_three.bin
+settings\accomplishments\accomplishments.bin
+settings\accomplishments\count_to_three.bin
 ai\aidifficulty.bin
 ai\aiheatparams.bin
 ai\aimovementstyles.bin
@@ -15,8 +15,6 @@ ai\carhandling\carhandlingsportscar.bin
 ai\sound\aisoundevents.bin
 ai\sound\soundeventmap.bin
 animations\ragdoll\ragdoll_params.bin
-areasets\areasets.bin
-areasets\areasets.bmp
 climate\common\impostor_top_lod1-at20.bin
 climate\common\impostor_top_lod1-at21.bin
 climate\common\impostor_top_lod1-at22.bin
@@ -89,6 +87,10 @@ climate\zone_3\grass_types_3.bin
 climate\zone_3\leaf_types_3.bin
 climate\zone_3\vegetation_set_3.bin
 climate\zone_3\vegetation_types_3.bin
+climate\zone_0\vegetation_0.blz
+climate\zone_1\vegetation_1.blz
+climate\zone_2\vegetation_2.blz
+climate\zone_3\vegetation_3.blz
 effects\arve_damage_fire_large.bin
 effects\arve_damage_smoke_burst.bin
 effects\arve_damage_smoke_large.bin

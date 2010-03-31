@@ -1,7 +1,3 @@
-global\areasets\areasets.bin
-global\areasets\areasets.bmp
-global\areasets\general.bl
-global\areasets\general.blz
 global\areasets\areaset01.blz
 global\areasets\areaset02.blz
 global\areasets\areaset03.blz
@@ -17,3 +13,7 @@ global\areasets\areaset12.blz
 global\areasets\areaset13.blz
 global\areasets\areaset14.blz
 global\areasets\areaset15.blz
+global\areasets\areasets.bin
+global\areasets\areasets.bmp
+global\areasets\general.bl
+global\areasets\general.blz

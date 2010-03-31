@@ -899,6 +899,8 @@ locations\unknown\etn.res01.flz
 locations\unknown\etn.res01.nlz
 locations\unknown\f3s01empsros.flz
 locations\unknown\f3s01empsros.nlz
+locations\unknown\f1m02.flz
+locations\unknown\f1m02.nlz
 locations\unknown\far.res01.flz
 locations\unknown\far.res01.nlz
 locations\unknown\ind.res01.flz
@@ -1242,6 +1244,8 @@ locations\wc\19\19x36.flz
 locations\wc\19\19x36.nlz
 locations\wc\19\19x40.flz
 locations\wc\19\19x40.nlz
+locations\wc\19\19x41.flz
+locations\wc\19\19x41.nlz
 locations\wc\19\19x42.flz
 locations\wc\19\19x42.nlz
 locations\wc\19\19x43.flz
@@ -1346,6 +1350,8 @@ locations\wc\22\22x37.flz
 locations\wc\22\22x37.nlz
 locations\wc\22\22x42.flz
 locations\wc\22\22x42.nlz
+locations\wc\22\22x45.flz
+locations\wc\22\22x45.nlz
 locations\wc\22\22x46.flz
 locations\wc\22\22x46.nlz
 locations\wc\22\22x47.flz
@@ -1748,6 +1754,8 @@ locations\wc\35\35x27.flz
 locations\wc\35\35x27.nlz
 locations\wc\35\35x28.flz
 locations\wc\35\35x28.nlz
+locations\wc\35\35x29.flz
+locations\wc\35\35x29.nlz
 locations\wc\35\35x30.flz
 locations\wc\35\35x30.nlz
 locations\wc\35\35x31.flz
@@ -1856,6 +1864,8 @@ locations\wc\37\37x41.flz
 locations\wc\37\37x41.nlz
 locations\wc\37\37x42.flz
 locations\wc\37\37x42.nlz
+locations\wc\37\37x43.flz
+locations\wc\37\37x43.nlz
 locations\wc\37\37x44.flz
 locations\wc\37\37x44.nlz
 locations\wc\37\37x51.flz
@@ -1896,6 +1906,8 @@ locations\wc\39\39x09.flz
 locations\wc\39\39x09.nlz
 locations\wc\39\39x11.flz
 locations\wc\39\39x11.nlz
+locations\wc\39\39x12.flz
+locations\wc\39\39x12.nlz
 locations\wc\39\39x21.flz
 locations\wc\39\39x21.nlz
 locations\wc\39\39x31.flz
@@ -1908,6 +1920,8 @@ locations\wc\39\39x39.flz
 locations\wc\39\39x39.nlz
 locations\wc\39\39x44.flz
 locations\wc\39\39x44.nlz
+locations\wc\39\39x46.flz
+locations\wc\39\39x46.nlz
 locations\wc\39\39x48.flz
 locations\wc\39\39x48.nlz
 locations\wc\39\39x50.flz
@@ -2022,6 +2036,8 @@ locations\wc\43\43x38.flz
 locations\wc\43\43x38.nlz
 locations\wc\43\43x41.flz
 locations\wc\43\43x41.nlz
+locations\wc\43\43x42.flz
+locations\wc\43\43x42.nlz
 locations\wc\43\43x45.flz
 locations\wc\43\43x45.nlz
 locations\wc\43\43x46.flz
@@ -2050,6 +2066,8 @@ locations\wc\44\44x41.flz
 locations\wc\44\44x41.nlz
 locations\wc\44\44x42.flz
 locations\wc\44\44x42.nlz
+locations\wc\44\44x43.flz
+locations\wc\44\44x43.nlz
 locations\wc\44\44x53.flz
 locations\wc\44\44x53.nlz
 locations\wc\44\44x58.flz
@@ -2344,6 +2362,7 @@ locations\wc\53\53x16.flz
 locations\wc\53\53x16.nlz
 locations\wc\53\53x17.flz
 locations\wc\53\53x17.nlz
+locations\wc\53\53x17.logic.nlz
 locations\wc\53\53x18.flz
 locations\wc\53\53x18.nlz
 locations\wc\53\53x19.flz
@@ -2508,6 +2527,8 @@ locations\wc\57\57x57.flz
 locations\wc\57\57x57.nlz
 locations\wc\57\57x58.flz
 locations\wc\57\57x58.nlz
+locations\wc\57\57x60.flz
+locations\wc\57\57x60.nlz
 locations\wc\58\58x05.flz
 locations\wc\58\58x05.nlz
 locations\wc\58\58x21.flz
@@ -2560,3 +2581,5 @@ locations\wc\61\61x14.flz
 locations\wc\61\61x14.nlz
 locations\wc\62\62x23.flz
 locations\wc\62\62x23.nlz
+locations\wc\62\62x32.flz
+locations\wc\62\62x32.nlz

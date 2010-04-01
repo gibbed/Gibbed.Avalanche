@@ -20,6 +20,7 @@ namespace Gibbed.Avalanche.SmallUnpack
             bool verbose = false;
             bool overwriteFiles = false;
             bool decompress = false;
+            bool listing = false;
             bool showHelp = false;
 
             OptionSet options = new OptionSet()
@@ -28,6 +29,11 @@ namespace Gibbed.Avalanche.SmallUnpack
                     "v|verbose",
                     "be verbose (list files)",
                     v => verbose = v != null
+                },
+                {
+                    "l|list",
+                    "just list files (don't extract)", 
+                    v => listing = v != null
                 },
                 {
                     "o|overwrite",
@@ -111,7 +117,10 @@ namespace Gibbed.Avalanche.SmallUnpack
                 input = decompressed;
             }
 
-            Directory.CreateDirectory(outputPath);
+            if (listing == false)
+            {
+                Directory.CreateDirectory(outputPath);
+            }
 
             SmallArchiveFile smallArchive = new SmallArchiveFile();
             smallArchive.Deserialize(input);
@@ -139,23 +148,26 @@ namespace Gibbed.Avalanche.SmallUnpack
                         Console.WriteLine("{1:D4}/{2:D4} => {0}", entry.Name, counter, totalCount);
                     }
 
-                    Stream output = File.Open(entryPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-
-                    input.Seek(entry.Offset, SeekOrigin.Begin);
-                    int left = (int)entry.Size;
-                    while (left > 0)
+                    if (listing == false)
                     {
-                        int read = input.Read(buffer, 0, Math.Min(left, buffer.Length));
-                        if (read == 0)
-                        {
-                            break;
-                        }
-                        output.Write(buffer, 0, read);
-                        left -= read;
-                    }
+                        Stream output = File.Open(entryPath, FileMode.Create, FileAccess.Write, FileShare.Read);
 
-                    output.Flush();
-                    output.Close();
+                        input.Seek(entry.Offset, SeekOrigin.Begin);
+                        int left = (int)entry.Size;
+                        while (left > 0)
+                        {
+                            int read = input.Read(buffer, 0, Math.Min(left, buffer.Length));
+                            if (read == 0)
+                            {
+                                break;
+                            }
+                            output.Write(buffer, 0, read);
+                            left -= read;
+                        }
+
+                        output.Flush();
+                        output.Close();
+                    }
                 }
 
                 input.Close();

@@ -89,8 +89,8 @@ namespace Gibbed.Avalanche.Setup
 
                     uint hash = Path.GetFileName(line).HashJenkinsFileName();
 
-                    if (this.FileHashLookup.ContainsKey(hash) &&
-                        this.FileHashLookup[hash] != line)
+                    if (this.FileHashLookup.ContainsKey(hash) == true /*&&
+                        this.FileHashLookup[hash] != line*/)
                     {
                         string otherLine = this.FileHashLookup[hash];
                         throw new InvalidOperationException("duplicate hash");

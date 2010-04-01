@@ -1,0 +1,20 @@
+File names (in .tab) and property names (in .bin) are stored using a hash of
+that name rather than the name itself.
+
+This means that we cannot find out what the original name without knowing it
+already, hence the many *.filelist and *.namelist used by the Gibbed tools.
+
+Property names are hashed directly with no modification to the string.
+File names are made lower case, and only the file name is hashed -- the path is
+ignored.
+
+"weapons" -> 0xC04B7961
+"settings\weapons.bin" -> 0x391AE539 (only "weapons.bin" is hashed)
+
+The hash used is Bob Jenkins' hashlittle() which can be found at:
+  http://www.burtleburtle.net/bob/c/lookup3.c
+
+There is a possibility of hash collisions with this, but so far nothing in JC2
+has collided.
+
+Example: "CheatDen" (0x57A65540) collides with "pd_ninja" (0x57A65540).

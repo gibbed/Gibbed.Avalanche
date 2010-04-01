@@ -4,9 +4,18 @@
 4. Click and drag weapons.bin on to bin2xml.
 5. Open weapons.xml with any text editor.
 6. Search for "weapon_8".
-7. Scroll down and look for "bulletspershot" and "max_max_bullet_spread".
-8. Change "bulletspershot" to 40, and "max_bullet_spread" to 10.
+7. Scroll down and look for the following:
+   "ammo_max_range"
+   "ammo_velocity"
+   "bulletspershot"
+   "max_max_bullet_spread"
+8. Change them to:
+   "ammo_max_range" to 5000
+   "ammo_velocity" to 10
+   "bulletspershot" to 40
+   "max_bullet_spread" to 10
 9. Save weapons.xml.
 10. Click and drag weapons.xml on to xml2bin.
-11. Start Just Cause 2, if you have done everything correctly, the rocket
-    launcher should have unlimited ammo.
+11. Start Just Cause 2, if you have done everything correctly, should make
+    a nice fireworks show.
+

@@ -1,0 +1,46 @@
+Extensions suffixed with a 'z' are compressed variants of that file, Just Cause
+2 will happily read uncompressed data though.
+
+Anything not listed here can be safely assumed as unresearched.  
+
+---[ Formats ]-----------------------------------------------------------------
+
+.bin                Binary property file compiled from a source .xml
+.csv                Comma-separated values
+.dds                DDS texture
+.lod                Level of detail definition, it's a text format of unknown
+                        specification
+.epe                Exported entity definition (it's a .bin)
+.rbm                'render block model', Avalanche's model format
+.vdoll              Vehicle doll (it's a .bin)
+.mvdoll             (moving?) vehicle doll (it's a .bin)
+
+
+---[ Small Archives ]----------------------------------------------------------
+
+These files contain other files (duh!).
+
+.ee / .eez          Exported entity (think vehicles, world objects, etc). 
+.bl / .blz          General containers, sequences, collections of data, etc.
+.flz                Location related (not researched yet)
+.nlz                Location related (not researched yet)
+
+
+---[ Unresearched Formats ]----------------------------------------------------
+
+fingerprint4.bin    It's not a .bin, no idea what it's for
+.agui               Anark GUI file (http://www.anark.com/)
+.asb                Animation related (it's a .bin)
+.asfm               Animation related (it's a .bin)
+.avproj             Avalanche project (xml)
+.ban                Some form of Havok data
+.bmf                BMF = 'Binary mission format'? Some research done (see code)
+.brd                Some form of Havok data
+.brf                A speical kind of .bin that specifies names instead of hashes
+.brfc               Empty, so who knows
+.bsk                Some form of Havok data
+.event_trackb       Unknown purpose (it's a .bin)
+.pfx                Particle effect definition (unknown format, seems to contain
+                        serialized Havok data)
+.rg                 Unknown
+.sst                Unknown (it's a .bin)

@@ -102,7 +102,7 @@
             this.reloadListsButton.Name = "reloadListsButton";
             this.reloadListsButton.Size = new System.Drawing.Size(101, 22);
             this.reloadListsButton.Text = "&Reload Lists";
-            this.reloadListsButton.Click += new System.EventHandler(this.OnReloadLists);
+            this.reloadListsButton.ButtonClick += new System.EventHandler(this.OnReloadLists);
             // 
             // saveKnownListToolStripMenuItem
             // 

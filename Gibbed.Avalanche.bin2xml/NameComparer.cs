@@ -43,5 +43,4 @@ namespace Gibbed.Avalanche.bin2xml
             }
         }
     }
-
 }

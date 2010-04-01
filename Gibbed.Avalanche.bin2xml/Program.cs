@@ -250,6 +250,8 @@ namespace Gibbed.Avalanche.bin2xml
             string xmlPath = extra.Count > 1 ?
                 extra[1] : Path.ChangeExtension(binPath, ".xml");
 
+            string binExtension = Path.GetExtension(binPath);
+
             var input = File.Open(binPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var propertyFile = new PropertyFile();
             propertyFile.Deserialize(input, littleEndian);
@@ -265,6 +267,12 @@ namespace Gibbed.Avalanche.bin2xml
 
             writer.WriteStartDocument();
             writer.WriteStartElement("root");
+
+            if (binExtension != null)
+            {
+                writer.WriteAttributeString("extension", binExtension);
+            }
+
             foreach (var node in propertyFile.Nodes)
             {
                 writer.WriteStartElement("object");

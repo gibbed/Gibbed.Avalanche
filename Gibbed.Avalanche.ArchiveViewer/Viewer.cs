@@ -36,11 +36,8 @@ namespace Gibbed.Avalanche.ArchiveViewer
             {
                 project.Load();
                 this.openDialog.InitialDirectory = project.InstallPath;
+                this.saveKnownFileListDialog.InitialDirectory = project.ListsPath;
             }
-        }
-
-        private void OnLoad(object sender, EventArgs e)
-        {
         }
 
         private ArchiveTableFile Table;
@@ -307,9 +304,39 @@ namespace Gibbed.Avalanche.ArchiveViewer
             {
                 this.projectComboBox.Items.Remove(this.projectComboBox.SelectedItem);
             }
-
             this.SetProject(project);
             this.BuildFileTree();
+        }
+
+        private void OnSaveKnownFileList(object sender, EventArgs e)
+        {
+            if (this.saveKnownFileListDialog.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            List<string> names = new List<string>();
+
+            if (this.Table != null &&
+                this.Manager.ActiveProject != null)
+            {
+                foreach (uint hash in this.Table.Keys)
+                {
+                    if (this.Manager.ActiveProject.FileHashLookup.ContainsKey(hash))
+                    {
+                        names.Add(this.Manager.ActiveProject.FileHashLookup[hash]);
+                    }
+                }
+            }
+
+            names.Sort();
+
+            TextWriter output = new StreamWriter(this.saveKnownFileListDialog.OpenFile());
+            foreach (string name in names)
+            {
+                output.WriteLine(name);
+            }
+            output.Close();
         }
     }
 }

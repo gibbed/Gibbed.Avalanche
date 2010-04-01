@@ -200,12 +200,16 @@ namespace Gibbed.Avalanche.xml2bin
             }
 
             string xmlPath = extra[0];
-            string binPath = extra.Count > 1 ?
-                extra[1] : Path.ChangeExtension(xmlPath, ".bin");
 
             var input = File.Open(xmlPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var doc = new XPathDocument(input);
             var nav = doc.CreateNavigator();
+
+            var root = nav.SelectSingleNode("/root");
+            string binExtension = root.GetAttribute("extension", "");
+
+            string binPath = extra.Count > 1 ?
+                extra[1] : Path.ChangeExtension(xmlPath, binExtension == null ? ".bin" : binExtension);
 
             PropertyFile propertyFile = new PropertyFile();
 

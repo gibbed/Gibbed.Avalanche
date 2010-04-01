@@ -17,6 +17,7 @@ namespace Gibbed.Avalanche.SmallPack
 
         public static void Main(string[] args)
         {
+            const int alignment = 4;
             bool verbose = false;
             bool compress = false;
             bool showHelp = false;
@@ -65,7 +66,7 @@ namespace Gibbed.Avalanche.SmallPack
             }
 
             string inputPath = extra[0];
-            string outputPath = extra.Count > 1 ? extra[1] : Path.ChangeExtension(inputPath, ".sarc");
+            string outputPath = extra.Count > 1 ? extra[1] : inputPath + ".sarc";
 
             Stream output = File.Create(outputPath);
 
@@ -74,7 +75,9 @@ namespace Gibbed.Avalanche.SmallPack
                 output = new DeflaterOutputStream(output);
             }
 
-            string[] paths = Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories);
+            List<string> paths = new List<string>();
+            paths.AddRange(Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories));
+            paths.Sort(new NameComparer());
 
             int headerSize = 0;
             foreach (string path in paths)
@@ -95,7 +98,7 @@ namespace Gibbed.Avalanche.SmallPack
                         Size = (uint)((new FileInfo(path)).Length),
                     });
                 offset += (int)((new FileInfo(path)).Length);
-                offset = offset.Align(16);
+                offset = offset.Align(alignment);
             }
 
             smallArchive.Serialize(output);
@@ -117,11 +120,11 @@ namespace Gibbed.Avalanche.SmallPack
                 }
                 input.Close();
 
-                int align = total.Align(16) - total;
-                if (align > 0)
+                int dummySize = total.Align(alignment) - total;
+                if (dummySize > 0)
                 {
-                    byte[] block = new byte[align];
-                    output.Write(block, 0, align);
+                    byte[] dummyBlock = new byte[dummySize];
+                    output.Write(dummyBlock, 0, dummySize);
                 }
             }
 

@@ -15,6 +15,6 @@ The hash used is Bob Jenkins' hashlittle() which can be found at:
   http://www.burtleburtle.net/bob/c/lookup3.c
 
 There is a possibility of hash collisions with this, but so far nothing in JC2
-has collided.
+has collided. (that I am aware of!)
 
 Example: "CheatDen" (0x57A65540) collides with "pd_ninja" (0x57A65540).

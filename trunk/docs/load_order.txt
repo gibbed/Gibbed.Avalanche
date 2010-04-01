@@ -6,6 +6,8 @@ beta.arc.
 Every .arc has a .tab associated with it, which is an index of the content of
 the .arc.
 
+** Directory names are completely ignored for file names! **
+
 archives_win32\*.arc
 dropzone\*              (JC2 will take all files in this directory and create
                          dropzone\seperate_files.arc from them)

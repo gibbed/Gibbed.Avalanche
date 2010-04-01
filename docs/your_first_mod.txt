@@ -4,8 +4,8 @@
 4. Click and drag weapons.bin on to bin2xml.
 5. Open weapons.xml with any text editor.
 6. Search for "weapon_8".
-7. Scroll down and look for "unlimited_ammo".
-8. Change the value from 0 to 1.
+7. Scroll down and look for "bulletspershot" and "max_max_bullet_spread".
+8. Change "bulletspershot" to 40, and "max_bullet_spread" to 10.
 9. Save weapons.xml.
 10. Click and drag weapons.xml on to xml2bin.
 11. Start Just Cause 2, if you have done everything correctly, the rocket

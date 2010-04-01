@@ -10,7 +10,6 @@ Anything not listed here can be safely assumed as unresearched.
 .dds                DDS texture
 .lod                Level of detail definition, it's a text format of unknown
                         specification
-.epe                Exported entity definition (it's a .bin)
 .rbm                'render block model', Avalanche's model format
 .vdoll              Vehicle doll (it's a .bin)
 .mvdoll             (moving?) vehicle doll (it's a .bin)
@@ -39,6 +38,7 @@ fingerprint4.bin    It's not a .bin, no idea what it's for
 .brf                A speical kind of .bin that specifies names instead of hashes
 .brfc               Empty, so who knows
 .bsk                Some form of Havok data
+.epe                Exported entity definition (PCBB)
 .event_trackb       Unknown purpose (it's a .bin)
 .pfx                Particle effect definition (unknown format, seems to contain
                         serialized Havok data)

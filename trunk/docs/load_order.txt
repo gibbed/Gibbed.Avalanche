@@ -1,0 +1,18 @@
+Just Cause 2 will load content in this order, content loaded later will override
+any content with the same hash loaded earlier. Files in directories are loaded
+in order of their filename, so content in alpha.arc will be overriden by
+beta.arc.
+
+Every .arc has a .tab associated with it, which is an index of the content of
+the .arc.
+
+archives_win32\*.arc
+dropzone\*              (JC2 will take all files in this directory and create
+                         dropzone\seperate_files.arc from them)
+dlc\*.arc
+
+Note that DLC packages are only loaded if the game detects you actually own that
+content.
+
+DLC .arcs are also special in that the game looks for certain files in them to
+pick up new content.

@@ -1,0 +1,12 @@
+1. Open pc0.tab with ArchiveViewer
+2. Save all, or save settings\weapons.bin to the dropzone directory.
+3. If you saved all, copy settings\weapons.bin to the dropzone directory.
+4. Click and drag weapons.bin on to bin2xml.
+5. Open weapons.xml with any text editor.
+6. Search for "weapon_8".
+7. Scroll down and look for "unlimited_ammo".
+8. Change the value from 0 to 1.
+9. Save weapons.xml.
+10. Click and drag weapons.xml on to xml2bin.
+11. Start Just Cause 2, if you have done everything correctly, the rocket
+    launcher should have unlimited ammo.

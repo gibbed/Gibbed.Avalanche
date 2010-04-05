@@ -537,6 +537,10 @@ fixed
 focal_distance
 fog
 forcedraw
+force
+sway
+weapon_force
+projectile_force
 friction
 frontal_area
 glass_armor
@@ -875,3 +879,6 @@ Scorpion_SMG
 Minigun
 RocketLauncher
 GrenadeLauncher
+uid
+settings
+max_playing_effects

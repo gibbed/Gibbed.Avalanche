@@ -1,7 +1,7 @@
-					<value id="a511715a" type="string">animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_back_lft.ban
-					<value id="a511715a" type="string">animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_back_rgt.ban
-					<value id="a511715a" type="string">animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_lft.ban
-					<value id="a511715a" type="string">animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_rgt.ban
+animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_back_lft.ban
+animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_back_rgt.ban
+animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_lft.ban
+animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_rgt.ban
 animations\animationsets\additivelayer.asb
 animations\animationsets\kc001_base.asb
 animations\animationsets\kc001_leftarm.asb

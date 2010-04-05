@@ -1,7 +1,3 @@
-animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_back_lft.ban
-animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_back_rgt.ban
-animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_lft.ban
-animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_rgt.ban
 animations\animationsets\additivelayer.asb
 animations\animationsets\kc001_base.asb
 animations\animationsets\kc001_leftarm.asb
@@ -82,6 +78,10 @@ animations\character\npc\vehicle\fourwheeled\shared\npc_door_hang_to_sit_left.ba
 animations\character\npc\vehicle\fourwheeled\shared\npc_door_hang_to_sit_right.ban
 animations\character\npc\vehicle\fourwheeled\shared\npc_hide_lft_to_run_fwd.ban
 animations\character\npc\vehicle\fourwheeled\shared\npc_hide_rgt_to_run_fwd.ban
+animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_back_lft.ban
+animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_back_rgt.ban
+animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_lft.ban
+animations\character\npc\vehicle\fourwheeled\shared\npc_hide_stumble_rgt.ban
 animations\character\npc\vehicle\fourwheeled\shared\npc_hide_to_sit_left.ban
 animations\character\npc\vehicle\fourwheeled\shared\npc_hide_to_sit_right.ban
 animations\character\npc\vehicle\fourwheeled\shared\npc_sit_to_idle_left.ban

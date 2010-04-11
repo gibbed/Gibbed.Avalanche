@@ -663,6 +663,17 @@ JumpAndFall
 JumpRotationSpeed
 Jungle
 key
+key_0
+key_1
+key_10
+key_2
+key_3
+key_4
+key_5
+key_6
+key_7
+key_8
+key_9
 key_off
 key_off_offset_0
 key_off_offset_1
@@ -672,6 +683,7 @@ key_off_offset_4
 key_on
 keymap
 keyoff_on_stop
+keys
 kick
 KICK
 kill_cam
@@ -946,6 +958,7 @@ play_at_water_surface
 play_effect_factor
 play_on_enabled
 player
+player_trigger
 PlayerHit
 PlayerMechanics
 points
@@ -1092,6 +1105,7 @@ settings_file
 setup_id
 seve
 severity
+shape_cast
 sheldon
 sheldon_service
 should_break
@@ -1187,6 +1201,7 @@ streaming
 strength
 STUNT_JUMP
 sub_modules
+subject_name
 subjectname
 sustain
 sway
@@ -1312,6 +1327,7 @@ variable_id_time_of_day
 variable_id_timeline
 variations
 Vegetation
+vehicle
 VEHICLE_CAM
 vehicle_file
 VEHICLE_FIRE_LEFT

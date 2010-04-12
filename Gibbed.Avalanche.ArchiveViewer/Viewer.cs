@@ -12,32 +12,69 @@ namespace Gibbed.Avalanche.ArchiveViewer
         public Viewer()
         {
             this.InitializeComponent();
-            this.LoadProject();
         }
 
         private Setup.Manager Manager;
 
+        private void OnLoad(object sender, EventArgs e)
+        {
+            this.LoadProject();
+        }
+
         private void LoadProject()
         {
-            this.Manager = Setup.Manager.Load();
-            this.projectComboBox.Items.AddRange(this.Manager.ToArray());
-            this.SetProject(this.Manager.ActiveProject);
+            try
+            {
+                this.Manager = Setup.Manager.Load();
+                this.projectComboBox.Items.AddRange(this.Manager.ToArray());
+                this.SetProject(this.Manager.ActiveProject);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(
+                    "There was an error while loading project data." +
+                    Environment.NewLine + Environment.NewLine +
+                    e.ToString() +
+                    Environment.NewLine + Environment.NewLine +
+                    "(You can press Ctrl+C to copy the contents of this dialog)",
+                    "Critical Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                this.Close();
+            }
         }
 
         private void SetProject(Setup.Project project)
         {
+            if (project != null)
+            {
+                try
+                {
+                    project.Load();
+                    this.openDialog.InitialDirectory = project.InstallPath;
+                    this.saveKnownFileListDialog.InitialDirectory = project.ListsPath;
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(
+                        "There was an error while loading project data." +
+                        Environment.NewLine + Environment.NewLine +
+                        e.ToString() +
+                        Environment.NewLine + Environment.NewLine +
+                        "(You can press Ctrl+C to copy the contents of this dialog)",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    project = null;
+                }
+            }
+
             if (project != this.Manager.ActiveProject)
             {
                 this.Manager.ActiveProject = project;
             }
 
             this.projectComboBox.SelectedItem = project;
-            if (project != null)
-            {
-                project.Load();
-                this.openDialog.InitialDirectory = project.InstallPath;
-                this.saveKnownFileListDialog.InitialDirectory = project.ListsPath;
-            }
         }
 
         private ArchiveTableFile Table;

@@ -83,8 +83,8 @@ namespace Gibbed.Avalanche.ArchiveViewer
                     if (info.Settings.DecompressSmallArchives == true)
                     {
                         string extension = Path.GetExtension(fileName);
-                        if (extension == ".blz" ||
-                            extension == ".eez" ||
+                        if (extension == ".blz" || extension == ".blx360z" || extension == ".bl3z" ||
+                            extension == ".eez" || extension == ".eex360z" || extension == ".ee3z" ||
                             extension == ".flz" ||
                             extension == ".nlz")
                         {
@@ -156,6 +156,15 @@ namespace Gibbed.Avalanche.ArchiveViewer
                             fileName = Path.ChangeExtension(fileName, ".dds");
                             fileName = Path.Combine("images", fileName);
                         }
+                        else if (
+                            read >= 4 &&
+                            guess[0] == 0x57 &&
+                            guess[1] == 0xE0 &&
+                            guess[2] == 0xE0 &&
+                            guess[3] == 0x57)
+                        {
+                            fileName = Path.Combine("havok", fileName);
+                        }
                         else if (read >= 5 && Encoding.ASCII.GetString(guess, 0, 5) == "<?xml")
                         {
                             fileName = Path.ChangeExtension(fileName, ".xml");
@@ -206,7 +215,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                             guess[2] == 0 &&
                             guess[3] == 0)
                         {
-                            fileName = Path.Combine("heightmap", fileName);
+                            fileName = Path.Combine("terrain", fileName);
                         }
                         else
                         {

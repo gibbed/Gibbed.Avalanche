@@ -69,7 +69,8 @@ namespace Gibbed.Avalanche.Setup
 
             foreach (string listPath in Directory.GetFiles(basePath, "*.filelist", SearchOption.AllDirectories))
             {
-                TextReader reader = new StreamReader(listPath);
+                Stream input = File.Open(listPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                TextReader reader = new StreamReader(input);
 
                 while (true)
                 {
@@ -93,13 +94,18 @@ namespace Gibbed.Avalanche.Setup
                         this.FileHashLookup[hash] != line*/)
                     {
                         string otherLine = this.FileHashLookup[hash];
-                        throw new InvalidOperationException("duplicate hash");
+                        throw new InvalidOperationException(
+                            string.Format(
+                                "duplicate hash ('{0}' vs '{1}')",
+                                line,
+                                otherLine));
                     }
 
                     this.FileHashLookup[hash] = line; // .Add(hash, line);
                 }
 
                 reader.Close();
+                input.Close();
             }
         }
 
@@ -128,7 +134,8 @@ namespace Gibbed.Avalanche.Setup
 
             foreach (string listPath in Directory.GetFiles(basePath, "*.namelist", SearchOption.AllDirectories))
             {
-                TextReader reader = new StreamReader(listPath);
+                Stream input = File.Open(listPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                TextReader reader = new StreamReader(input);
 
                 while (true)
                 {
@@ -153,10 +160,15 @@ namespace Gibbed.Avalanche.Setup
                         throw new InvalidOperationException("duplicate hash");
                     }
 
+                    if (hash == 0xA1EF3435)
+                    {
+                    }
+
                     this.NameHashLookup[hash] = line; // .Add(hash, line);
                 }
 
                 reader.Close();
+                input.Close();
             }
         }
 

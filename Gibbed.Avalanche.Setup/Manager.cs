@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,9 +32,11 @@ namespace Gibbed.Avalanche.Setup
                 }
                 else
                 {
-                    TextWriter writer = new StreamWriter(Path.Combine(this.ProjectPath, "current.txt"));
+                    Stream output = File.Open(Path.Combine(this.ProjectPath, "current.txt"), FileMode.Create, FileAccess.Write, FileShare.Read);
+                    TextWriter writer = new StreamWriter(output);
                     writer.WriteLine(value.Name);
                     writer.Close();
+                    output.Close();
                 }
 
                 this._ActiveProject = value;
@@ -77,9 +80,11 @@ namespace Gibbed.Avalanche.Setup
             }
             else
             {
-                TextReader reader = new StreamReader(currentPath);
+                Stream input = File.Open(currentPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                TextReader reader = new StreamReader(input);
                 string name = reader.ReadLine().Trim();
                 reader.Close();
+                input.Close();
 
                 if (manager[name] != null)
                 {

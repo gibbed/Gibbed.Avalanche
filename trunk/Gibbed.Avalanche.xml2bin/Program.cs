@@ -165,7 +165,7 @@ namespace Gibbed.Avalanche.xml2bin
             {
                 {
                     "b|bigendian",
-                    "read in big endian mode",
+                    "write in big endian mode",
                     v => littleEndian = v == null
                 },
                 {

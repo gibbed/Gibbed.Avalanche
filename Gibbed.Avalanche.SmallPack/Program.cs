@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Gibbed.Avalanche.FileFormats;
 using Gibbed.Helpers;
+using ICSharpCode.SharpZipLib.Zip.Compression;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using NDesk.Options;
 
@@ -18,6 +19,7 @@ namespace Gibbed.Avalanche.SmallPack
         public static void Main(string[] args)
         {
             const int alignment = 4;
+            bool littleEndian = true;
             bool verbose = false;
             bool compress = false;
             bool showHelp = false;
@@ -28,6 +30,11 @@ namespace Gibbed.Avalanche.SmallPack
                     "v|verbose",
                     "be verbose (list files)",
                     v => verbose = v != null
+                },
+                {
+                    "b|bigendian",
+                    "write in big endian mode",
+                    v => littleEndian = v == null
                 },
                 {
                     "c|compress",
@@ -72,7 +79,7 @@ namespace Gibbed.Avalanche.SmallPack
 
             if (compress == true)
             {
-                output = new DeflaterOutputStream(output);
+                output = new DeflaterOutputStream(output, new Deflater(Deflater.BEST_SPEED, false));
             }
 
             List<string> paths = new List<string>();
@@ -101,11 +108,13 @@ namespace Gibbed.Avalanche.SmallPack
                 offset = offset.Align(alignment);
             }
 
+            smallArchive.LittleEndian = littleEndian;
             smallArchive.Serialize(output);
 
             byte[] buffer = new byte[0x4000];
             foreach (string path in paths)
             {
+                Console.WriteLine("Adding {0}...", Path.GetFileName(path));
                 Stream input = File.OpenRead(path);
                 int total = 0;
                 while (true)

@@ -50,6 +50,7 @@
     <Compile Include="Matrix.cs" />
     <Compile Include="MissionsFile.cs" />
     <Compile Include="Model\BlockTypes.cs" />
+    <Compile Include="PcbbFile.cs" />
     <Compile Include="RbModel.cs" />
     <Compile Include="Model\BlockTypeHashes.cs" />
     <Compile Include="Model\IRenderBlock.cs" />

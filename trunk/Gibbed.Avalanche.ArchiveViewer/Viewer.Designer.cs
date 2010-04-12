@@ -206,6 +206,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Viewer";
             this.Text = "Gibbed\'s Avalanche Archive Viewer";
+            this.Load += new System.EventHandler(this.OnLoad);
             this.mainToolStrip.ResumeLayout(false);
             this.mainToolStrip.PerformLayout();
             this.fileMenuStrip.ResumeLayout(false);

@@ -87,5 +87,34 @@ namespace Gibbed.Avalanche.ModelViewer
                 this.SelectedBlocks.Remove((RenderBlock.IRenderBlock)e.Item.Tag);
             }
         }
+
+        private void OnItemSelected(object sender, EventArgs e)
+        {
+            if (this.blockListView.SelectedItems.Count != 1)
+            {
+                return;
+            }
+
+            var item = this.blockListView.SelectedItems[0];
+            var block = item.Tag as RenderBlock.IRenderBlock;
+            
+            if (block == null)
+            {
+                return;
+            }
+
+            if (this.Model.DebugInfos.ContainsKey(block) == false)
+            {
+                return;
+            }
+
+            var debugInfo = this.Model.DebugInfos[block];
+
+            this.statusLabel.Text = string.Format(
+                "{0} @ offset {1} (0x{1:X}), size {2}",
+                item.Text,
+                debugInfo.Offset,
+                debugInfo.Size);
+        }
     }
 }

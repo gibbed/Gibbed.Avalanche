@@ -30,14 +30,17 @@
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.blockListView = new System.Windows.Forms.ListView();
-            this.viewportPanel = new Gibbed.Avalanche.ModelViewer.RenderPanel();
             this.mainToolStrip = new System.Windows.Forms.ToolStrip();
             this.openButton = new System.Windows.Forms.ToolStripButton();
             this.openModelFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.viewportPanel = new Gibbed.Avalanche.ModelViewer.RenderPanel();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.mainToolStrip.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -53,7 +56,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.viewportPanel);
-            this.splitContainer1.Size = new System.Drawing.Size(640, 455);
+            this.splitContainer1.Size = new System.Drawing.Size(640, 433);
             this.splitContainer1.SplitterDistance = 213;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -63,20 +66,12 @@
             this.blockListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.blockListView.Location = new System.Drawing.Point(0, 0);
             this.blockListView.Name = "blockListView";
-            this.blockListView.Size = new System.Drawing.Size(213, 455);
+            this.blockListView.Size = new System.Drawing.Size(213, 433);
             this.blockListView.TabIndex = 0;
             this.blockListView.UseCompatibleStateImageBehavior = false;
             this.blockListView.View = System.Windows.Forms.View.List;
             this.blockListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.OnItemChecked);
-            // 
-            // viewportPanel
-            // 
-            this.viewportPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.viewportPanel.Location = new System.Drawing.Point(0, 0);
-            this.viewportPanel.Name = "viewportPanel";
-            this.viewportPanel.Size = new System.Drawing.Size(423, 455);
-            this.viewportPanel.TabIndex = 0;
-            this.viewportPanel.Resize += new System.EventHandler(this.OnViewportResize);
+            this.blockListView.SelectedIndexChanged += new System.EventHandler(this.OnItemSelected);
             // 
             // mainToolStrip
             // 
@@ -104,6 +99,32 @@
             this.openModelFileDialog.Filter = "Render Block Model Files (*.rbm, *.rbx360, *.rb3)|*.rbm;*.rbx360;*.rb3|All Files " +
                 "(*.*)|*.*";
             // 
+            // viewportPanel
+            // 
+            this.viewportPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.viewportPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.viewportPanel.Location = new System.Drawing.Point(0, 0);
+            this.viewportPanel.Name = "viewportPanel";
+            this.viewportPanel.Size = new System.Drawing.Size(423, 433);
+            this.viewportPanel.TabIndex = 0;
+            this.viewportPanel.Resize += new System.EventHandler(this.OnViewportResize);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 458);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(640, 22);
+            this.statusStrip1.TabIndex = 2;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(79, 17);
+            this.statusLabel.Text = "Select a block";
+            // 
             // Viewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -111,6 +132,7 @@
             this.ClientSize = new System.Drawing.Size(640, 480);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.mainToolStrip);
+            this.Controls.Add(this.statusStrip1);
             this.DoubleBuffered = true;
             this.Name = "Viewer";
             this.Text = "Gibbed\'s Avalanche Model Viewer";
@@ -120,6 +142,8 @@
             this.splitContainer1.ResumeLayout(false);
             this.mainToolStrip.ResumeLayout(false);
             this.mainToolStrip.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -133,6 +157,8 @@
         private System.Windows.Forms.ToolStripButton openButton;
         private System.Windows.Forms.OpenFileDialog openModelFileDialog;
         private RenderPanel viewportPanel;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel statusLabel;
     }
 }
 

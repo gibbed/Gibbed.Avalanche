@@ -64,8 +64,9 @@ namespace Gibbed.Avalanche.ModelViewer
             this.Camera.LookTo(new Vector2(1.3f, -0.4f));
             
             this.RendererTypes.Clear();
+            this.AddRendererType<RenderBlock.CarPaint, Renderers.CarPaintRenderer>();
+            this.AddRendererType<RenderBlock.DeformableWindow, Renderers.DeformableWindowRenderer>();
             this.AddRendererType<RenderBlock.SkinnedGeneral, Renderers.SkinnedGeneralRenderer>();
-
             this.BlockRenderers.Clear();
         }
 

@@ -74,7 +74,8 @@ namespace Gibbed.Avalanche.FileFormats
                 throw new FormatException("bad header magic");
             }
 
-            if (input.ReadValueU32(this.LittleEndian) != 2)
+            uint version = input.ReadValueU32(this.LittleEndian);
+            if (version != 1 && version != 2)
             {
                 throw new FormatException("bad header version");
             }

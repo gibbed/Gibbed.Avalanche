@@ -16,8 +16,8 @@ namespace Gibbed.Avalanche.FileFormats
         public float MaxY;
         public float MaxZ;
 
-        public List<Model.IRenderBlock> RenderBlocks =
-            new List<Model.IRenderBlock>();
+        public List<RenderBlock.IRenderBlock> Blocks =
+            new List<RenderBlock.IRenderBlock>();
 
         public void Deserialize(Stream input)
         {
@@ -42,13 +42,13 @@ namespace Gibbed.Avalanche.FileFormats
             this.MaxY = input.ReadValueF32();
             this.MaxZ = input.ReadValueF32();
 
-            this.RenderBlocks.Clear();
+            this.Blocks.Clear();
             uint count = input.ReadValueU32();
             for (uint i = 0; i < count; i++)
             {
                 uint type = input.ReadValueU32();
 
-                var block = Model.BlockTypes.GetBlock(type);
+                var block = RenderBlock.BlockTypes.GetBlock(type);
                 if (block == null)
                 {
                     throw new Exception("unknown block type " + type.ToString("X8"));
@@ -61,7 +61,7 @@ namespace Gibbed.Avalanche.FileFormats
                     throw new Exception("failed to read block properly");
                 }
 
-                this.RenderBlocks.Add(block);
+                this.Blocks.Add(block);
             }
         }
 

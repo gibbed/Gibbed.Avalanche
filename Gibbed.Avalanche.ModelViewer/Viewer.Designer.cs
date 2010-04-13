@@ -46,13 +46,14 @@
             this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modelOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.blockStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.blockListToolStrip.SuspendLayout();
             this.viewportToolStrip.SuspendLayout();
             this.mainToolStrip.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -70,8 +71,8 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.viewportPanel);
             this.splitContainer1.Panel2.Controls.Add(this.viewportToolStrip);
-            this.splitContainer1.Size = new System.Drawing.Size(640, 433);
-            this.splitContainer1.SplitterDistance = 213;
+            this.splitContainer1.Size = new System.Drawing.Size(800, 433);
+            this.splitContainer1.SplitterDistance = 266;
             this.splitContainer1.TabIndex = 0;
             // 
             // blockListView
@@ -80,7 +81,7 @@
             this.blockListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.blockListView.Location = new System.Drawing.Point(0, 0);
             this.blockListView.Name = "blockListView";
-            this.blockListView.Size = new System.Drawing.Size(213, 408);
+            this.blockListView.Size = new System.Drawing.Size(266, 408);
             this.blockListView.TabIndex = 0;
             this.blockListView.UseCompatibleStateImageBehavior = false;
             this.blockListView.View = System.Windows.Forms.View.List;
@@ -95,7 +96,7 @@
             this.blockDeleteButton});
             this.blockListToolStrip.Location = new System.Drawing.Point(0, 408);
             this.blockListToolStrip.Name = "blockListToolStrip";
-            this.blockListToolStrip.Size = new System.Drawing.Size(213, 25);
+            this.blockListToolStrip.Size = new System.Drawing.Size(266, 25);
             this.blockListToolStrip.TabIndex = 1;
             this.blockListToolStrip.Text = "toolStrip1";
             // 
@@ -125,7 +126,7 @@
             this.viewportPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.viewportPanel.Location = new System.Drawing.Point(0, 0);
             this.viewportPanel.Name = "viewportPanel";
-            this.viewportPanel.Size = new System.Drawing.Size(423, 408);
+            this.viewportPanel.Size = new System.Drawing.Size(530, 408);
             this.viewportPanel.TabIndex = 1;
             this.viewportPanel.MouseLeave += new System.EventHandler(this.OnViewportMouseLeave);
             this.viewportPanel.Resize += new System.EventHandler(this.OnViewportResize);
@@ -139,7 +140,7 @@
             this.cameraResetButton});
             this.viewportToolStrip.Location = new System.Drawing.Point(0, 408);
             this.viewportToolStrip.Name = "viewportToolStrip";
-            this.viewportToolStrip.Size = new System.Drawing.Size(423, 25);
+            this.viewportToolStrip.Size = new System.Drawing.Size(530, 25);
             this.viewportToolStrip.TabIndex = 1;
             this.viewportToolStrip.Text = "toolStrip2";
             // 
@@ -203,7 +204,7 @@
             this.modelOpenFileButton});
             this.mainToolStrip.Location = new System.Drawing.Point(0, 0);
             this.mainToolStrip.Name = "mainToolStrip";
-            this.mainToolStrip.Size = new System.Drawing.Size(640, 25);
+            this.mainToolStrip.Size = new System.Drawing.Size(800, 25);
             this.mainToolStrip.TabIndex = 1;
             this.mainToolStrip.Text = "toolStrip1";
             // 
@@ -233,17 +234,19 @@
             // 
             // statusStrip
             // 
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.blockStatusLabel});
             this.statusStrip.Location = new System.Drawing.Point(0, 458);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(640, 22);
+            this.statusStrip.Size = new System.Drawing.Size(800, 22);
             this.statusStrip.TabIndex = 2;
             this.statusStrip.Text = "statusStrip1";
             // 
-            // statusLabel
+            // blockStatusLabel
             // 
-            this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(79, 17);
-            this.statusLabel.Text = "Select a block";
+            this.blockStatusLabel.Name = "blockStatusLabel";
+            this.blockStatusLabel.Size = new System.Drawing.Size(79, 17);
+            this.blockStatusLabel.Text = "Select a block";
             // 
             // Viewer
             // 
@@ -269,6 +272,8 @@
             this.viewportToolStrip.PerformLayout();
             this.mainToolStrip.ResumeLayout(false);
             this.mainToolStrip.PerformLayout();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -282,7 +287,6 @@
         private System.Windows.Forms.OpenFileDialog modelOpenFileDialog;
         private ModelViewRenderPanel viewportPanel;
         private System.Windows.Forms.StatusStrip statusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel statusLabel;
         private System.Windows.Forms.ToolStripSplitButton modelOpenFileButton;
         private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
         private System.Windows.Forms.ToolStrip blockListToolStrip;
@@ -295,6 +299,7 @@
         private System.Windows.Forms.ToolStripMenuItem cameraBehaviorFlightButton;
         private System.Windows.Forms.ToolStripMenuItem cameraBehaviorOrbitButton;
         private System.Windows.Forms.ToolStripButton cameraResetButton;
+        private System.Windows.Forms.ToolStripStatusLabel blockStatusLabel;
     }
 }
 

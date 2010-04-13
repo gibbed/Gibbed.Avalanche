@@ -185,7 +185,7 @@ namespace Gibbed.Avalanche.ModelViewer
 
             var debugInfo = this.Model.DebugInfos[block];
 
-            this.statusLabel.Text = string.Format(
+            this.blockStatusLabel.Text = string.Format(
                 "{0} @ offset {1} (0x{1:X}), size {2}",
                 item.Text,
                 debugInfo.Offset,

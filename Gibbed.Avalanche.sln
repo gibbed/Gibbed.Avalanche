@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.SmallPack"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.Setup", "Gibbed.Avalanche.Setup\Gibbed.Avalanche.Setup.csproj", "{AB016DF6-6176-442C-A189-E513DD673AC2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.ModelViewer", "Gibbed.Avalanche.ModelViewer\Gibbed.Avalanche.ModelViewer.csproj", "{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,16 @@ Global
 		{AB016DF6-6176-442C-A189-E513DD673AC2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{AB016DF6-6176-442C-A189-E513DD673AC2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AB016DF6-6176-442C-A189-E513DD673AC2}.Release|Win32.ActiveCfg = Release|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

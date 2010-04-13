@@ -52,7 +52,6 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
         public override void Render(GraphicsDevice device, DeformableWindow block)
         {
             VertexBuffer vertices;
-            int vertexSize;
 
             device.VertexDeclaration = this.VertexDeclaration;
             vertices = new VertexBuffer(

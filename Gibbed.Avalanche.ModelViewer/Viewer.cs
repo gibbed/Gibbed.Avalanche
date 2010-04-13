@@ -4,6 +4,8 @@ using System.IO;
 using System.Windows.Forms;
 using RbModel = Gibbed.Avalanche.FileFormats.RbModel;
 using RenderBlock = Gibbed.Avalanche.FileFormats.RenderBlock;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using Mouse = Microsoft.Xna.Framework.Input.Mouse;
 
 namespace Gibbed.Avalanche.ModelViewer
 {
@@ -12,7 +14,8 @@ namespace Gibbed.Avalanche.ModelViewer
         public Viewer()
         {
             this.InitializeComponent();
-            this.Renderer = new Renderer(this.viewportPanel);
+            this.Renderer = new ModelViewRenderer(this.viewportPanel);
+            Mouse.WindowHandle = this.viewportPanel.Handle;
         }
 
         private void OnShown(object sender, EventArgs e)
@@ -20,18 +23,30 @@ namespace Gibbed.Avalanche.ModelViewer
             this.RenderViewport();
         }
 
-        private Renderer Renderer;
-        private RbModel Model;
+        private bool HandlingViewportInput = false;
+
+        private ModelViewRenderer Renderer;
+        private RbModel Model = new RbModel();
         private string ModelPath;
         private List<RenderBlock.IRenderBlock> SelectedBlocks =
             new List<RenderBlock.IRenderBlock>();
 
         private void RenderViewport()
         {
+            var timer = new System.Diagnostics.Stopwatch();
+            timer.Start();
+
+            var lastUpdate = timer.Elapsed;
+
             this.Renderer.CreateDevice();
             while (!this.IsDisposed)
             {
-                this.Renderer.UpdateCamera(this.viewportPanel.Focused);
+                var total = timer.Elapsed;
+                var elapsed = total - lastUpdate;
+                var gameTime = new GameTime(total, elapsed, total, elapsed);
+                lastUpdate = total;
+
+                this.Renderer.UpdateCamera(gameTime, this.HandlingViewportInput);
                 Application.DoEvents();
                 this.Renderer.UpdateScene(this.ModelPath, this.Model, this.SelectedBlocks);
                 Application.DoEvents();
@@ -49,14 +64,14 @@ namespace Gibbed.Avalanche.ModelViewer
 
         private void OnOpenModelFile(object sender, EventArgs e)
         {
-            if (this.openModelFileDialog.ShowDialog() != DialogResult.OK)
+            if (this.modelOpenFileDialog.ShowDialog() != DialogResult.OK)
             {
                 return;
             }
 
-            this.ModelPath = Path.GetDirectoryName(this.openModelFileDialog.FileName);
+            this.ModelPath = Path.GetDirectoryName(this.modelOpenFileDialog.FileName);
 
-            Stream input = File.Open(this.openModelFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            Stream input = File.Open(this.modelOpenFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Read);
             this.Model = new RbModel();
             this.Model.Deserialize(input);
             input.Close();
@@ -74,6 +89,66 @@ namespace Gibbed.Avalanche.ModelViewer
             }
 
             this.Renderer.ResetDevice();
+            this.SetupCamera();
+        }
+
+        private void OnAddModelFile(object sender, EventArgs e)
+        {
+            if (this.modelOpenFileDialog.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            this.ModelPath = Path.GetDirectoryName(this.modelOpenFileDialog.FileName);
+
+            Stream input = File.Open(this.modelOpenFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var model = new RbModel();
+            model.Deserialize(input);
+            input.Close();
+
+            int i = this.Model.Blocks.Count;
+            foreach (RenderBlock.IRenderBlock block in model.Blocks)
+            {
+                this.Model.Blocks.Add(block);
+
+                ListViewItem item = new ListViewItem();
+                item.Text = i.ToString() + ": " + block.GetType().Name;
+                item.Tag = block;
+                this.blockListView.Items.Add(item);
+                i++;
+            }
+
+            this.Renderer.ResetDevice();
+            this.SetupCamera();
+        }
+
+        private void SetupCamera()
+        {
+            var min = new Microsoft.Xna.Framework.Vector3(
+                this.Model.MinX,
+                this.Model.MinY,
+                this.Model.MinZ);
+
+            var max = new Microsoft.Xna.Framework.Vector3(
+                this.Model.MaxX,
+                this.Model.MaxY,
+                this.Model.MaxZ);
+
+            var center = Microsoft.Xna.Framework.Vector3.Add(min, max);
+            center = Microsoft.Xna.Framework.Vector3.Divide(center, 2.0f);
+
+            var distance = Microsoft.Xna.Framework.Vector3.Distance(center, max);
+
+            var position = center;
+            position.X -= distance / 2.0f;
+            position.Y += distance / 2.0f;
+            position.Z -= distance / 1.0f;
+
+            this.Renderer.Camera.Stop();
+            this.Renderer.Camera.LookAt(position, center, Microsoft.Xna.Framework.Vector3.Up);
+            this.Renderer.Camera.OrbitTarget = center;
+            this.Renderer.Camera.OrbitOffsetDistance = distance * 1.25f;
+            this.Renderer.Camera.UndoRoll();
         }
 
         private void OnItemChecked(object sender, ItemCheckedEventArgs e)
@@ -115,6 +190,71 @@ namespace Gibbed.Avalanche.ModelViewer
                 item.Text,
                 debugInfo.Offset,
                 debugInfo.Size);
+        }
+
+        private void SetCameraBehavior(Camera.Behavior behavior)
+        {
+            this.Renderer.Camera.CurrentBehavior = behavior;
+            this.cameraBehaviorSpectatorButton.Checked = behavior == Camera.Behavior.Spectator;
+            this.cameraBehaviorFirstPersonButton.Checked = behavior == Camera.Behavior.FirstPerson;
+            this.cameraBehaviorFlightButton.Checked = behavior == Camera.Behavior.Flight;
+            this.cameraBehaviorOrbitButton.Checked = behavior == Camera.Behavior.Orbit;
+            this.SetupCamera();
+        }
+
+        private void OnSetCameraBehaviorSpectator(object sender, EventArgs e)
+        {
+            this.SetCameraBehavior(Camera.Behavior.Spectator);
+        }
+
+        private void OnSetCameraBehaviorFirstPerson(object sender, EventArgs e)
+        {
+            this.SetCameraBehavior(Camera.Behavior.FirstPerson);
+        }
+
+        private void OnSetCameraBehaviorFlight(object sender, EventArgs e)
+        {
+            this.SetCameraBehavior(Camera.Behavior.Flight);
+        }
+
+        private void OnSetCameraBehaviorOrbit(object sender, EventArgs e)
+        {
+            this.SetCameraBehavior(Camera.Behavior.Orbit);
+        }
+
+        private void OnResetCameraView(object sender, EventArgs e)
+        {
+            this.SetupCamera();
+        }
+
+        private void OnViewportMouseEnter(object sender, EventArgs e)
+        {
+            this.HandlingViewportInput = true;
+        }
+
+        private void OnViewportMouseLeave(object sender, EventArgs e)
+        {
+            this.HandlingViewportInput = false;
+        }
+
+        private void OnBlockCopy(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OnBlockDelete(object sender, EventArgs e)
+        {
+            var selectedItems = this.blockListView.SelectedItems;
+            foreach (ListViewItem item in selectedItems)
+            {
+                var block = item.Tag as RenderBlock.IRenderBlock;
+                if (block == null)
+                {
+                    continue;
+                }
+                this.Model.Blocks.Remove(block);
+                this.blockListView.Items.Remove(item);
+            }
         }
     }
 }

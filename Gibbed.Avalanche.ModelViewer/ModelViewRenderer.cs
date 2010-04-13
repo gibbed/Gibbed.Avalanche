@@ -11,19 +11,20 @@ using XnaColor = Microsoft.Xna.Framework.Graphics.Color;
 
 namespace Gibbed.Avalanche.ModelViewer
 {
-    internal class Renderer
+    internal class ModelViewRenderer
     {
         private GraphicsDevice Device;
         private BasicEffect BasicEffect;
-        private Camera Camera;
+        public ModelViewCamera Camera;
         private Control Control;
         private Dictionary<Type, Type> RendererTypes = new Dictionary<Type, Type>();
         private Dictionary<RenderBlock.IRenderBlock, Renderers.IBlockRenderer>
             BlockRenderers = new Dictionary<RenderBlock.IRenderBlock, Renderers.IBlockRenderer>();
 
-        public Renderer(Control control)
+        public ModelViewRenderer(Control control)
         {
             this.Control = control;
+            this.Camera = new ModelViewCamera(this.Control);
         }
 
         public void CreateDevice()
@@ -38,7 +39,7 @@ namespace Gibbed.Avalanche.ModelViewer
             pp.EnableAutoDepthStencil = true;
             pp.PresentationInterval = PresentInterval.Default;
             pp.BackBufferFormat = SurfaceFormat.Unknown;
-            pp.MultiSampleType = MultiSampleType.None;
+            pp.MultiSampleType = MultiSampleType.NonMaskable;
 
             this.Device = new GraphicsDevice(
                 GraphicsAdapter.DefaultAdapter,
@@ -59,10 +60,9 @@ namespace Gibbed.Avalanche.ModelViewer
 
             this.BasicEffect.VertexColorEnabled = false;
 
-            this.Camera = new Camera(this.Control);
-            this.Camera.MoveTo(new Vector3(-0.4f, 1.6f, -1.1f));
-            this.Camera.LookTo(new Vector2(1.3f, -0.4f));
-            
+            this.BasicEffect.World = Matrix.Identity;
+            this.BasicEffect.Projection = this.Camera.ProjectionMatrix;
+
             this.RendererTypes.Clear();
             this.AddRendererType<RenderBlock.CarPaint, Renderers.CarPaintRenderer>();
             this.AddRendererType<RenderBlock.CarPaintSimple, Renderers.CarPaintSimpleRenderer>();
@@ -152,83 +152,10 @@ namespace Gibbed.Avalanche.ModelViewer
             System.Threading.Thread.Sleep(5);
         }
 
-        public void UpdateCamera(bool handleInput)
+        public void UpdateCamera(GameTime gameTime, bool handleInput)
         {
-            if (handleInput == true)
-            {
-                // get input states
-                MouseState mouse = Mouse.GetState();
-                KeyboardState keyboard = Keyboard.GetState();
-                GamePadState gamepad = GamePad.GetState(PlayerIndex.One);
-
-                // apply movement
-                if (keyboard.IsKeyDown(XInput.Keys.W))
-                {
-                    Camera.ApplyForce(Camera.ForwardDirection);
-                }
-                if (keyboard.IsKeyDown(XInput.Keys.A))
-                {
-                    Camera.ApplyForce(-Camera.HorizontalDirection);
-                }
-                if (keyboard.IsKeyDown(XInput.Keys.S))
-                {
-                    Camera.ApplyForce(-Camera.ForwardDirection);
-                }
-                if (keyboard.IsKeyDown(XInput.Keys.D))
-                {
-                    Camera.ApplyForce(Camera.HorizontalDirection);
-                }
-                if (keyboard.IsKeyDown(XInput.Keys.Q))
-                {
-                    Camera.ApplyForce(new Vector3(0, -1, 0));
-                }
-                if (keyboard.IsKeyDown(XInput.Keys.E))
-                {
-                    Camera.ApplyForce(new Vector3(0, 1, 0));
-                }
-                if (keyboard.IsKeyDown(XInput.Keys.Up))
-                {
-                    Camera.ApplyLookForce(new Vector2(0, 0.1f));
-                }
-                if (keyboard.IsKeyDown(XInput.Keys.Left))
-                {
-                    Camera.ApplyLookForce(new Vector2(-0.1f, 0));
-                }
-                if (keyboard.IsKeyDown(XInput.Keys.Down))
-                {
-                    Camera.ApplyLookForce(new Vector2(0, -0.1f));
-                }
-                if (keyboard.IsKeyDown(XInput.Keys.Right))
-                {
-                    Camera.ApplyLookForce(new Vector2(0.1f, 0));
-                }
-
-                if (mouse.ScrollWheelValue < 0)
-                    Camera.ApplyZoomForce(0.02f);
-                else if (mouse.ScrollWheelValue > 0)
-                    Camera.ApplyZoomForce(-0.02f);
-
-                //if (mouse.RightButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
-                //{
-                //    Camera.ApplyLookForce(new Vector2(-mouse.
-                //}
-                // if windowed, you must click the left mouse button to look around
-                //if (DXUTIsWindowed())
-                //{
-                //    if (mouseState->rgbButtons[0] > 0)
-                //        cam->ApplyLookForce(Vector2(-mouseState->lX * .01f, -mouseState->lY * .01f));
-                //}
-                //else
-                //    cam->ApplyLookForce(Vector2(-mouseState->lX * .01f, -mouseState->lY * .01f));
-            }
-
-            // do the calculations
-            this.Camera.Update();
-
-            // update views
-            this.BasicEffect.View = this.Camera.View;
-            this.BasicEffect.Projection = this.Camera.Projection;
-            this.BasicEffect.World = this.Camera.World;
+            this.Camera.Update(gameTime, handleInput);
+            this.BasicEffect.View = this.Camera.ViewMatrix;
         }
     }
 }

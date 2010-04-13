@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace Gibbed.Avalanche.ModelViewer
 {
-    public class RenderPanel : Panel
+    public class ModelViewRenderPanel : Panel
     {
-        public RenderPanel() : base()
+        public ModelViewRenderPanel() : base()
         {
             this.SetStyle(ControlStyles.Selectable, true);
             this.BorderStyle = BorderStyle.FixedSingle;

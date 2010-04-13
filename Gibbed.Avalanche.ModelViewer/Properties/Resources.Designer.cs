@@ -60,6 +60,34 @@ namespace Gibbed.Avalanche.ModelViewer.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap BlockCopy {
+            get {
+                object obj = ResourceManager.GetObject("BlockCopy", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap BlockDelete {
+            get {
+                object obj = ResourceManager.GetObject("BlockDelete", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CameraMode {
+            get {
+                object obj = ResourceManager.GetObject("CameraMode", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap CameraReset {
+            get {
+                object obj = ResourceManager.GetObject("CameraReset", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap OpenModel {
             get {
                 object obj = ResourceManager.GetObject("OpenModel", resourceCulture);

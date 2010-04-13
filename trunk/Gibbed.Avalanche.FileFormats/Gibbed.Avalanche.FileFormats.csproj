@@ -53,6 +53,8 @@
     <Compile Include="PcbbFile.cs" />
     <Compile Include="RbModel.cs" />
     <Compile Include="RenderBlock\BlockTypeHashes.cs" />
+    <Compile Include="RenderBlock\CarPaint.cs" />
+    <Compile Include="RenderBlock\DeformableWindow.cs" />
     <Compile Include="RenderBlock\IRenderBlock.cs" />
     <Compile Include="RenderBlock\SkinnedGeneral.cs" />
     <Compile Include="StreamHelpers.cs" />

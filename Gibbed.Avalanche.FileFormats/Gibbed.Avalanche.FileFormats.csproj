@@ -54,6 +54,7 @@
     <Compile Include="RbModel.cs" />
     <Compile Include="RenderBlock\BlockTypeHashes.cs" />
     <Compile Include="RenderBlock\CarPaint.cs" />
+    <Compile Include="RenderBlock\CarPaintSimple.cs" />
     <Compile Include="RenderBlock\DeformableWindow.cs" />
     <Compile Include="RenderBlock\IRenderBlock.cs" />
     <Compile Include="RenderBlock\SkinnedGeneral.cs" />

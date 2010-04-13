@@ -67,6 +67,7 @@ namespace Gibbed.Avalanche.ModelViewer
             this.AddRendererType<RenderBlock.CarPaint, Renderers.CarPaintRenderer>();
             this.AddRendererType<RenderBlock.CarPaintSimple, Renderers.CarPaintSimpleRenderer>();
             this.AddRendererType<RenderBlock.DeformableWindow, Renderers.DeformableWindowRenderer>();
+            this.AddRendererType<RenderBlock.General, Renderers.GeneralRenderer>();
             this.AddRendererType<RenderBlock.SkinnedGeneral, Renderers.SkinnedGeneralRenderer>();
             this.BlockRenderers.Clear();
         }

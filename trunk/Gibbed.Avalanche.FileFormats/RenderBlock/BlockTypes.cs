@@ -41,6 +41,7 @@ namespace Gibbed.Avalanche.FileFormats.RenderBlock
             Register<CarPaint>("CarPaint");
             Register<CarPaintSimple>("CarPaintSimple");
             Register<DeformableWindow>("DeformableWindow");
+            Register<General>("General");
             Register<SkinnedGeneral>("SkinnedGeneral");
         }
     }

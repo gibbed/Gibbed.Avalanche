@@ -1,0 +1,197 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+using Gibbed.Helpers;
+
+namespace Gibbed.Avalanche.FileFormats.RenderBlock
+{
+    public class General : IRenderBlock
+    {
+        public struct SmallVertex
+        {
+            public short TexCoord1A;
+            public short TexCoord1B;
+            public short TexCoord1C;
+            public short TexCoord1D;
+            public float TexCoord2A;
+            public float TexCoord2B;
+            public float TexCoord2C;
+            public short PositionX;
+            public short PositionY;
+            public short PositionZ;
+            public short PositionW;
+
+            public void Deserialize(Stream input)
+            {
+                this.TexCoord1A = input.ReadValueS16();
+                this.TexCoord1B = input.ReadValueS16();
+                this.TexCoord1C = input.ReadValueS16();
+                this.TexCoord1D = input.ReadValueS16();
+                this.TexCoord2A = input.ReadValueF32();
+                this.TexCoord2B = input.ReadValueF32();
+                this.TexCoord2C = input.ReadValueF32();
+                this.PositionX = input.ReadValueS16();
+                this.PositionY = input.ReadValueS16();
+                this.PositionZ = input.ReadValueS16();
+                this.PositionW = input.ReadValueS16();
+            }
+
+            public override string ToString()
+            {
+                return string.Format("{0},{1},{2}",
+                    this.PositionX,
+                    this.PositionY,
+                    this.PositionZ);
+            }
+        }
+
+        public struct BigVertex
+        {
+            public float PositionX;
+            public float PositionY;
+            public float PositionZ;
+            public float TexCoord1A;
+            public float TexCoord1B;
+            public float TexCoord1C;
+            public float TexCoord1D;
+            public float TexCoord2A;
+            public float TexCoord2B;
+            public float TexCoord2C;
+
+            public void Deserialize(Stream input)
+            {
+                this.PositionX = input.ReadValueF32();
+                this.PositionY = input.ReadValueF32();
+                this.PositionZ = input.ReadValueF32();
+                this.TexCoord1A = input.ReadValueF32();
+                this.TexCoord1B = input.ReadValueF32();
+                this.TexCoord1C = input.ReadValueF32();
+                this.TexCoord1D = input.ReadValueF32();
+                this.TexCoord2A = input.ReadValueF32();
+                this.TexCoord2B = input.ReadValueF32();
+                this.TexCoord2C = input.ReadValueF32();
+            }
+        }
+
+        public byte Version;
+        public uint Flags;
+        public bool HasBigVertices
+        {
+            get { return this.Unknown11 == 0; }
+        }
+
+        public float Unknown01;
+        public float Unknown02;
+        public float Unknown03;
+        public float Unknown04;
+        public float Unknown05;
+        public float Unknown06;
+        public float Unknown07;
+        public float Unknown08;
+        public float Unknown09;
+        public float Unknown10;
+
+        public uint Unknown11;
+
+        public float Unknown12;
+        public float Unknown13;
+        public float Unknown14;
+        public float Unknown15;
+        public float Unknown16;
+        public float Unknown17;
+        public int Unknown18;
+        public int Unknown19;
+
+        public List<string> Textures = new List<string>();
+        public uint Unknown20;
+
+        public List<SmallVertex> SmallVertices = new List<SmallVertex>();
+        public List<BigVertex> BigVertices = new List<BigVertex>();
+        public List<short> Faces = new List<short>();
+
+        public void Serialize(Stream output)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Deserialize(Stream input)
+        {
+            this.Version = input.ReadValueU8();
+            if (this.Version != 2 && this.Version != 3)
+            {
+                throw new FormatException("unhandled version for General");
+            }
+
+            this.Unknown01 = input.ReadValueF32();
+            this.Unknown02 = input.ReadValueF32();
+            this.Unknown03 = input.ReadValueF32();
+            this.Unknown04 = input.ReadValueF32();
+            this.Unknown05 = input.ReadValueF32();
+            this.Unknown06 = input.ReadValueF32();
+            this.Unknown07 = input.ReadValueF32();
+            this.Unknown08 = input.ReadValueF32();
+            this.Unknown09 = input.ReadValueF32();
+            this.Unknown10 = input.ReadValueF32();
+
+            this.Unknown11 = input.ReadValueU32();
+
+            this.Unknown12 = input.ReadValueF32();
+            this.Unknown13 = input.ReadValueF32();
+            this.Unknown14 = input.ReadValueF32();
+            this.Unknown15 = input.ReadValueF32();
+            this.Unknown16 = input.ReadValueF32();
+            this.Unknown17 = input.ReadValueF32();
+
+            if (this.Version == 3)
+            {
+                this.Unknown18 = input.ReadValueS32();
+                this.Unknown19 = input.ReadValueS32();
+            }
+
+            this.Textures.Clear();
+            for (int i = 0; i < 8; i++)
+            {
+                this.Textures.Add(input.ReadStringASCIIUInt32());
+            }
+            this.Unknown20 = input.ReadValueU32();
+
+            if (this.HasBigVertices == false)
+            {
+                this.SmallVertices.Clear();
+                {
+                    uint count = input.ReadValueU32();
+                    for (uint i = 0; i < count; i++)
+                    {
+                        var data = new SmallVertex();
+                        data.Deserialize(input);
+                        this.SmallVertices.Add(data);
+                    }
+                }
+            }
+            else
+            {
+                this.BigVertices.Clear();
+                {
+                    uint count = input.ReadValueU32();
+                    for (uint i = 0; i < count; i++)
+                    {
+                        var data = new BigVertex();
+                        data.Deserialize(input);
+                        this.BigVertices.Add(data);
+                    }
+                }
+            }
+
+            this.Faces.Clear();
+            {
+                uint count = input.ReadValueU32();
+                for (uint i = 0; i < count; i++)
+                {
+                    this.Faces.Add(input.ReadValueS16());
+                }
+            }
+        }
+    }
+}

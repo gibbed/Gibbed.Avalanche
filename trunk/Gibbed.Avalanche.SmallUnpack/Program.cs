@@ -135,7 +135,8 @@ namespace Gibbed.Avalanche.SmallUnpack
                 {
                     counter++;
 
-                    string entryPath = Path.Combine(outputPath, entry.Name);
+                    string entryName = Path.GetFileName(entry.Name);
+                    string entryPath = Path.Combine(outputPath, entryName);
 
                     if (overwriteFiles == false && File.Exists(entryPath) == true)
                     {

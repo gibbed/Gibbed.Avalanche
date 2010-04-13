@@ -249,13 +249,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(640, 480);
+            this.ClientSize = new System.Drawing.Size(800, 480);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.mainToolStrip);
             this.Controls.Add(this.statusStrip);
             this.DoubleBuffered = true;
             this.Name = "Viewer";
-            this.Text = "Gibbed\'s Avalanche Model Viewer";
+            this.Text = "Gibbed\'s Avalanche Model Viewer *THE I REALLY FUCKING HATE THE GENERAL BLOCK TYPE" +
+                " EDITION*";
             this.Shown += new System.EventHandler(this.OnShown);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();

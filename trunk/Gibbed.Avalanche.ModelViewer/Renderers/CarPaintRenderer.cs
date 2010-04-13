@@ -52,14 +52,12 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
         public override void Render(GraphicsDevice device, CarPaint block)
         {
             VertexBuffer vertices;
-            int vertexSize;
-
-                device.VertexDeclaration = this.VertexDeclaration;
-                vertices = new VertexBuffer(
-                    device,
-                    block.Vertices.Count * 24,
-                    BufferUsage.WriteOnly);
-                vertices.SetData(block.Vertices.ToArray());
+            device.VertexDeclaration = this.VertexDeclaration;
+            vertices = new VertexBuffer(
+                device,
+                block.Vertices.Count * 24,
+                BufferUsage.WriteOnly);
+            vertices.SetData(block.Vertices.ToArray());
 
             VertexBuffer extras = new VertexBuffer(
                 device,

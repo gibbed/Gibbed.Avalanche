@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Game, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -51,14 +52,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="ICamera.cs" />
+    <Compile Include="ModelViewCamera.cs" />
     <Compile Include="Renderers\CarPaintRenderer.cs" />
     <Compile Include="Renderers\CarPaintSimpleRenderer.cs" />
     <Compile Include="Renderers\DeformableWindowRenderer.cs" />
     <Compile Include="Renderers\GeneralRenderer.cs" />
-    <Compile Include="RenderPanel.cs">
+    <Compile Include="ModelViewRenderPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Renderer.cs" />
+    <Compile Include="ModelViewRenderer.cs" />
     <Compile Include="Renderers\GenericBlockRenderer.cs" />
     <Compile Include="Renderers\IBlockRenderer.cs" />
     <Compile Include="Renderers\SkinnedGeneralRenderer.cs" />
@@ -105,6 +108,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\OpenModel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CameraReset.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CameraMode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BlockCopy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BlockDelete.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -75,6 +75,15 @@ namespace Gibbed.Avalanche.FileFormats.RenderBlock
             }
         }
 
+        public struct HackToFixDumbVertex
+        {
+            public float PositionX;
+            public float PositionY;
+            public float PositionZ;
+            public float TexCoordA;
+            public float TexCoordB;
+        }
+
         public byte Version;
         public uint Flags;
         public bool HasBigVertices
@@ -108,12 +117,23 @@ namespace Gibbed.Avalanche.FileFormats.RenderBlock
         public uint Unknown20;
 
         public List<SmallVertex> SmallVertices = new List<SmallVertex>();
+        public List<HackToFixDumbVertex> HackToFixDumbVertices = new List<HackToFixDumbVertex>();
         public List<BigVertex> BigVertices = new List<BigVertex>();
         public List<short> Faces = new List<short>();
 
         public void Serialize(Stream output)
         {
             throw new NotImplementedException();
+        }
+
+        private static float GetFloatFromS16N(short c)
+        {
+            if (c == 0xFFFF)
+            {
+                return -1.0f;
+            }
+
+            return (float)c * (1.0f / 32767);
         }
 
         public void Deserialize(Stream input)
@@ -160,6 +180,7 @@ namespace Gibbed.Avalanche.FileFormats.RenderBlock
             if (this.HasBigVertices == false)
             {
                 this.SmallVertices.Clear();
+                this.HackToFixDumbVertices.Clear();
                 {
                     uint count = input.ReadValueU32();
                     for (uint i = 0; i < count; i++)
@@ -167,8 +188,18 @@ namespace Gibbed.Avalanche.FileFormats.RenderBlock
                         var data = new SmallVertex();
                         data.Deserialize(input);
                         this.SmallVertices.Add(data);
+
+                        var hack = new HackToFixDumbVertex();
+                        hack.PositionX = GetFloatFromS16N(data.PositionX) * this.Unknown10;
+                        hack.PositionY = GetFloatFromS16N(data.PositionY) * this.Unknown10;
+                        hack.PositionZ = GetFloatFromS16N(data.PositionZ) * this.Unknown10;
+                        hack.TexCoordA = GetFloatFromS16N(data.TexCoord1A);
+                        hack.TexCoordB = GetFloatFromS16N(data.TexCoord1B);
+                        this.HackToFixDumbVertices.Add(hack);
                     }
                 }
+
+                
             }
             else
             {

@@ -14,6 +14,12 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
             new VertexElement(0, 20, VertexElementFormat.NormalizedShort4, VertexElementMethod.Default, VertexElementUsage.Position, 0),
         };
 
+        public static VertexElement[] HackToFixDumbVertexElements =
+        {
+            new VertexElement(0, 0, VertexElementFormat.Vector3, VertexElementMethod.Default, VertexElementUsage.Position, 0),
+            new VertexElement(0, 12, VertexElementFormat.Vector2, VertexElementMethod.Default, VertexElementUsage.TextureCoordinate, 0),
+        };
+
         public static VertexElement[] BigVertexElements =
         {
             new VertexElement(0, 0, VertexElementFormat.Vector3, VertexElementMethod.Default, VertexElementUsage.Position, 0),
@@ -26,12 +32,14 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
         private Texture TextureNrm;
         private VertexDeclaration SmallVertexDeclaration;
         private VertexDeclaration BigVertexDeclaration;
+        private VertexDeclaration HackToFixDumbVertexDeclaration;
 
         public override void Setup(GraphicsDevice device, General block, string basePath)
         {
             this.SmallVertexDeclaration = new VertexDeclaration(device, SmallVertexElements);
             this.BigVertexDeclaration = new VertexDeclaration(device, BigVertexElements);
-
+            this.HackToFixDumbVertexDeclaration = new VertexDeclaration(device, HackToFixDumbVertexElements);
+            
             string texturePath;
 
             texturePath = Path.Combine(basePath, block.Textures[0]);
@@ -62,6 +70,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
 
             if (block.HasBigVertices == false)
             {
+                /*
                 vertexSize = 28;
                 device.VertexDeclaration = this.SmallVertexDeclaration;
                 vertices = new VertexBuffer(
@@ -69,6 +78,14 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                     block.SmallVertices.Count * vertexSize,
                     BufferUsage.WriteOnly);
                 vertices.SetData(block.SmallVertices.ToArray());
+                */
+                vertexSize = 20;
+                device.VertexDeclaration = this.HackToFixDumbVertexDeclaration;
+                vertices = new VertexBuffer(
+                    device,
+                    block.HackToFixDumbVertices.Count * vertexSize,
+                    BufferUsage.WriteOnly);
+                vertices.SetData(block.HackToFixDumbVertices.ToArray());
             }
             else
             {

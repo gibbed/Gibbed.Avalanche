@@ -49,12 +49,12 @@
     <Compile Include="ArchiveTableFile.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="MissionsFile.cs" />
-    <Compile Include="Model\BlockTypes.cs" />
+    <Compile Include="RenderBlock\BlockTypes.cs" />
     <Compile Include="PcbbFile.cs" />
     <Compile Include="RbModel.cs" />
-    <Compile Include="Model\BlockTypeHashes.cs" />
-    <Compile Include="Model\IRenderBlock.cs" />
-    <Compile Include="Model\SkinnedGeneral.cs" />
+    <Compile Include="RenderBlock\BlockTypeHashes.cs" />
+    <Compile Include="RenderBlock\IRenderBlock.cs" />
+    <Compile Include="RenderBlock\SkinnedGeneral.cs" />
     <Compile Include="StreamHelpers.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

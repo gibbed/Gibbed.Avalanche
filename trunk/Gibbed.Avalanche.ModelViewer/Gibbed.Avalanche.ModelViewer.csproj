@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="Renderers\CarPaintRenderer.cs" />
+    <Compile Include="Renderers\CarPaintSimpleRenderer.cs" />
     <Compile Include="Renderers\DeformableWindowRenderer.cs" />
     <Compile Include="RenderPanel.cs">
       <SubType>Component</SubType>

@@ -128,7 +128,7 @@ namespace Gibbed.Avalanche.FileFormats.RenderBlock
 
         private static float GetFloatFromS16N(short c)
         {
-            if (c == 0xFFFF)
+            if (c == -1)
             {
                 return -1.0f;
             }

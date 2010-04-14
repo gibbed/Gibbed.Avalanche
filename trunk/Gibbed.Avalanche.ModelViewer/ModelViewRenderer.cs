@@ -49,7 +49,7 @@ namespace Gibbed.Avalanche.ModelViewer
 
             this.BasicEffect = new BasicEffect(this.Device, null);
             this.BasicEffect.TextureEnabled = true;
-
+            
             this.BasicEffect.Alpha = 1.0f;
             //this.BasicEffect.EnableDefaultLighting();
 
@@ -101,8 +101,11 @@ namespace Gibbed.Avalanche.ModelViewer
         public void UpdateScene(string basePath, RbModel model, List<RenderBlock.IRenderBlock> selectedBlocks)
         {
             this.Device.Clear(XnaColor.SteelBlue);
-            this.Device.RenderState.CullMode = CullMode.None;
+            this.Device.RenderState.CullMode = CullMode.CullClockwiseFace;
             this.Device.RenderState.FillMode = FillMode.Solid;
+            this.Device.RenderState.AlphaTestEnable = true;
+            this.Device.RenderState.SourceBlend = Blend.One;
+            this.Device.RenderState.DestinationBlend = Blend.One;
 
             if (model != null)
             {

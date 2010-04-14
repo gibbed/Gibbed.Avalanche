@@ -131,7 +131,30 @@ namespace Gibbed.Avalanche.xml2bin
                         matrix.L = float.Parse(parts[11], CultureInfo.InvariantCulture);
                         value = matrix;
                         break;
+                    }
+                    case "vec_int":
+                    {
+                        string[] parts = current.Value.Split(',');
 
+                        var ints = new List<int>();
+                        foreach (var part in parts)
+                        {
+                            ints.Add(int.Parse(part, CultureInfo.InvariantCulture));
+                        }
+                        value = ints;
+                        break;
+                    }
+                    case "vec_float":
+                    {
+                        string[] parts = current.Value.Split(',');
+
+                        var floats = new List<float>();
+                        foreach (var part in parts)
+                        {
+                            floats.Add(float.Parse(part, CultureInfo.InvariantCulture));
+                        }
+                        value = floats;
+                        break;
                     }
                     default: throw new InvalidOperationException("unsupported type " + type.ToString());
                 }

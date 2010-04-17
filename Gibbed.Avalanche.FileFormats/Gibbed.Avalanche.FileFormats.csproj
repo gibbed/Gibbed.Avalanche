@@ -47,6 +47,12 @@
   <ItemGroup>
     <Compile Include="AnarkFile.cs" />
     <Compile Include="ArchiveTableFile.cs" />
+    <Compile Include="DataFormat\Structure.cs" />
+    <Compile Include="DataFormat\Definition.cs" />
+    <Compile Include="DataFormat\Entry.cs" />
+    <Compile Include="DataFormat\DefinitionType.cs" />
+    <Compile Include="DataFormat\DefinitionValue.cs" />
+    <Compile Include="DataFormat\NativeValueType.cs" />
     <Compile Include="Matrix.cs" />
     <Compile Include="MissionsFile.cs" />
     <Compile Include="RenderBlock\BlockTypes.cs" />
@@ -59,6 +65,9 @@
     <Compile Include="RenderBlock\General.cs" />
     <Compile Include="RenderBlock\IRenderBlock.cs" />
     <Compile Include="RenderBlock\SkinnedGeneral.cs" />
+    <Compile Include="DataFormatFile.cs" />
+    <Compile Include="ShaderLibraryFile.cs" />
+    <Compile Include="ShaderLibraryFormat.cs" />
     <Compile Include="StreamHelpers.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

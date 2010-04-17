@@ -44,8 +44,10 @@ namespace Gibbed.Avalanche.FileFormats
                 throw new InvalidOperationException("ShaderLibrary entry not present in shader library file");
             }
 
-            object library = libraryFormat.ParseEntry(root, input);
+            // hack :)
+            libraryFormat.LittleEndian = data.LittleEndian;
 
+            object library = libraryFormat.ParseEntry(root, input);
             try
             {
                 var structure = (DataFormat.Structure)library;

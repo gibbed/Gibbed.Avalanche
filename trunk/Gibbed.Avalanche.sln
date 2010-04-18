@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.Setup", "G
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.ModelViewer", "Gibbed.Avalanche.ModelViewer\Gibbed.Avalanche.ModelViewer.csproj", "{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Avalanche.ModelViewer2", "Gibbed.Avalanche.ModelViewer2\Gibbed.Avalanche.ModelViewer2.csproj", "{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,16 @@ Global
 		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F95CD252-DC89-4690-9C73-0C30F8EBA9CF}.Release|Win32.ActiveCfg = Release|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0FC47F0F-E471-4A54-A4AF-D6A48AEF4233}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -206,7 +206,7 @@ namespace Gibbed.Avalanche.FileFormats.RenderBlock
         public uint Unknown08;
         public List<SmallVertex> SmallVertices = new List<SmallVertex>();
         public List<BigVertex> BigVertices = new List<BigVertex>();
-        public List<ExtraData> Unknown10 = new List<ExtraData>();
+        public List<ExtraData> Extras = new List<ExtraData>();
         public List<SkinBatch> SkinBatches = new List<SkinBatch>();
         public List<short> Faces = new List<short>();
 
@@ -265,14 +265,14 @@ namespace Gibbed.Avalanche.FileFormats.RenderBlock
                 }
             }
 
-            this.Unknown10.Clear();
+            this.Extras.Clear();
             {
                 uint count = input.ReadValueU32();
                 for (uint i = 0; i < count; i++)
                 {
                     var data = new ExtraData();
                     data.Deserialize(input);
-                    this.Unknown10.Add(data);
+                    this.Extras.Add(data);
                 }
             }
 

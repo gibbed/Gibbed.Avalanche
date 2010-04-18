@@ -93,8 +93,8 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                 vertices.SetData(block.BigVertices.ToArray());
             }
 
-            VertexBuffer extras = new VertexBuffer(device, block.Unknown10.Count * 20, BufferUsage.WriteOnly);
-            extras.SetData(block.Unknown10.ToArray());
+            VertexBuffer extras = new VertexBuffer(device, block.Extras.Count * 20, BufferUsage.WriteOnly);
+            extras.SetData(block.Extras.ToArray());
 
             device.Vertices[0].SetSource(vertices, 0, vertexSize);
             device.Vertices[1].SetSource(extras, 0, 20);

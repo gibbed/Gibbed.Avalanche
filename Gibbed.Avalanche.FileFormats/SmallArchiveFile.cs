@@ -27,7 +27,7 @@ namespace Gibbed.Avalanche.FileFormats
                 uint length = input.ReadValueU32(littleEndian);
                 if (length > 1024)
                 {
-                    throw new FormatException("doubt there is a file with more than 256 characters in its name");
+                    throw new FormatException("doubt there is a file with more than 1024 characters in its name");
                 }
 
                 this.Name = input.ReadStringASCII(length);

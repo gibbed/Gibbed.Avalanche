@@ -169,7 +169,7 @@ namespace Gibbed.Avalanche.FileFormats
 
                             byte propertyType = input.ReadValueU8();
                             IPropertyType value = PropertyHelpers.GetPropertyType(
-                                propertyType);
+                                propertyType, raw);
                             value.Deserialize(input, true, littleEndian);
                             this.ValuesByName.Add(id, value);
                         }
@@ -197,7 +197,7 @@ namespace Gibbed.Avalanche.FileFormats
 
                             byte propertyType = input.ReadValueU8();
                             IPropertyType value = PropertyHelpers.GetPropertyType(
-                                propertyType);
+                                propertyType, raw);
                             value.Deserialize(input, true, littleEndian);
                             this.ValuesByHash.Add(id, value);
                         }
@@ -249,7 +249,7 @@ namespace Gibbed.Avalanche.FileFormats
                             input.Seek(offset, SeekOrigin.Begin);
                             uint type = input.ReadValueU32(littleEndian);
 
-                            value = PropertyHelpers.GetPropertyType(type);
+                            value = PropertyHelpers.GetPropertyType(type, raw);
 
                             if (value.Inline == true)
                             {

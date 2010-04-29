@@ -18,8 +18,13 @@ namespace Gibbed.Avalanche.FileFormats
          * 9 - vec_int
          * 10 - vec_float */
 
-        public static IPropertyType GetPropertyType(uint type)
+        public static IPropertyType GetPropertyType(uint type, bool raw)
         {
+            if (raw == false && type == 8)
+            {
+                return new PropertyTypes.Matrix4x4Property();
+            }
+
             switch (type)
             {
                 case 1: return new PropertyTypes.IntegerProperty();
@@ -36,7 +41,7 @@ namespace Gibbed.Avalanche.FileFormats
             }
         }
 
-        public static IPropertyType GetPropertyType(string type)
+        public static IPropertyType GetPropertyType(string type, bool raw)
         {
             switch (type)
             {

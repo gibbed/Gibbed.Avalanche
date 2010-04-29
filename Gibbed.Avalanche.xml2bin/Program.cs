@@ -60,7 +60,7 @@ namespace Gibbed.Avalanche.xml2bin
                 uint id = GetIdOrName(current);
                 string type = current.GetAttribute("type", "");
 
-                IPropertyType value = PropertyHelpers.GetPropertyType(type);
+                IPropertyType value = PropertyHelpers.GetPropertyType(type, false);
                 value.Parse(current.Value);
                 obj.ValuesByHash.Add(id, value);
             }

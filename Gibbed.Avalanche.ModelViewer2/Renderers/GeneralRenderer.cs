@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Gibbed.Avalanche.FileFormats.RenderBlock;
+using ShaderLibrary = Gibbed.Avalanche.FileFormats.ShaderLibraryFile;
 
 namespace Gibbed.Avalanche.ModelViewer2.Renderers
 {
@@ -35,7 +36,10 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
         private VertexDeclaration HackToFixDumbVertexDeclaration;
         */
 
-        public override void Setup(SlimDX.Direct3D10.Device device, General block, string basePath)
+        public override void Setup(
+            SlimDX.Direct3D10.Device device,
+            ShaderLibrary shaderLibrary,
+            string basePath)
         {
             /*
             this.SmallVertexDeclaration = new VertexDeclaration(device, SmallVertexElements);
@@ -66,7 +70,7 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
             */
         }
 
-        public override void Render(SlimDX.Direct3D10.Device device, General block)
+        public override void Render(SlimDX.Direct3D10.Device device, SlimDX.Matrix viewMatrix)
         {
             /*
             VertexBuffer vertices;

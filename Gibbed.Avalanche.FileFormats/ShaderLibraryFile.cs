@@ -26,6 +26,38 @@ namespace Gibbed.Avalanche.FileFormats
         public List<Shader> VertexShaders = new List<Shader>();
         public List<Shader> FragmentShaders = new List<Shader>();
 
+        public Shader GetVertexShader(string name)
+        {
+            return this.VertexShaders.SingleOrDefault(
+                v => v.Name == name);
+        }
+
+        public byte[] GetVertexShaderData(string name)
+        {
+            var shader = this.GetVertexShader(name);
+            if (shader == null)
+            {
+                return null;
+            }
+            return shader.Data;
+        }
+
+        public Shader GetFragmentShader(string name)
+        {
+            return this.FragmentShaders.SingleOrDefault(
+                v => v.Name == name);
+        }
+
+        public byte[] GetFragmentShaderData(string name)
+        {
+            var shader = this.GetFragmentShader(name);
+            if (shader == null)
+            {
+                return null;
+            }
+            return shader.Data;
+        }
+
         public void Deserialize(Stream input)
         {
             var libraryFormat = new DataFormatFile();

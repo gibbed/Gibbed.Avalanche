@@ -58,8 +58,9 @@
     <Compile Include="MissionsFile.cs" />
     <Compile Include="PropertyTypes\FloatListProperty.cs" />
     <Compile Include="PropertyTypes\FloatProperty.cs" />
-    <Compile Include="PropertyTypes\IntegerList.cs" />
+    <Compile Include="PropertyTypes\IntegerListProperty.cs" />
     <Compile Include="PropertyTypes\IntegerProperty.cs" />
+    <Compile Include="PropertyTypes\Matrix3x3Property.cs" />
     <Compile Include="PropertyTypes\Matrix4x3Property.cs" />
     <Compile Include="PropertyTypes\StringProperty.cs" />
     <Compile Include="PropertyTypes\Vector2Property.cs" />

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Gibbed.Avalanche.FileFormats.RenderBlock;
+using ShaderLibrary = Gibbed.Avalanche.FileFormats.ShaderLibraryFile;
 
 namespace Gibbed.Avalanche.ModelViewer2.Renderers
 {
@@ -20,7 +21,10 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
         private VertexDeclaration VertexDeclaration;
         */
 
-        public override void Setup(SlimDX.Direct3D10.Device device, CarPaintSimple block, string basePath)
+        public override void Setup(
+            SlimDX.Direct3D10.Device device,
+            ShaderLibrary shaderLibrary,
+            string basePath)
         {
             /*
             this.VertexDeclaration = new VertexDeclaration(device, VertexElements);
@@ -49,7 +53,7 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
             */
         }
 
-        public override void Render(SlimDX.Direct3D10.Device device, CarPaintSimple block)
+        public override void Render(SlimDX.Direct3D10.Device device, SlimDX.Matrix viewMatrix)
         {
             /*
             VertexBuffer vertices;

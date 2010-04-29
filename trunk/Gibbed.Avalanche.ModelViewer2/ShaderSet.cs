@@ -16,36 +16,20 @@ namespace Gibbed.Avalanche.ModelViewer2
         public D3D10.PixelShader PixelShader;
         public D3D10.InputLayout InputLayout;
 
-        private static byte[] LoadBytes(string path)
+        public void Load(D3D10.Device device, byte[] vertexShaderData, byte[] pixelShaderData, D3D10.InputElement[] inputElements)
         {
-            using (Stream input = File.OpenRead(path))
-            {
-                byte[] data = new byte[input.Length];
-                input.Read(data, 0, data.Length);
-                return data;
-            }
-        }
-
-        public void Load(D3D10.Device device, string vertexShaderPath, string pixelShaderPath, D3D10.InputElement[] inputElements)
-        {
-            if (vertexShaderPath == null)
+            if (vertexShaderData == null)
             {
                 throw new ArgumentNullException("vertexShaderPath");
             }
-
-            if (vertexShaderPath != null && File.Exists(vertexShaderPath) == false)
+            else if (inputElements == null)
             {
-                throw new FileNotFoundException("vertex shader file missing", vertexShaderPath);
+                throw new ArgumentNullException("inputElements");
             }
 
-            if (pixelShaderPath != null && File.Exists(pixelShaderPath) == false)
+            if (vertexShaderData != null)
             {
-                throw new FileNotFoundException("pixel shader file missing", pixelShaderPath);
-            }
-
-            //if (vertexShaderPath != null)
-            {
-                var byteCode = new D3D10.ShaderBytecode(LoadBytes(vertexShaderPath));
+                var byteCode = new D3D10.ShaderBytecode(vertexShaderData);
                 var shader = new D3D10.VertexShader(device, byteCode);
 
                 var inputLayout = new D3D10.InputLayout(
@@ -57,9 +41,9 @@ namespace Gibbed.Avalanche.ModelViewer2
                 this.InputLayout = inputLayout;
             }
 
-            if (pixelShaderPath != null)
+            if (pixelShaderData != null)
             {
-                var byteCode = new D3D10.ShaderBytecode(LoadBytes(pixelShaderPath));
+                var byteCode = new D3D10.ShaderBytecode(pixelShaderData);
                 var shader = new D3D10.PixelShader(device, byteCode);
 
                 this.PixelShader = shader;

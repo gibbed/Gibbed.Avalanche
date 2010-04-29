@@ -4,6 +4,8 @@ using System.IO;
 using System.Windows.Forms;
 using RbModel = Gibbed.Avalanche.FileFormats.RbModel;
 using RenderBlock = Gibbed.Avalanche.FileFormats.RenderBlock;
+using ShaderLibrary = Gibbed.Avalanche.FileFormats.ShaderLibraryFile;
+using Registry = Microsoft.Win32.Registry;
 
 using SlimDX;
 using D3D10 = SlimDX.Direct3D10;
@@ -11,7 +13,7 @@ using DXGI = SlimDX.DXGI;
 
 namespace Gibbed.Avalanche.ModelViewer2
 {
-    public partial class Viewer : Form, D3D10.Include, IDisposable
+    public partial class Viewer : Form, IDisposable
     {
         #region Render Types
         private static class RendererTypes
@@ -30,12 +32,12 @@ namespace Gibbed.Avalanche.ModelViewer2
 
             private static void AddRendererType<TRenderBlock, TBlockRenderer>()
                 where TRenderBlock : RenderBlock.IRenderBlock
-                where TBlockRenderer : Renderers.IBlockRenderer, new()
+                where TBlockRenderer : Renderers.IRenderer, new()
             {
                 Types.Add(typeof(TRenderBlock), typeof(TBlockRenderer));
             }
 
-            public static Renderers.IBlockRenderer Instantiate(RenderBlock.IRenderBlock block)
+            public static Renderers.IRenderer Instantiate(RenderBlock.IRenderBlock block)
             {
                 Type type = block.GetType();
 
@@ -44,7 +46,7 @@ namespace Gibbed.Avalanche.ModelViewer2
                     return null;
                 }
 
-                return (Renderers.IBlockRenderer)Activator.CreateInstance(Types[type]);
+                return (Renderers.IRenderer)Activator.CreateInstance(Types[type]);
             }
         }
         #endregion
@@ -52,8 +54,11 @@ namespace Gibbed.Avalanche.ModelViewer2
         private InputCamera Camera;
         private Clock Clock;
 
-        private Dictionary<RenderBlock.IRenderBlock, Renderers.IBlockRenderer>
-            BlockRenderers = new Dictionary<RenderBlock.IRenderBlock, Renderers.IBlockRenderer>();
+        private Dictionary<RenderBlock.IRenderBlock, Renderers.IRenderer>
+            BlockRenderers = new Dictionary<RenderBlock.IRenderBlock, Renderers.IRenderer>();
+
+        private ShaderLibrary ShaderBundle;
+        private ShaderLibrary SpecialShaderBundle;
 
         public Viewer()
         {
@@ -64,25 +69,60 @@ namespace Gibbed.Avalanche.ModelViewer2
 
             this.Camera = new InputCamera(this.renderPanel);
 
-            /*
-            this.BasicEffect = new BasicEffect(this.Device, null);
-            this.BasicEffect.TextureEnabled = true;
-                        
-            this.BasicEffect.Alpha = 1.0f;
-            //this.BasicEffect.EnableDefaultLighting();
-
-            this.BasicEffect.DiffuseColor = new Vector3(1.0f, 1.0f, 1.0f);
-            this.BasicEffect.SpecularColor = new Vector3(0.25f, 0.25f, 0.25f);
-            this.BasicEffect.SpecularPower = 15.0f;
-            this.BasicEffect.AmbientLightColor = new Vector3(0.90f, 0.90f, 0.90f);
-
-            this.BasicEffect.VertexColorEnabled = false;
-
-            this.BasicEffect.World = Matrix.Identity;
-            this.BasicEffect.Projection = this.Camera.ProjectionMatrix;
-            */
-
             this.BlockRenderers.Clear();
+
+            this.LoadShaderBundles();
+        }
+
+        private void LoadShaderBundles()
+        {
+            try
+            {
+                string gamePath = (string)Registry.GetValue(
+                        @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 8190",
+                        "InstallLocation",
+                        null);
+
+                if (gamePath == null)
+                {
+                    throw new InvalidOperationException("could not find Just Cause 2 install location");
+                }
+
+                string shaderBundlePath = Path.Combine(gamePath, "DX10_Shaders_F.shader_bundle");
+                if (File.Exists(shaderBundlePath) == false)
+                {
+                    throw new FileNotFoundException("shader bundle is missing", shaderBundlePath);
+                }
+
+                string specialShaderBundlePath = Path.Combine(gamePath, "DX10_SpecialShaders_F.shader_bundle");
+                if (File.Exists(specialShaderBundlePath) == false)
+                {
+                    throw new FileNotFoundException("special shader bundle is missing", specialShaderBundlePath);
+                }
+
+                using (Stream input = File.OpenRead(shaderBundlePath))
+                {
+                    this.ShaderBundle = new ShaderLibrary();
+                    this.ShaderBundle.Deserialize(input);
+                }
+
+                using (Stream input = File.OpenRead(specialShaderBundlePath))
+                {
+                    this.SpecialShaderBundle = new ShaderLibrary();
+                    this.SpecialShaderBundle.Deserialize(input);
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(
+                    String.Format(
+                        "Failed to load shader bundles.\n\nError: {0}\n\n{1}",
+                        e.Message,
+                        e.ToString()),
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         ~Viewer()
@@ -100,7 +140,7 @@ namespace Gibbed.Avalanche.ModelViewer2
                 }
             }
             this.BlockRenderers.Clear();
-        }
+        }        
 
         private bool HandlingViewportInput = false;
 
@@ -335,27 +375,6 @@ namespace Gibbed.Avalanche.ModelViewer2
             e.Device.Rasterizer.State = D3D10.RasterizerState.FromDescription(
                 e.Device, rsd);
 
-            /*
-            errors = "unset";
-            try
-            {
-                this.BasicEffect = D3D10.Effect.FromString(
-                    e.Device,
-                    Properties.Resources.BasicEffect,
-                    "fx_4_0",
-                    D3D10.ShaderFlags.EnableBackwardsCompatibility,
-                    D3D10.EffectFlags.None,
-                    null,
-                    this,
-                    out errors);
-            }
-            catch (Exception er)
-            {
-                MessageBox.Show(er.ToString());
-            }
-            MessageBox.Show(errors);
-            */
-
             //this.BasicEffect.GetVariableByName("World").AsMatrix().SetMatrix(Matrix.Identity);
         }
 
@@ -363,59 +382,40 @@ namespace Gibbed.Avalanche.ModelViewer2
         {
             float elapsedTime = this.Clock.Update();
             this.Camera.Update(elapsedTime, false);
-
             //this.BasicEffect.GetVariableByName("View").AsMatrix().SetMatrix(this.Camera.ViewMatrix);
         }
 
         private void OnViewportRender(object sender, RenderEventArgs e)
         {
-            /*
-            var technique = this.BasicEffect.GetTechniqueByIndex(0);
-            for (int i = 0; i < technique.Description.PassCount; i++)
+            foreach (RenderBlock.IRenderBlock block in this.Model.Blocks)
             {
-                var pass = technique.GetPassByIndex(i);
+                //var oldMode = this.Device.RenderState.FillMode;
+                //this.Device.RenderState.FillMode =
+                //    selectedBlocks.Contains(block) == true ?
+                //        FillMode.WireFrame : FillMode.Solid;
 
-                //this.BasicEffect.*/
-                foreach (RenderBlock.IRenderBlock block in this.Model.Blocks)
+                if (this.BlockRenderers.ContainsKey(block) == false)
                 {
-                    //var oldMode = this.Device.RenderState.FillMode;
-                    //this.Device.RenderState.FillMode =
-                    //    selectedBlocks.Contains(block) == true ?
-                    //        FillMode.WireFrame : FillMode.Solid;
-
-                    if (this.BlockRenderers.ContainsKey(block) == false)
+                    var renderer = RendererTypes.Instantiate(block);
+                    if (renderer == null)
                     {
-                        var renderer = RendererTypes.Instantiate(block);
-                        if (renderer == null)
-                        {
-                            continue;
-                        }
-
-                        renderer.Setup(e.Device, block, this.ModelPath);
-                        this.BlockRenderers.Add(block, renderer);
-                        this.BlockRenderers[block].Render(e.Device, block);
-                    }
-                    else
-                    {
-                        this.BlockRenderers[block].Render(e.Device, block);
+                        continue;
                     }
 
-                    //e.Device.RenderState.FillMode = oldMode;
+                    renderer.Setup(
+                        e.Device, block,
+                        this.ShaderBundle,
+                        this.ModelPath);
+                    this.BlockRenderers.Add(block, renderer);
+                    this.BlockRenderers[block].Render(e.Device, this.Camera.ViewProjectionMatrix);
                 }
-            /*
-                pass.Apply();
+                else
+                {
+                    this.BlockRenderers[block].Render(e.Device, this.Camera.ViewProjectionMatrix);
+                }
+
+                //e.Device.RenderState.FillMode = oldMode;
             }
-            */
-        }
-
-        void D3D10.Include.Close(Stream stream)
-        {
-            throw new NotImplementedException();
-        }
-
-        void D3D10.Include.Open(D3D10.IncludeType type, string fileName, Stream parentStream, out Stream stream)
-        {
-            throw new NotImplementedException();
         }
 
         private void OnViewportUnitialize(object sender, EventArgs e)

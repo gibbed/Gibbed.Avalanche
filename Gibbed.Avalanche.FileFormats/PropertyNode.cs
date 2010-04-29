@@ -8,183 +8,242 @@ namespace Gibbed.Avalanche.FileFormats
 {
     public class PropertyNode
     {
-        public Dictionary<string, PropertyNode> ChildrenByName;
-        public Dictionary<string, object> ValuesByName;
-        public Dictionary<uint, PropertyNode> ChildrenByHash;
-        public Dictionary<uint, object> ValuesByHash;
+        public Dictionary<string, PropertyNode> ChildrenByName =
+            new Dictionary<string, PropertyNode>();
+
+        public Dictionary<string, IPropertyType> ValuesByName =
+            new Dictionary<string, IPropertyType>();
+
+        public Dictionary<uint, PropertyNode> ChildrenByHash =
+            new Dictionary<uint, PropertyNode>();
+
+        public Dictionary<uint, IPropertyType> ValuesByHash =
+            new Dictionary<uint, IPropertyType>();
+
         public byte[] Unknown3;
 
-        public uint GetUInt32(uint id)
+        public void Serialize(Stream output, bool raw, bool littleEndian)
         {
-            if (!(this.ValuesByHash[id] is int))
+            if (raw == true)
             {
-                throw new InvalidOperationException();
-            }
+                byte count = 0;
 
-            return (uint)((int)this.ValuesByHash[id]);
-        }
-
-        public uint GetUInt32(string id)
-        {
-            return this.GetUInt32(id.HashJenkins());
-        }
-
-        public string GetString(uint id)
-        {
-            if (!(this.ValuesByHash[id] is string))
-            {
-                throw new InvalidOperationException();
-            }
-
-            return (string)this.ValuesByHash[id];
-        }
-
-        public string GetString(string id)
-        {
-            return this.GetString(id.HashJenkins());
-        }
-
-        public Matrix GetMatrix(uint id)
-        {
-            if (!(this.ValuesByHash[id] is Matrix))
-            {
-                throw new InvalidOperationException();
-            }
-
-            return (Matrix)this.ValuesByHash[id];
-        }
-
-        public Matrix GetMatrix(string id)
-        {
-            return this.GetMatrix(id.HashJenkins());
-        }
-
-        public void Serialize(Stream output, bool littleEndian)
-        {
-            byte count = 0;
-
-            if (this.ChildrenByHash != null && this.ChildrenByHash.Count > 0)
-            {
-                count++;
-            }
-
-            if (this.ValuesByHash != null && this.ValuesByHash.Count > 0)
-            {
-                count++;
-            }
-
-            if (this.Unknown3 != null && this.Unknown3.Length > 0)
-            {
-                count++;
-            }
-
-            output.WriteValueU8(count);
-
-            if (this.Unknown3 != null && this.Unknown3.Length > 0)
-            {
-                output.WriteValueU16(3, littleEndian);
-                output.WriteValueU16((ushort)(this.Unknown3.Length & 0xFFFF), littleEndian);
-                output.Write(this.Unknown3, 0, this.Unknown3.Length & 0xFFFF);
-            }
-
-            if (this.ChildrenByHash != null && this.ChildrenByHash.Count > 0)
-            {
-                output.WriteValueU16(4, littleEndian);
-                output.WriteValueU16((ushort)this.ChildrenByHash.Count, littleEndian);
-                foreach (var kvp in this.ChildrenByHash.Take(this.ChildrenByHash.Count & 0xFFFF))
+                if (this.ChildrenByHash.Count > 0)
                 {
-                    output.WriteValueU32(kvp.Key, littleEndian);
-                    kvp.Value.Serialize(output, littleEndian);
-                }
-            }
-
-            if (this.ValuesByHash != null && this.ValuesByHash.Count > 0)
-            {
-                output.WriteValueU16(5, littleEndian);
-                output.WriteValueU16((ushort)this.ValuesByHash.Count, littleEndian);
-                foreach (var kvp in this.ValuesByHash.Take(this.ValuesByHash.Count & 0xFFFF))
-                {
-                    output.WriteValueU32(kvp.Key, littleEndian);
-                    PropertyHelpers.WriteTypedValue(output, kvp.Value, littleEndian);
-                }
-            }
-        }
-
-        public void Deserialize(Stream input, bool littleEndian)
-        {
-            List<ushort> used = new List<ushort>();
-            byte count = input.ReadValueU8();
-
-            for (byte i = 0; i < count; i++)
-            {
-                ushort type = input.ReadValueU16(littleEndian);
-                ushort subcount = input.ReadValueU16(littleEndian);
-
-                if (used.Contains(type) == true)
-                {
-                    throw new Exception();
+                    count++;
                 }
 
-                used.Add(type);
-
-                if (type == 1)
+                if (this.ValuesByHash.Count > 0)
                 {
-                    this.ChildrenByName = new Dictionary<string, PropertyNode>();
-                    for (ushort j = 0; j < subcount; j++)
+                    count++;
+                }
+
+                if (this.Unknown3 != null && this.Unknown3.Length > 0)
+                {
+                    count++;
+                }
+
+                output.WriteValueU8(count);
+
+                if (this.Unknown3 != null && this.Unknown3.Length > 0)
+                {
+                    output.WriteValueU16(3, littleEndian);
+                    output.WriteValueU16((ushort)(this.Unknown3.Length & 0xFFFF), littleEndian);
+                    output.Write(this.Unknown3, 0, this.Unknown3.Length & 0xFFFF);
+                }
+
+                if (this.ChildrenByHash.Count > 0)
+                {
+                    output.WriteValueU16(4, littleEndian);
+                    output.WriteValueU16((ushort)this.ChildrenByHash.Count, littleEndian);
+                    foreach (var kvp in this.ChildrenByHash.Take(this.ChildrenByHash.Count & 0xFFFF))
                     {
-                        uint length = input.ReadValueU32(littleEndian);
-                        if (length >= 0x7FFF)
+                        output.WriteValueU32(kvp.Key, littleEndian);
+                        kvp.Value.Serialize(output, raw, littleEndian);
+                    }
+                }
+
+                if (this.ValuesByHash.Count > 0)
+                {
+                    output.WriteValueU16(5, littleEndian);
+                    output.WriteValueU16((ushort)this.ValuesByHash.Count, littleEndian);
+                    foreach (var kvp in this.ValuesByHash.Take(this.ValuesByHash.Count & 0xFFFF))
+                    {
+                        output.WriteValueU32(kvp.Key, littleEndian);
+                        output.WriteValueU8(kvp.Value.Id);
+                        kvp.Value.Serialize(output, raw, littleEndian);
+                    }
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public void Deserialize(Stream input, bool raw, bool littleEndian)
+        {
+            this.ChildrenByName.Clear();
+            this.ValuesByName.Clear();
+            this.ChildrenByHash.Clear();
+            this.ValuesByHash.Clear();
+            this.Unknown3 = null;
+
+            if (raw == true)
+            {
+                List<ushort> used = new List<ushort>();
+                byte count = input.ReadValueU8();
+
+                for (byte i = 0; i < count; i++)
+                {
+                    ushort type = input.ReadValueU16(littleEndian);
+                    ushort subcount = input.ReadValueU16(littleEndian);
+
+                    if (used.Contains(type) == true)
+                    {
+                        throw new Exception();
+                    }
+
+                    used.Add(type);
+
+                    if (type == 1)
+                    {
+                        for (ushort j = 0; j < subcount; j++)
                         {
-                            throw new Exception();
+                            uint length = input.ReadValueU32(littleEndian);
+                            if (length >= 0x7FFF)
+                            {
+                                throw new Exception();
+                            }
+                            string id = input.ReadStringASCII(length, true);
+                            PropertyNode child = new PropertyNode();
+                            child.Deserialize(input, raw, littleEndian);
+                            this.ChildrenByName.Add(id, child);
                         }
-                        string id = input.ReadStringASCII(length, true);
-                        PropertyNode child = new PropertyNode();
-                        child.Deserialize(input, littleEndian);
-                        this.ChildrenByName.Add(id, child);
                     }
-                }
-                else if (type == 2)
-                {
-                    this.ValuesByName = new Dictionary<string, object>();
-                    for (ushort j = 0; j < subcount; j++)
+                    else if (type == 2)
                     {
-                        uint length = input.ReadValueU32(littleEndian);
-                        if (length >= 0x7FFF)
+                        for (ushort j = 0; j < subcount; j++)
                         {
-                            throw new Exception();
+                            uint length = input.ReadValueU32(littleEndian);
+                            if (length >= 0x7FFF)
+                            {
+                                throw new Exception();
+                            }
+                            string id = input.ReadStringASCII(length, true);
+
+                            byte propertyType = input.ReadValueU8();
+                            IPropertyType value = PropertyHelpers.GetPropertyType(
+                                propertyType);
+                            value.Deserialize(input, true, littleEndian);
+                            this.ValuesByName.Add(id, value);
                         }
-                        string id = input.ReadStringASCII(length, true);
-                        this.ValuesByName.Add(id, PropertyHelpers.ReadTypedValue(input, littleEndian));
+                    }
+                    else if (type == 3)
+                    {
+                        this.Unknown3 = new byte[subcount];
+                        input.Read(this.Unknown3, 0, subcount);
+                    }
+                    else if (type == 4)
+                    {
+                        for (ushort j = 0; j < subcount; j++)
+                        {
+                            uint id = input.ReadValueU32(littleEndian);
+                            PropertyNode child = new PropertyNode();
+                            child.Deserialize(input, raw, littleEndian);
+                            this.ChildrenByHash.Add(id, child);
+                        }
+                    }
+                    else if (type == 5)
+                    {
+                        for (ushort j = 0; j < subcount; j++)
+                        {
+                            uint id = input.ReadValueU32(littleEndian);
+
+                            byte propertyType = input.ReadValueU8();
+                            IPropertyType value = PropertyHelpers.GetPropertyType(
+                                propertyType);
+                            value.Deserialize(input, true, littleEndian);
+                            this.ValuesByHash.Add(id, value);
+                        }
+                    }
+                    else
+                    {
+                        throw new FormatException("unknown object section type " + type.ToString());
                     }
                 }
-                else if (type == 3)
+            }
+            else
+            {
+                while (input.Position < input.Length)
                 {
-                    this.Unknown3 = new byte[subcount];
-                    input.Read(this.Unknown3, 0, subcount);
-                }
-                else if (type == 4)
-                {
-                    this.ChildrenByHash = new Dictionary<uint, PropertyNode>();
-                    for (ushort j = 0; j < subcount; j++)
+                    uint hash = input.ReadValueU32(littleEndian);
+                    uint mode = input.ReadValueU32(littleEndian);
+                    uint offset = input.ReadValueU32(littleEndian);
+                    uint next = input.ReadValueU32(littleEndian);
+
+                    if (mode == 1)
                     {
-                        uint id = input.ReadValueU32(littleEndian);
                         PropertyNode child = new PropertyNode();
-                        child.Deserialize(input, littleEndian);
-                        this.ChildrenByHash.Add(id, child);
+
+                        if (offset != 0xFFFFFFFF)
+                        {
+                            input.Seek(offset, SeekOrigin.Begin);
+                            offset = input.ReadValueU32(littleEndian);
+
+                            if (offset != 0xFFFFFFFF)
+                            {
+                                input.Seek(offset, SeekOrigin.Begin);
+                                child.Deserialize(input, raw, littleEndian);
+                            }
+                        }
+
+                        this.ChildrenByHash.Add(hash, child);
                     }
-                }
-                else if (type == 5)
-                {
-                    this.ValuesByHash = new Dictionary<uint, object>();
-                    for (ushort j = 0; j < subcount; j++)
+                    else if (mode == 2)
                     {
-                        uint id = input.ReadValueU32(littleEndian);
-                        this.ValuesByHash.Add(id, PropertyHelpers.ReadTypedValue(input, littleEndian));
+                        IPropertyType value;
+
+                        // null value?
+                        if (offset == 0xFFFFFFFF)
+                        {
+                            value = null;
+                        }
+                        else
+                        {
+                            input.Seek(offset, SeekOrigin.Begin);
+                            uint type = input.ReadValueU32(littleEndian);
+
+                            value = PropertyHelpers.GetPropertyType(type);
+
+                            if (value.Inline == true)
+                            {
+                                value.Deserialize(input, false, littleEndian);
+                            }
+                            else
+                            {
+                                offset = input.ReadValueU32(littleEndian);
+                                if (offset == 0xFFFFFFFF)
+                                {
+                                    value.Default();
+                                }
+                                else
+                                {
+                                    input.Seek(offset, SeekOrigin.Begin);
+                                    value.Deserialize(input, false, littleEndian);
+                                }
+                            }
+                        }
+
+                        this.ValuesByHash.Add(hash, value);
                     }
-                }
-                else
-                {
-                    throw new FormatException("unknown object section type " + type.ToString());
+
+                    if (next == 0xFFFFFFFF)
+                    {
+                        break;
+                    }
+
+                    input.Seek(next, SeekOrigin.Begin);
                 }
             }
         }

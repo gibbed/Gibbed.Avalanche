@@ -14,96 +14,10 @@ namespace Gibbed.Avalanche.bin2xml
     {
         private static Dictionary<uint, string> Names = new Dictionary<uint, string>();
 
-        private static void WriteProperty(XmlWriter writer, object value)
+        private static void WriteProperty(XmlWriter writer, IPropertyType value)
         {
-            if (value is int)
-            {
-                writer.WriteAttributeString("type", "int");
-                writer.WriteValue(((int)value).ToString(CultureInfo.InvariantCulture));
-            }
-            else if (value is float)
-            {
-                writer.WriteAttributeString("type", "float");
-                writer.WriteValue(((float)value).ToString(CultureInfo.InvariantCulture));
-            }
-            else if (value is string)
-            {
-                writer.WriteAttributeString("type", "string");
-
-                string text = (string)value;
-                if (text.IndexOf('\x07') >= 0)
-                {
-                    writer.WriteAttributeString("filtered", "0x07");
-                    writer.WriteValue(text.Replace('\x07', '_'));
-                }
-                else
-                {
-                    writer.WriteValue(text);
-                }
-            }
-            else if (value is Vector2)
-            {
-                var vector = (Vector2)value;
-                writer.WriteAttributeString("type", "vec2");
-                writer.WriteValue(string.Format(
-                    "{0},{1}",
-                    vector.X.ToString(CultureInfo.InvariantCulture),
-                    vector.Y.ToString(CultureInfo.InvariantCulture)));
-            }
-            else if (value is Vector3)
-            {
-                var vector = (Vector3)value;
-                writer.WriteAttributeString("type", "vec");
-                writer.WriteValue(string.Format(
-                    "{0},{1},{2}",
-                    vector.X.ToString(CultureInfo.InvariantCulture),
-                    vector.Y.ToString(CultureInfo.InvariantCulture),
-                    vector.Z.ToString(CultureInfo.InvariantCulture)));
-            }
-            else if (value is Vector4)
-            {
-                var vector = (Vector4)value;
-                writer.WriteAttributeString("type", "vec4");
-                writer.WriteValue(string.Format(
-                    "{0},{1},{2},{3}",
-                    vector.X.ToString(CultureInfo.InvariantCulture),
-                    vector.Y.ToString(CultureInfo.InvariantCulture),
-                    vector.Z.ToString(CultureInfo.InvariantCulture),
-                    vector.W.ToString(CultureInfo.InvariantCulture)));
-            }
-            else if (value is Matrix)
-            {
-                var matrix = (Matrix)value;
-                writer.WriteAttributeString("type", "mat");
-                writer.WriteValue(string.Format(
-                    "{0},{1},{2}, {3},{4},{5}, {6},{7},{8}, {9},{10},{11}",
-                    matrix.A.ToString(CultureInfo.InvariantCulture),
-                    matrix.B.ToString(CultureInfo.InvariantCulture),
-                    matrix.C.ToString(CultureInfo.InvariantCulture),
-                    matrix.D.ToString(CultureInfo.InvariantCulture),
-                    matrix.E.ToString(CultureInfo.InvariantCulture),
-                    matrix.F.ToString(CultureInfo.InvariantCulture),
-                    matrix.G.ToString(CultureInfo.InvariantCulture),
-                    matrix.H.ToString(CultureInfo.InvariantCulture),
-                    matrix.I.ToString(CultureInfo.InvariantCulture),
-                    matrix.J.ToString(CultureInfo.InvariantCulture),
-                    matrix.K.ToString(CultureInfo.InvariantCulture),
-                    matrix.L.ToString(CultureInfo.InvariantCulture)));
-            }
-            else if (value is List<int>)
-            {
-                writer.WriteAttributeString("type", "vec_int");
-                writer.WriteValue(((List<int>)value).Implode(v => v.ToString(CultureInfo.InvariantCulture), ","));
-            }
-            else if (value is List<float>)
-            {
-                writer.WriteAttributeString("type", "vec_float");
-                writer.WriteValue(((List<float>)value).Implode(v => v.ToString(CultureInfo.InvariantCulture), ","));
-            }
-            else
-            {
-                throw new InvalidOperationException("unhandled type");
-            }
+            writer.WriteAttributeString("type", value.Tag);
+            writer.WriteValue(value.Compose());
         }
 
         private static void WriteObject(XmlWriter writer, PropertyNode obj)
@@ -271,6 +185,11 @@ namespace Gibbed.Avalanche.bin2xml
             if (binExtension != null)
             {
                 writer.WriteAttributeString("extension", binExtension);
+            }
+
+            if (propertyFile.Raw != true)
+            {
+                writer.WriteAttributeString("raw", propertyFile.Raw.ToString());
             }
 
             foreach (var node in propertyFile.Nodes)

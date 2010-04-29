@@ -1,3 +1,5 @@
+Available (through pre-order, purchase from store, etc):
+
 pack_0  - Bull's Eye Rifle
 pack_3  - Rico's Signature Gun
 pack_5  - Multi-lock Missile Launcher
@@ -9,3 +11,16 @@ pack_11 - Monster Truck
 pack_12 - Dual Parachute Thrusters
 pack_14 - Chaos Parachute
 pack_19 - Rico's Standard Parachute
+
+
+Not available yet:
+
+pack_1  - Air Propulsion Gun
+pack_2  - Cluster Bomb Launcher
+pack_4  - Quad Rocket Launcher
+pack_6  - Tuk Tuk Boom Boom
+pack_13 - Dare Devil Parachute
+pack_15 - Camo Parachute
+pack_16 - Tiger Parachute
+pack_17 - Scorpion Parachute
+pack_18 - Firestorm Parachute

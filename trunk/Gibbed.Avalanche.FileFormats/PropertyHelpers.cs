@@ -5,7 +5,7 @@ using Gibbed.Helpers;
 
 namespace Gibbed.Avalanche.FileFormats
 {
-    internal static class PropertyHelpers
+    public static class PropertyHelpers
     {
         /* 1 - int
          * 2 - float
@@ -16,10 +16,82 @@ namespace Gibbed.Avalanche.FileFormats
          * 7 - mat3x3
          * 8 - mat
          * 9 - vec_int
-         * 10 - vec_float
-         */
+         * 10 - vec_float */
 
-        public static object ReadTypedValue(Stream input, bool littleEndian)
+        public static IPropertyType GetPropertyType(uint type)
+        {
+            switch (type)
+            {
+                case 1: return new PropertyTypes.IntegerProperty();
+                case 2: return new PropertyTypes.FloatProperty();
+                case 3: return new PropertyTypes.StringProperty();
+                case 4: return new PropertyTypes.Vector2Property();
+                case 5: return new PropertyTypes.Vector3Property();
+                case 6: return new PropertyTypes.Vector4Property();
+                case 8: return new PropertyTypes.Matrix4x3Property();
+                case 9: return new PropertyTypes.IntegerListProperty();
+                case 10: return new PropertyTypes.FloatListProperty();
+                default: throw new NotSupportedException("unsupported property type");
+            }
+        }
+
+        public static IPropertyType GetPropertyType(string type)
+        {
+            switch (type)
+            {
+                case "int": return new PropertyTypes.IntegerProperty();
+                case "float": return new PropertyTypes.FloatProperty();
+                case "string": return new PropertyTypes.StringProperty();
+                case "vec2": return new PropertyTypes.Vector2Property();
+                case "vec": return new PropertyTypes.Vector3Property();
+                case "vec4": return new PropertyTypes.Vector4Property();
+                case "mat": return new PropertyTypes.Matrix4x3Property();
+                case "vec_int": return new PropertyTypes.IntegerListProperty();
+                case "vec_float": return new PropertyTypes.FloatListProperty();
+                default: throw new NotSupportedException("unsupported property type");
+            }
+        }
+
+        /*
+        public static object ReadTypedValueTagged(Stream input, uint type, bool littleEndian)
+        {
+            switch (type)
+            {
+                case 1: return input.ReadValueS32(littleEndian);
+                case 2: return input.ReadValueF32(littleEndian);
+                case 3:
+                {
+                    uint offset = input.ReadValueU32(littleEndian);
+                    if (offset == 0xFFFFFFFF)
+                    {
+                        return "";
+                    }
+                    else
+                    {
+                        input.Seek(offset, SeekOrigin.Begin);
+                        return input.ReadStringASCIIZ();
+                    }
+                }
+                case 5:
+                {
+                    uint offset = input.ReadValueU32(littleEndian);
+                    if (offset == 0xFFFFFFFF)
+                    {
+                        return new Vector3();
+                    }
+                    else
+                    {
+                        input.Seek(offset, SeekOrigin.Begin);
+                        Vector3 vector = new Vector3();
+                        vector.Deserialize(input, littleEndian);
+                        return vector;
+                    }
+                }
+                default: throw new Exception("unhandled type " + type.ToString());
+            }
+        }
+
+        public static object ReadTypedValueRaw(Stream input, bool littleEndian)
         {
             byte type = input.ReadValueU8();
 
@@ -81,7 +153,7 @@ namespace Gibbed.Avalanche.FileFormats
             }
         }
 
-        public static void WriteTypedValue(Stream output, object value, bool littleEndian)
+        public static void WriteTypedValueRaw(Stream output, object value, bool littleEndian)
         {
             if (value is int)
             {
@@ -145,5 +217,6 @@ namespace Gibbed.Avalanche.FileFormats
                 throw new Exception("unhandled type " + value.GetType().ToString());
             }
         }
+        */
     }
 }

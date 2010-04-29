@@ -51,114 +51,17 @@ namespace Gibbed.Avalanche.xml2bin
                 obj.Unknown3 = Convert.FromBase64String(unknown3.Value);
             }
 
-            obj.ValuesByHash = new Dictionary<uint, object>();
+            obj.ValuesByHash = new Dictionary<uint, IPropertyType>();
             var values = node.Select("value");
             while (values.MoveNext() == true)
             {
                 var current = values.Current;
 
                 uint id = GetIdOrName(current);
-                object value;
-
                 string type = current.GetAttribute("type", "");
-                switch (type)
-                {
-                    case "int": value = int.Parse(current.Value, CultureInfo.InvariantCulture); break;
-                    case "float": value = float.Parse(current.Value, CultureInfo.InvariantCulture); break;
-                    case "string": value = current.Value; break;
-                    case "vec2":
-                    {
-                        string[] parts = current.Value.Split(',');
-                        if (parts.Length != 2)
-                        {
-                            throw new InvalidOperationException("vec2 requires two float values delimited by a comma");
-                        }
-                        Vector2 vector = new Vector2();
-                        vector.X = float.Parse(parts[0], CultureInfo.InvariantCulture);
-                        vector.Y = float.Parse(parts[1], CultureInfo.InvariantCulture);
-                        value = vector;
-                        break;
-                    }
-                    case "vec":
-                    {
-                        string[] parts = current.Value.Split(',');
-                        if (parts.Length != 3)
-                        {
-                            throw new InvalidOperationException("vec requires two float values delimited by a comma");
-                        }
-                        Vector3 vector = new Vector3();
-                        vector.X = float.Parse(parts[0], CultureInfo.InvariantCulture);
-                        vector.Y = float.Parse(parts[1], CultureInfo.InvariantCulture);
-                        vector.Z = float.Parse(parts[2], CultureInfo.InvariantCulture);
-                        value = vector;
-                        break;
-                    }
-                    case "vec4":
-                    {
-                        string[] parts = current.Value.Split(',');
-                        if (parts.Length != 4)
-                        {
-                            throw new InvalidOperationException("vec4 requires three float values delimited by a comma");
-                        }
-                        Vector4 vector = new Vector4();
-                        vector.X = float.Parse(parts[0], CultureInfo.InvariantCulture);
-                        vector.Y = float.Parse(parts[1], CultureInfo.InvariantCulture);
-                        vector.Z = float.Parse(parts[2], CultureInfo.InvariantCulture);
-                        vector.W = float.Parse(parts[3], CultureInfo.InvariantCulture);
-                        value = vector;
-                        break;
-                    }
-                    case "mat":
-                    {
-                        string[] parts = current.Value.Split(',');
-                        if (parts.Length != 3 * 4)
-                        {
-                            throw new InvalidOperationException("mat requires twelve float values delimited by a comma");
-                        }
 
-                        Matrix matrix = new Matrix();
-                        matrix.A = float.Parse(parts[0], CultureInfo.InvariantCulture);
-                        matrix.B = float.Parse(parts[1], CultureInfo.InvariantCulture);
-                        matrix.C = float.Parse(parts[2], CultureInfo.InvariantCulture);
-                        matrix.D = float.Parse(parts[3], CultureInfo.InvariantCulture);
-                        matrix.E = float.Parse(parts[4], CultureInfo.InvariantCulture);
-                        matrix.F = float.Parse(parts[5], CultureInfo.InvariantCulture);
-                        matrix.G = float.Parse(parts[6], CultureInfo.InvariantCulture);
-                        matrix.H = float.Parse(parts[7], CultureInfo.InvariantCulture);
-                        matrix.I = float.Parse(parts[8], CultureInfo.InvariantCulture);
-                        matrix.J = float.Parse(parts[9], CultureInfo.InvariantCulture);
-                        matrix.K = float.Parse(parts[10], CultureInfo.InvariantCulture);
-                        matrix.L = float.Parse(parts[11], CultureInfo.InvariantCulture);
-                        value = matrix;
-                        break;
-                    }
-                    case "vec_int":
-                    {
-                        string[] parts = current.Value.Split(',');
-
-                        var ints = new List<int>();
-                        foreach (var part in parts)
-                        {
-                            ints.Add(int.Parse(part, CultureInfo.InvariantCulture));
-                        }
-                        value = ints;
-                        break;
-                    }
-                    case "vec_float":
-                    {
-                        string[] parts = current.Value.Split(',');
-
-                        var floats = new List<float>();
-                        foreach (var part in parts)
-                        {
-                            floats.Add(float.Parse(part, CultureInfo.InvariantCulture));
-                        }
-                        value = floats;
-                        break;
-                    }
-                    default: throw new InvalidOperationException("unsupported type " + type.ToString());
-                }
-
+                IPropertyType value = PropertyHelpers.GetPropertyType(type);
+                value.Parse(current.Value);
                 obj.ValuesByHash.Add(id, value);
             }
 
@@ -230,11 +133,20 @@ namespace Gibbed.Avalanche.xml2bin
 
             var root = nav.SelectSingleNode("/root");
             string binExtension = root.GetAttribute("extension", "");
+            string rawMode = root.GetAttribute("raw", "");
+
+            bool raw = true;
+            
+            if (string.IsNullOrEmpty(rawMode) == false)
+            {
+                bool.TryParse(rawMode, out raw);
+            }
 
             string binPath = extra.Count > 1 ?
                 extra[1] : Path.ChangeExtension(xmlPath, binExtension == null ? ".bin" : binExtension);
 
             PropertyFile propertyFile = new PropertyFile();
+            propertyFile.Raw = raw;
 
             var nodes = nav.Select("/root/object");
             while (nodes.MoveNext() == true)

@@ -12,7 +12,7 @@ namespace Gibbed.Avalanche.FileFormats.PropertyTypes
 
         public byte Id { get { return 10; } }
         public string Tag { get { return "vec_float"; } }
-        public bool Inline { get { return true; } }
+        public bool Inline { get { return false; } }
 
         public void Default()
         {

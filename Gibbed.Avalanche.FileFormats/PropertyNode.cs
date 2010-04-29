@@ -28,6 +28,16 @@ namespace Gibbed.Avalanche.FileFormats
             {
                 byte count = 0;
 
+                if (this.ChildrenByName.Count > 0)
+                {
+                    count++;
+                }
+
+                if (this.ValuesByName.Count > 0)
+                {
+                    count++;
+                }
+
                 if (this.ChildrenByHash.Count > 0)
                 {
                     count++;
@@ -44,6 +54,31 @@ namespace Gibbed.Avalanche.FileFormats
                 }
 
                 output.WriteValueU8(count);
+
+                if (this.ChildrenByName.Count > 0)
+                {
+                    output.WriteValueU16(1, littleEndian);
+                    output.WriteValueU16((ushort)this.ChildrenByName.Count, littleEndian);
+                    foreach (var kvp in this.ChildrenByName.Take(this.ChildrenByName.Count & 0xFFFF))
+                    {
+                        output.WriteValueS32(kvp.Key.Length, littleEndian);
+                        output.WriteStringASCII(kvp.Key);
+                        kvp.Value.Serialize(output, raw, littleEndian);
+                    }
+                }
+
+                if (this.ValuesByName.Count > 0)
+                {
+                    output.WriteValueU16(2, littleEndian);
+                    output.WriteValueU16((ushort)this.ValuesByName.Count, littleEndian);
+                    foreach (var kvp in this.ValuesByName.Take(this.ValuesByName.Count & 0xFFFF))
+                    {
+                        output.WriteValueS32(kvp.Key.Length, littleEndian);
+                        output.WriteStringASCII(kvp.Key);
+                        output.WriteValueU8(kvp.Value.Id);
+                        kvp.Value.Serialize(output, raw, littleEndian);
+                    }
+                }
 
                 if (this.Unknown3 != null && this.Unknown3.Length > 0)
                 {

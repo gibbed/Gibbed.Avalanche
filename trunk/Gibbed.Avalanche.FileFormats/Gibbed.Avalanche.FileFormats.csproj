@@ -61,6 +61,7 @@
     <Compile Include="PropertyTypes\IntegerProperty.cs" />
     <Compile Include="PropertyTypes\Matrix3x3Property.cs" />
     <Compile Include="PropertyTypes\Matrix4x3Property.cs" />
+    <Compile Include="PropertyTypes\Matrix4x4Property.cs" />
     <Compile Include="PropertyTypes\StringProperty.cs" />
     <Compile Include="PropertyTypes\Vector2Property.cs" />
     <Compile Include="PropertyTypes\Vector3Property.cs" />

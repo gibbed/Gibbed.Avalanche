@@ -13,12 +13,44 @@ namespace Gibbed.Avalanche.SmallPack
         static NameComparer()
         {
             Extensions = new List<string>();
-            Extensions.Add(".dds");
+            /*Extensions.Add(".dds");
             Extensions.Add(".rbm");
             Extensions.Add(".lod");
             Extensions.Add(".pal");
             Extensions.Add(".pfx");
+            Extensions.Add(".dec");*/
+            Extensions.Add(".bsk");
+            Extensions.Add(".ban");
+            Extensions.Add(".pfs");
+            Extensions.Add(".dds");
+            Extensions.Add(".agui");
+            Extensions.Add(".rbm");
+            Extensions.Add(".batchlod");
+            Extensions.Add(".lod");
+            Extensions.Add(".pal");
+            Extensions.Add(".cdoll");
+            Extensions.Add(".pfx");
             Extensions.Add(".dec");
+            Extensions.Add(".vdoll");
+            Extensions.Add(".mvdoll");
+            Extensions.Add(".sst");
+            Extensions.Add(".aiteam");
+            Extensions.Add(".pfi");
+            Extensions.Add(".dcs");
+            Extensions.Add(".obc");
+            Extensions.Add(".blo");
+            Extensions.Add(".cgd");
+            Extensions.Add(".afsm");
+            Extensions.Add(".acsb");
+            Extensions.Add(".aiprop");
+            Extensions.Add(".asb");
+            Extensions.Add(".event_trackb");
+            Extensions.Add(".seq");
+            Extensions.Add(".skl");
+            Extensions.Add(".af");
+            Extensions.Add(".psmb");
+            Extensions.Add(".bl");
+            Extensions.Add(".epe");
         }
 
         public int Compare(string x, string y)

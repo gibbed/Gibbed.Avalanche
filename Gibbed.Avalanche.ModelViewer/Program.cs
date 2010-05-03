@@ -11,9 +11,18 @@ namespace Gibbed.Avalanche.ModelViewer
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Viewer());
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new Viewer());
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(
+                    "Press CTRL+C to copy this dialog.\n\n" + e.ToString(),
+                    "Exception!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

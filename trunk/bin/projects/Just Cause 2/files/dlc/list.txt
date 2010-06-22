@@ -6,6 +6,7 @@ pack_2  - Cluster Bomb Launcher
 pack_3  - Rico's Signature Gun
 pack_4  - Quad Rocket Launcher
 pack_5  - Multi-lock Missile Launcher
+pack_6  - Tuk Tuk Boom Boom
 pack_7  - Chevalier Ice Breaker
 pack_8  - F-33 DragonFly Jet Fighter
 pack_9  - Chevalier Classic
@@ -17,7 +18,6 @@ pack_19 - Rico's Standard Parachute
 
 Not available yet:
 
-pack_6  - Tuk Tuk Boom Boom
 pack_13 - Dare Devil Parachute
 pack_15 - Camo Parachute
 pack_16 - Tiger Parachute

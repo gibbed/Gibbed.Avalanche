@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Gibbed.Helpers;
+using Gibbed.IO;
 
 namespace Gibbed.Avalanche.FileFormats
 {
@@ -19,7 +19,7 @@ namespace Gibbed.Avalanche.FileFormats
             {
                 throw new Exception();
             }
-            return input.ReadStringASCII(length);
+            return input.ReadString(length, Encoding.ASCII);
         }
 
         public static void WriteStringASCIIUInt32(this Stream output, string value)
@@ -30,7 +30,7 @@ namespace Gibbed.Avalanche.FileFormats
         public static void WriteStringASCIIUInt32(this Stream output, string value, bool littleEndian)
         {
             output.WriteValueS32(value.Length);
-            output.WriteStringASCII(value);
+            output.WriteString(value, Encoding.ASCII);
         }
     }
 }

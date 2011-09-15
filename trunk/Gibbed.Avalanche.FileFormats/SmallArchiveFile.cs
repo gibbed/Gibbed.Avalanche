@@ -2,7 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 using System.IO;
-using Gibbed.Helpers;
+using Gibbed.IO;
 
 namespace Gibbed.Avalanche.FileFormats
 {
@@ -17,7 +17,7 @@ namespace Gibbed.Avalanche.FileFormats
             public void Serialize(Stream output, bool littleEndian)
             {
                 output.WriteValueS32(Encoding.ASCII.GetByteCount(this.Name), littleEndian);
-                output.WriteStringASCII(this.Name);
+                output.WriteString(this.Name, Encoding.ASCII);
                 output.WriteValueU32(this.Offset, littleEndian);
                 output.WriteValueU32(this.Size, littleEndian);
             }
@@ -30,7 +30,7 @@ namespace Gibbed.Avalanche.FileFormats
                     throw new FormatException("doubt there is a file with more than 1024 characters in its name");
                 }
 
-                this.Name = input.ReadStringASCII(length);
+                this.Name = input.ReadString(length, Encoding.ASCII);
                 this.Offset = input.ReadValueU32(littleEndian);
                 this.Size = input.ReadValueU32(littleEndian);
             }
@@ -51,7 +51,7 @@ namespace Gibbed.Avalanche.FileFormats
             index.Position = 0;
 
             output.WriteValueU32(4, this.LittleEndian);
-            output.WriteStringASCII("SARC");
+            output.WriteString("SARC", Encoding.ASCII);
             output.WriteValueU32(2, this.LittleEndian);
             output.WriteValueU32((uint)index.Length, this.LittleEndian);
 
@@ -69,7 +69,7 @@ namespace Gibbed.Avalanche.FileFormats
 
             this.LittleEndian = magicSize == 4;
 
-            if (input.ReadStringASCII(4) != "SARC")
+            if (input.ReadString(4, Encoding.ASCII) != "SARC")
             {
                 throw new FormatException("bad header magic");
             }

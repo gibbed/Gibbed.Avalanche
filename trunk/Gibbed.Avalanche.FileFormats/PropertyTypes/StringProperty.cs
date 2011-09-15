@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Text;
 using System.Globalization;
 using System.IO;
-using Gibbed.Helpers;
+using Gibbed.IO;
 
 namespace Gibbed.Avalanche.FileFormats.PropertyTypes
 {
@@ -26,11 +27,11 @@ namespace Gibbed.Avalanche.FileFormats.PropertyTypes
                 s = s.Substring(0, Math.Min(s.Length, 0xFFFF));
 
                 output.WriteValueU16((ushort)s.Length, littleEndian);
-                output.WriteStringASCII(s);
+                output.WriteString(s, Encoding.ASCII);
             }
             else
             {
-                output.WriteStringASCIIZ(this.Value);
+                output.WriteStringZ(this.Value, Encoding.ASCII);
             }
         }
 
@@ -39,11 +40,11 @@ namespace Gibbed.Avalanche.FileFormats.PropertyTypes
             if (raw == true)
             {
                 ushort length = input.ReadValueU16(littleEndian);
-                this.Value = input.ReadStringASCII(length, true);
+                this.Value = input.ReadString(length, true, Encoding.ASCII);
             }
             else
             {
-                this.Value = input.ReadStringASCIIZ();
+                this.Value = input.ReadStringZ(Encoding.ASCII);
             }
         }
 

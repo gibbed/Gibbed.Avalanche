@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Gibbed.Helpers;
+using Gibbed.IO;
 using System.IO;
 
 namespace Gibbed.Avalanche.FileFormats
@@ -114,7 +114,7 @@ namespace Gibbed.Avalanche.FileFormats
 
                     uint offset = input.ReadValueU32(this.LittleEndian);
                     input.Seek(offset, SeekOrigin.Begin);
-                    return input.ReadStringASCIIZ();
+                    return input.ReadStringZ(Encoding.ASCII);
                 }
 
                 default:

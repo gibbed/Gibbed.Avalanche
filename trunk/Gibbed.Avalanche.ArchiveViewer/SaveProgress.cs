@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Gibbed.Avalanche.FileFormats;
-using Gibbed.Helpers;
+using Gibbed.IO;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace Gibbed.Avalanche.ArchiveViewer

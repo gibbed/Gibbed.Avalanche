@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Gibbed.Helpers;
+using Gibbed.IO;
 
 namespace Gibbed.Avalanche.FileFormats.DataFormat
 {
@@ -26,7 +26,7 @@ namespace Gibbed.Avalanche.FileFormats.DataFormat
             this.Size = input.ReadValueU32(littleEndian);
             this.Unknown08 = input.ReadValueU32(littleEndian);
             this.TypeHash = input.ReadValueU32(littleEndian);
-            this.Name = input.ReadStringASCII(64, true);
+            this.Name = input.ReadString(64, true, Encoding.ASCII);
             this.Unknown50 = input.ReadValueU32(littleEndian);
             this.ElementTypeHash = input.ReadValueU32(littleEndian);
             this.Unknown58 = input.ReadValueU32(littleEndian);

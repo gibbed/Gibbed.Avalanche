@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using Gibbed.Avalanche.FileFormats;
-using Gibbed.Helpers;
+using Gibbed.IO;
 using NDesk.Options;
 
 namespace Gibbed.Avalanche.bin2xml

@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.IO;
-using Gibbed.Helpers;
+using Gibbed.IO;
 using System.Linq;
 using System.Text;
 
@@ -40,7 +40,7 @@ namespace Gibbed.Avalanche.FileFormats
 
             public void Deserialize(Stream input)
             {
-                this.Name = input.ReadStringASCII(32).StripJunk();
+                this.Name = input.ReadString(32, Encoding.ASCII).StripJunk();
                 this.Unknown20 = input.ReadValueU32();
                 this.Unknown24 = input.ReadValueU8();
                 this.Unknown25 = input.ReadValueU8();

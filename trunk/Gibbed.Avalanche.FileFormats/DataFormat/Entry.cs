@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Gibbed.Helpers;
+using Gibbed.IO;
 using System.IO;
 
 namespace Gibbed.Avalanche.FileFormats.DataFormat
@@ -21,7 +21,7 @@ namespace Gibbed.Avalanche.FileFormats.DataFormat
             this.TypeHash = input.ReadValueU32(littleEndian);
             this.Offset = input.ReadValueU32(littleEndian);
             this.Size = input.ReadValueU32(littleEndian);
-            this.Name = input.ReadStringASCII(32, true);
+            this.Name = input.ReadString(32, true, Encoding.ASCII);
         }
 
         public override string ToString()

@@ -125,11 +125,13 @@ namespace Gibbed.Avalanche.FileFormats
         }
 #endregion
 
+        /*
         public static uint HashJenkinsFileName(this string input)
         {
             byte[] data = Encoding.ASCII.GetBytes(input.ToLowerInvariant());
             return HashJenkins(data, 0, data.Length, 0);
         }
+        */
 
         public static uint HashJenkins(this string input)
         {

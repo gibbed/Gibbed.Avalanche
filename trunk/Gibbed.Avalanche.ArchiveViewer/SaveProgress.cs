@@ -75,7 +75,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
 				string fileName = null;
 
                 bool decompressing = false;
-                if (info.FileNames.ContainsKey(hash) == true)
+                if (info.FileNames.Contains(hash) == true)
 				{
 					fileName = info.FileNames[hash];
 					UsedNames[hash] = info.FileNames[hash];
@@ -298,12 +298,19 @@ namespace Gibbed.Avalanche.ArchiveViewer
 			public Stream Archive;
 			public ArchiveTableFile Table;
             public List<uint> Saving;
-			public Dictionary<uint, string> FileNames;
+            public ProjectData.HashList<uint> FileNames;
             public SaveAllSettings Settings;
 		}
 
 		private Thread SaveThread;
-		public void ShowSaveProgress(IWin32Window owner, Stream archive, ArchiveTableFile table, List<uint> saving, Dictionary<uint, string> fileNames, string basePath, SaveAllSettings settings)
+		public void ShowSaveProgress(
+            IWin32Window owner,
+            Stream archive,
+            ArchiveTableFile table,
+            List<uint> saving,
+            ProjectData.HashList<uint> fileNames,
+            string basePath,
+            SaveAllSettings settings)
 		{
 			SaveAllInformation info;
 			info.BasePath = basePath;

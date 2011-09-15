@@ -12,7 +12,7 @@ namespace Gibbed.Avalanche.bin2xml
 {
     internal class Program
     {
-        private static Dictionary<uint, string> Names = new Dictionary<uint, string>();
+        private static ProjectData.HashList<uint> Names = null;
 
         private static void WriteProperty(XmlWriter writer, IPropertyType value)
         {
@@ -47,7 +47,7 @@ namespace Gibbed.Avalanche.bin2xml
                 {
                     writer.WriteStartElement("value");
 
-                    if (Names.ContainsKey(kvp.Key) == true)
+                    if (Names.Contains(kvp.Key) == true)
                     {
                         writer.WriteAttributeString("name", Names[kvp.Key]);
                     }
@@ -79,7 +79,7 @@ namespace Gibbed.Avalanche.bin2xml
                 {
                     writer.WriteStartElement("object");
 
-                    if (Names.ContainsKey(kvp.Key) == true)
+                    if (Names.Contains(kvp.Key) == true)
                     {
                         writer.WriteAttributeString("name", Names[kvp.Key]);
                     }
@@ -149,16 +149,13 @@ namespace Gibbed.Avalanche.bin2xml
 
             string listsPath = Path.Combine(GetExecutablePath(), "lists");
 
-            var manager = Setup.Manager.Load();
-            if (manager.ActiveProject != null)
-            {
-                manager.ActiveProject.Load();
-                Names = manager.ActiveProject.NameHashLookup;
-            }
-            else
+            var manager = ProjectData.Manager.Load();
+            if (manager.ActiveProject == null)
             {
                 Console.WriteLine("Warning: no active project loaded.");
             }
+
+            Names = manager.LoadListsPropertyNames();
 
             string binPath = extra[0];
             string xmlPath = extra.Count > 1 ?

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Gibbed.Avalanche.FileFormats;
-using Gibbed.Helpers;
+using Gibbed.IO;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using NDesk.Options;

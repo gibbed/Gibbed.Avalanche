@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using Gibbed.Helpers;
+using Gibbed.IO;
 
 namespace Gibbed.Avalanche.FileFormats
 {
@@ -33,7 +34,7 @@ namespace Gibbed.Avalanche.FileFormats
                     node.Serialize(memory, this.Raw, littleEndian);
                     memory.Position = 0;
 
-                    output.WriteStringASCII("PCBB");
+                    output.WriteString("PCBB", Encoding.ASCII);
                     output.WriteValueU32((uint)memory.Length, littleEndian);
                     output.WriteFromStream(memory, memory.Length);
                 }
@@ -45,14 +46,14 @@ namespace Gibbed.Avalanche.FileFormats
             this.Nodes = new List<PropertyNode>();
 
             input.Seek(0, SeekOrigin.Begin);
-            if (input.ReadStringASCII(4) == "PCBB")
+            if (input.ReadString(4, Encoding.ASCII) == "PCBB")
             {
                 this.Raw = false;
                 input.Seek(0, SeekOrigin.Begin);
 
                 while (input.Position < input.Length)
                 {
-                    if (input.ReadStringASCII(4) != "PCBB")
+                    if (input.ReadString(4, Encoding.ASCII) != "PCBB")
                     {
                         //throw new FormatException("invalid magic tag");
                         break;

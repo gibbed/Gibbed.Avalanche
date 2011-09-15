@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Gibbed.Helpers;
+using Gibbed.IO;
 using System.IO;
 
 namespace Gibbed.Avalanche.FileFormats
@@ -53,7 +53,7 @@ namespace Gibbed.Avalanche.FileFormats
                             {
                                 throw new Exception();
                             }
-                            value = input.ReadStringASCII(length, true);
+                            value = input.ReadString(length, true, Encoding.ASCII);
                             break;
                         }
                         default: throw new InvalidOperationException("unhandled attribute type " + type.ToString());
@@ -76,7 +76,7 @@ namespace Gibbed.Avalanche.FileFormats
             input.Seek(3, SeekOrigin.Current);
             input.Seek(4, SeekOrigin.Current);
 
-            if (input.ReadStringASCII(8, true) != "AnarkBGF")
+            if (input.ReadString(8, true, Encoding.ASCII) != "AnarkBGF")
             {
                 throw new FormatException("invalid header tag");
             }

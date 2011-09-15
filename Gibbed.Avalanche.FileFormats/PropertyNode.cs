@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Gibbed.Helpers;
+using Gibbed.IO;
 
 namespace Gibbed.Avalanche.FileFormats
 {
@@ -62,7 +63,7 @@ namespace Gibbed.Avalanche.FileFormats
                     foreach (var kvp in this.ChildrenByName.Take(this.ChildrenByName.Count & 0xFFFF))
                     {
                         output.WriteValueS32(kvp.Key.Length, littleEndian);
-                        output.WriteStringASCII(kvp.Key);
+                        output.WriteString(kvp.Key, Encoding.ASCII);
                         kvp.Value.Serialize(output, raw, littleEndian);
                     }
                 }
@@ -74,7 +75,7 @@ namespace Gibbed.Avalanche.FileFormats
                     foreach (var kvp in this.ValuesByName.Take(this.ValuesByName.Count & 0xFFFF))
                     {
                         output.WriteValueS32(kvp.Key.Length, littleEndian);
-                        output.WriteStringASCII(kvp.Key);
+                        output.WriteString(kvp.Key, Encoding.ASCII);
                         output.WriteValueU8(kvp.Value.Id);
                         kvp.Value.Serialize(output, raw, littleEndian);
                     }
@@ -150,7 +151,7 @@ namespace Gibbed.Avalanche.FileFormats
                             {
                                 throw new Exception();
                             }
-                            string id = input.ReadStringASCII(length, true);
+                            string id = input.ReadString(length, true, Encoding.ASCII);
                             PropertyNode child = new PropertyNode();
                             child.Deserialize(input, raw, littleEndian);
                             this.ChildrenByName.Add(id, child);
@@ -165,7 +166,7 @@ namespace Gibbed.Avalanche.FileFormats
                             {
                                 throw new Exception();
                             }
-                            string id = input.ReadStringASCII(length, true);
+                            string id = input.ReadString(length, true, Encoding.ASCII);
 
                             byte propertyType = input.ReadValueU8();
                             IPropertyType value = PropertyHelpers.GetPropertyType(

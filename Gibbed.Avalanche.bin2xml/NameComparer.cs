@@ -5,18 +5,18 @@ namespace Gibbed.Avalanche.bin2xml
 {
     internal class NameComparer : IComparer<uint>
     {
-        private Dictionary<uint, string> Names;
+        private ProjectData.HashList<uint> Names;
 
-        public NameComparer(Dictionary<uint, string> names)
+        public NameComparer(ProjectData.HashList<uint> names)
         {
             this.Names = names;
         }
 
         public int Compare(uint x, uint y)
         {
-            if (this.Names.ContainsKey(x) == false)
+            if (this.Names.Contains(x) == false)
             {
-                if (this.Names.ContainsKey(y) == false)
+                if (this.Names.Contains(y) == false)
                 {
                     if (x == y)
                     {
@@ -32,7 +32,7 @@ namespace Gibbed.Avalanche.bin2xml
             }
             else
             {
-                if (this.Names.ContainsKey(y) == false)
+                if (this.Names.Contains(y) == false)
                 {
                     return 1;
                 }

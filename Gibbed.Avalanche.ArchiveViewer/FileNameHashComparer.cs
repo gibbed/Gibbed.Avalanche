@@ -7,18 +7,18 @@ namespace Gibbed.Avalanche.ArchiveViewer
 {
     internal class FileNameHashComparer : IComparer<uint>
     {
-        private Dictionary<uint, string> FileNames;
+        private ProjectData.HashList<uint> FileNames;
 
-        public FileNameHashComparer(Dictionary<uint, string> names)
+        public FileNameHashComparer(ProjectData.HashList<uint> names)
         {
             this.FileNames = names;
         }
 
         public int Compare(uint x, uint y)
         {
-            if (this.FileNames == null || this.FileNames.ContainsKey(x) == false)
+            if (this.FileNames == null || this.FileNames.Contains(x) == false)
             {
-                if (this.FileNames == null || this.FileNames.ContainsKey(y) == false)
+                if (this.FileNames == null || this.FileNames.Contains(y) == false)
                 {
                     if (x == y)
                     {
@@ -34,7 +34,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
             }
             else
             {
-                if (this.FileNames == null || this.FileNames.ContainsKey(y) == false)
+                if (this.FileNames == null || this.FileNames.Contains(y) == false)
                 {
                     return 1;
                 }

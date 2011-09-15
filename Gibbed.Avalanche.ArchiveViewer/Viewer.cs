@@ -14,7 +14,8 @@ namespace Gibbed.Avalanche.ArchiveViewer
             this.InitializeComponent();
         }
 
-        private Setup.Manager Manager;
+        private ProjectData.Manager Manager;
+        private ProjectData.HashList<uint> Hashes;
 
         private void OnLoad(object sender, EventArgs e)
         {
@@ -25,7 +26,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
         {
             try
             {
-                this.Manager = Setup.Manager.Load();
+                this.Manager = ProjectData.Manager.Load();
                 this.projectComboBox.Items.AddRange(this.Manager.ToArray());
                 this.SetProject(this.Manager.ActiveProject);
             }
@@ -44,13 +45,12 @@ namespace Gibbed.Avalanche.ArchiveViewer
             }
         }
 
-        private void SetProject(Setup.Project project)
+        private void SetProject(ProjectData.Project project)
         {
             if (project != null)
             {
                 try
                 {
-                    project.Load();
                     this.openDialog.InitialDirectory = project.InstallPath;
                     this.saveKnownFileListDialog.InitialDirectory = project.ListsPath;
                 }
@@ -67,6 +67,8 @@ namespace Gibbed.Avalanche.ArchiveViewer
                         MessageBoxIcon.Error);
                     project = null;
                 }
+
+                this.Hashes = project.LoadListsFileNames();
             }
 
             if (project != this.Manager.ActiveProject)
@@ -91,18 +93,15 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 TreeNode knownNode = new TreeNode("Known", 1, 1);
                 TreeNode unknownNode = new TreeNode("Unknown", 1, 1);
 
-                Dictionary<uint, string> lookup = 
-                    this.Manager.ActiveProject == null ? null : this.Manager.ActiveProject.FileHashLookup;
-
                 foreach (uint hash in this.Table.Keys
-                    .OrderBy(k => k, new FileNameHashComparer(lookup)))
+                    .OrderBy(k => k, new FileNameHashComparer(this.Hashes)))
                 {
                     ArchiveTableFile.Entry entry = this.Table[hash];
                     TreeNode node = null;
 
-                    if (lookup != null && lookup.ContainsKey(hash) == true)
+                    if (this.Hashes != null && this.Hashes.Contains(hash) == true)
                     {
-                        string fileName = lookup[hash];
+                        string fileName = this.Hashes[hash];
                         string pathName = Path.GetDirectoryName(fileName);
                         TreeNodeCollection parentNodes = knownNode.Nodes;
 
@@ -262,7 +261,6 @@ namespace Gibbed.Avalanche.ArchiveViewer
                     }
                 }
 
-                lookup = this.Manager.ActiveProject == null ? null : this.Manager.ActiveProject.FileHashLookup;
                 basePath = this.saveFilesDialog.SelectedPath;
             }
 
@@ -279,7 +277,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 input,
                 this.Table,
                 saving,
-                lookup,
+                this.Hashes,
                 basePath,
                 settings);
 
@@ -302,9 +300,6 @@ namespace Gibbed.Avalanche.ArchiveViewer
 
             string basePath = this.saveFilesDialog.SelectedPath;
 
-            Dictionary<uint, string> lookup =
-                this.Manager.ActiveProject == null ? null : this.Manager.ActiveProject.FileHashLookup;
-
             SaveProgress.SaveAllSettings settings;
             settings.DecompressUnknownFiles = this.decompressUnknownFilesMenuItem.Checked;
             settings.DecompressSmallArchives = this.decompressSmallArchivesMenuItem.Checked;
@@ -316,7 +311,8 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 this,
                 input,
                 this.Table,
-                null, lookup,
+                null,
+                this.Hashes,
                 basePath,
                 settings);
 
@@ -327,7 +323,11 @@ namespace Gibbed.Avalanche.ArchiveViewer
         {
             if (this.Manager.ActiveProject != null)
             {
-                this.Manager.ActiveProject.Reload();
+                this.Hashes = this.Manager.ActiveProject.LoadListsFileNames();
+            }
+            else
+            {
+                this.Hashes = null;
             }
 
             this.BuildFileTree();
@@ -336,7 +336,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
         private void OnProjectSelected(object sender, EventArgs e)
         {
             this.projectComboBox.Invalidate();
-            var project = this.projectComboBox.SelectedItem as Setup.Project;
+            var project = this.projectComboBox.SelectedItem as ProjectData.Project;
             if (project == null)
             {
                 this.projectComboBox.Items.Remove(this.projectComboBox.SelectedItem);
@@ -359,9 +359,9 @@ namespace Gibbed.Avalanche.ArchiveViewer
             {
                 foreach (uint hash in this.Table.Keys)
                 {
-                    if (this.Manager.ActiveProject.FileHashLookup.ContainsKey(hash))
+                    if (this.Hashes.Contains(hash))
                     {
-                        names.Add(this.Manager.ActiveProject.FileHashLookup[hash]);
+                        names.Add(this.Hashes[hash]);
                     }
                 }
             }

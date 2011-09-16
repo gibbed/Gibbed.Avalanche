@@ -75,6 +75,7 @@
     <Compile Include="DataFormat\DefinitionType.cs" />
     <Compile Include="DataFormat\DefinitionValue.cs" />
     <Compile Include="DataFormat\NativeValueType.cs" />
+    <Compile Include="FileExtensions.cs" />
     <Compile Include="IPropertyType.cs" />
     <Compile Include="JoinHelpers.cs" />
     <Compile Include="MissionsFile.cs" />

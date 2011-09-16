@@ -23,7 +23,7 @@ namespace Gibbed.Avalanche.SmallUnpack
             bool listing = false;
             bool showHelp = false;
 
-            OptionSet options = new OptionSet()
+            var options = new OptionSet()
             {
                 {
                     "v|verbose",
@@ -77,105 +77,97 @@ namespace Gibbed.Avalanche.SmallUnpack
             }
 
             string inputPath = extra[0];
-            string outputPath = extra.Count > 1 ? extra[1] : Path.ChangeExtension(inputPath, null);
+            string outputPath = extra.Count > 1 ?
+                extra[1] : Path.ChangeExtension(inputPath, null) + "_unpack";
 
-            Stream input = File.OpenRead(inputPath);
-
-            if (input.ReadValueU8() == 0x78)
+            using (var input = File.OpenRead(inputPath))
             {
-                Console.WriteLine("Detected compressed SARC.");
-                decompress = true;
-            }
-            input.Seek(-1, SeekOrigin.Current);
-
-            if (decompress == true)
-            {
-                Stream decompressed = new MemoryStream();
-
-                //var zlib = new ZlibStream(input, CompressionMode.Decompress);
-                var zlib = new InflaterInputStream(input);
-                
-                byte[] buffer = new byte[0x4000];
-                while (true)
+                if (input.ReadValueU8() == 0x78)
                 {
-                    int read = zlib.Read(buffer, 0, buffer.Length);
-                    if (read < 0)
+                    Console.WriteLine("Detected compressed SARC.");
+                    decompress = true;
+                }
+                input.Seek(-1, SeekOrigin.Current);
+
+                Stream data;
+                if (decompress == false)
+                {
+                    data = input;
+                }
+                else
+                {
+                    var decompressed = new MemoryStream();
+
+                    //var zlib = new ZlibStream(input, CompressionMode.Decompress);
+                    var zlib = new InflaterInputStream(input);
+
+                    byte[] buffer = new byte[0x4000];
+                    while (true)
                     {
-                        throw new InvalidOperationException("zlib error");
+                        int read = zlib.Read(buffer, 0, buffer.Length);
+                        if (read < 0)
+                        {
+                            throw new InvalidOperationException("zlib error");
+                        }
+                        else if (read == 0)
+                        {
+                            break;
+                        }
+                        decompressed.Write(buffer, 0, read);
                     }
-                    else if (read == 0)
-                    {
-                        break;
-                    }
-                    decompressed.Write(buffer, 0, read);
+
+                    zlib.Close();
+                    input.Close();
+                    decompressed.Position = 0;
+
+                    data = decompressed;
                 }
 
-                zlib.Close();
-                input.Close();
-                decompressed.Position = 0;
-
-                input = decompressed;
-            }
-
-            if (listing == false)
-            {
-                Directory.CreateDirectory(outputPath);
-            }
-
-            SmallArchiveFile smallArchive = new SmallArchiveFile();
-            smallArchive.Deserialize(input);
-
-            long counter = 0;
-            long skipped = 0;
-            long totalCount = smallArchive.Entries.Count;
-            Console.WriteLine("{0} files in small archive.", totalCount);
-            {
-                byte[] buffer = new byte[0x4000];
-                foreach (var entry in smallArchive.Entries)
+                if (listing == false)
                 {
-                    counter++;
+                    Directory.CreateDirectory(outputPath);
+                }
 
-                    string entryName = Path.GetFileName(entry.Name);
-                    string entryPath = Path.Combine(outputPath, entryName);
+                var smallArchive = new SmallArchiveFile();
+                smallArchive.Deserialize(data);
 
-                    if (overwriteFiles == false && File.Exists(entryPath) == true)
+                long counter = 0;
+                long skipped = 0;
+                long totalCount = smallArchive.Entries.Count;
+                Console.WriteLine("{0} files in small archive.", totalCount);
+                {
+                    foreach (var entry in smallArchive.Entries)
                     {
-                        Console.WriteLine("{1:D4}/{2:D4} !! {0}", entry.Name, counter, totalCount);
-                        skipped++;
-                        continue;
-                    }
-                    else
-                    {
-                        Console.WriteLine("{1:D4}/{2:D4} => {0}", entry.Name, counter, totalCount);
-                    }
+                        counter++;
 
-                    if (listing == false)
-                    {
-                        Stream output = File.Open(entryPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+                        string entryName = Path.GetFileName(entry.Name);
+                        string entryPath = Path.Combine(outputPath, entryName);
 
-                        input.Seek(entry.Offset, SeekOrigin.Begin);
-                        int left = (int)entry.Size;
-                        while (left > 0)
+                        if (overwriteFiles == false && File.Exists(entryPath) == true)
                         {
-                            int read = input.Read(buffer, 0, Math.Min(left, buffer.Length));
-                            if (read == 0)
-                            {
-                                break;
-                            }
-                            output.Write(buffer, 0, read);
-                            left -= read;
+                            Console.WriteLine("{1:D4}/{2:D4} !! {0}", entry.Name, counter, totalCount);
+                            skipped++;
+                            continue;
+                        }
+                        else
+                        {
+                            Console.WriteLine("{1:D4}/{2:D4} => {0}", entry.Name, counter, totalCount);
                         }
 
-                        output.Flush();
-                        output.Close();
+                        if (listing == false)
+                        {
+                            using (var output = File.Open(entryPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                            {
+                                data.Seek(entry.Offset, SeekOrigin.Begin);
+                                output.WriteFromStream(data, entry.Size);
+                            }
+                        }
                     }
-                }
 
-                input.Close();
-
-                if (skipped > 0)
-                {
-                    Console.WriteLine("{0} files not overwritten.", skipped);
+                    if (skipped > 0)
+                    {
+                        Console.WriteLine("{0} files not overwritten.", skipped);
+                    }
                 }
             }
         }

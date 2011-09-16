@@ -106,7 +106,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                     {
                         info.Archive.Seek(index.Offset, SeekOrigin.Begin);
                         byte[] guess = new byte[16];
-                        int read = info.Archive.Read(guess, 0, guess.Length);
+                        int read = info.Archive.Read(guess, 0, (int)Math.Min(guess.Length, index.Size));
 
                         if (read >= 2 && guess[0] == 0x78 && guess[1] == 0x01
                             && info.Settings.DecompressUnknownFiles == true)
@@ -114,113 +114,27 @@ namespace Gibbed.Avalanche.ArchiveViewer
                             info.Archive.Seek(index.Offset, SeekOrigin.Begin);
 
                             decompressing = true;
-                            MemoryStream memory = info.Archive.ReadToMemoryStream(index.Size);
-                            var zlib = new InflaterInputStream(memory);
-                            read = zlib.Read(guess, 0, guess.Length);
-                            if (read < 0)
+                            using (var memory = info.Archive.ReadToMemoryStream(index.Size))
                             {
-                                throw new InvalidOperationException("zlib error");
+                                var zlib = new InflaterInputStream(memory);
+                                read = zlib.Read(guess, 0, guess.Length);
+                                if (read < 0)
+                                {
+                                    throw new InvalidOperationException("zlib error");
+                                }
                             }
-                            zlib.Close();
-                            memory.Close();
                         }
 
-                        if (read >= 2 && guess[0] == 0x78 && guess[1] == 0x01
-                            && info.Settings.DecompressUnknownFiles == false)
+                        var extension = FileExtensions.Detect(guess, read);
+
+                        if (extension.Value != null)
                         {
-                            fileName = Path.ChangeExtension(fileName, ".z");
-                            fileName = Path.Combine(Path.Combine("compressed", fileName.Substring(0, 1)), fileName);
+                            fileName = Path.ChangeExtension(fileName, "." + extension.Value);
                         }
-                        else if (read >= 2 && Encoding.ASCII.GetString(guess, 0, 2) == "MZ")
+
+                        if (extension.Key != null)
                         {
-                            fileName = Path.ChangeExtension(fileName, ".exe");
-                            fileName = Path.Combine("executables", fileName);
-                        }
-                        else if (read >= 2 && Encoding.ASCII.GetString(guess, 0, 2) == "BM")
-                        {
-                            fileName = Path.ChangeExtension(fileName, ".bmp");
-                            fileName = Path.Combine("images", fileName);
-                        }
-                        else if (read >= 3 && Encoding.ASCII.GetString(guess, 0, 3) == "FSB")
-                        {
-                            fileName = Path.ChangeExtension(fileName, ".fsb");
-                            fileName = Path.Combine("sounds", fileName);
-                        }
-                        else if (read >= 3 && Encoding.ASCII.GetString(guess, 0, 3) == "FEV")
-                        {
-                            fileName = Path.ChangeExtension(fileName, ".fev");
-                            fileName = Path.Combine("sounds", fileName);
-                        }
-                        else if (read >= 3 && Encoding.ASCII.GetString(guess, 0, 3) == "DDS")
-                        {
-                            fileName = Path.ChangeExtension(fileName, ".dds");
-                            fileName = Path.Combine("images", fileName);
-                        }
-                        else if (
-                            read >= 4 &&
-                            guess[0] == 0x57 &&
-                            guess[1] == 0xE0 &&
-                            guess[2] == 0xE0 &&
-                            guess[3] == 0x57)
-                        {
-                            fileName = Path.Combine("havok", fileName);
-                        }
-                        else if (read >= 5 && Encoding.ASCII.GetString(guess, 0, 5) == "<?xml")
-                        {
-                            fileName = Path.ChangeExtension(fileName, ".xml");
-                            fileName = Path.Combine("xml", fileName);
-                        }
-                        else if (read >= 7 && Encoding.ASCII.GetString(guess, 0, 7) == "<object")
-                        {
-                            fileName = Path.ChangeExtension(fileName, ".xml");
-                            fileName = Path.Combine("bins", fileName);
-                        }
-                        else if (read >= 16 && Encoding.ASCII.GetString(guess, 8, 4) == "CTAB")
-                        {
-                            fileName = Path.Combine("shaders", fileName);
-                        }
-                        else if (
-                            read >= 3 &&
-                            (guess[0] == 1 || guess[0] == 2) &&
-                            (guess[1] == 1 || guess[1] == 4 || guess[1] == 5) &&
-                            guess[2] == 0)
-                        {
-                            fileName = Path.ChangeExtension(fileName, ".bin");
-                            fileName = Path.Combine("bins", fileName);
-                        }
-                        else if (
-                            read >= 8 &&
-                            guess[0] == 4 &&
-                            guess[1] == 0 &&
-                            guess[2] == 0 &&
-                            guess[3] == 0 &&
-                            Encoding.ASCII.GetString(guess, 4, 4) == "SARC")
-                        {
-                            fileName = Path.ChangeExtension(fileName, ".sarc");
-                            fileName = Path.Combine("archives", fileName);
-                        }
-                        else if (
-                            read >= 16 &&
-                            BitConverter.ToUInt32(guess, 0) == 0 &&
-                            BitConverter.ToUInt32(guess, 4) == 0x1C &&
-                            Encoding.ASCII.GetString(guess, 8, 8) == "AnarkBGF")
-                        {
-                            fileName = Path.ChangeExtension(fileName, ".agui");
-                            fileName = Path.Combine("anark", fileName);
-                        }
-                        else if (
-                            read >= 4 &&
-                            (guess[0] == 9 || guess[0] == 12) &&
-                            guess[1] == 0 &&
-                            guess[2] == 0 &&
-                            guess[3] == 0)
-                        {
-                            fileName = Path.Combine("terrain", fileName);
-                        }
-                        else
-                        {
-                            //fileName = Path.Combine(Path.Combine("unknown", fileName.Substring(0, 1)), fileName);
-                            fileName = Path.Combine("unknown", fileName);
+                            fileName = Path.Combine(extension.Key, fileName);
                         }
                     }
 
@@ -241,44 +155,33 @@ namespace Gibbed.Avalanche.ArchiveViewer
 
                 info.Archive.Seek(index.Offset, SeekOrigin.Begin);
 
-				FileStream output = new FileStream(path, FileMode.Create);
-
-                if (decompressing == true)
+                using (var output = File.Create(path))
                 {
-                    MemoryStream memory = info.Archive.ReadToMemoryStream(index.Size);
-                    var zlib = new InflaterInputStream(memory);
-                    while (true)
+                    if (decompressing == true)
                     {
-                        int read = zlib.Read(buffer, 0, buffer.Length);
-                        if (read < 0)
+                        using (var memory = info.Archive.ReadToMemoryStream(index.Size))
                         {
-                            throw new InvalidOperationException("zlib error");
+                            var zlib = new InflaterInputStream(memory);
+                            while (true)
+                            {
+                                int read = zlib.Read(buffer, 0, buffer.Length);
+                                if (read < 0)
+                                {
+                                    throw new InvalidOperationException("zlib error");
+                                }
+                                else if (read == 0)
+                                {
+                                    break;
+                                }
+                                output.Write(buffer, 0, read);
+                            }
                         }
-                        else if (read == 0)
-                        {
-                            break;
-                        }
-                        output.Write(buffer, 0, read);
                     }
-                    zlib.Close();
-                    memory.Close();
-                }
-                else
-                {
-                    int left = (int)index.Size;
-                    while (left > 0)
+                    else
                     {
-                        int read = info.Archive.Read(buffer, 0, Math.Min(left, buffer.Length));
-                        if (read == 0)
-                        {
-                            break;
-                        }
-                        output.Write(buffer, 0, read);
-                        left -= read;
+                        output.WriteFromStream(info.Archive, index.Size);
                     }
                 }
-
-				output.Close();
 			}
 
 			this.SaveDone();

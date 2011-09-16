@@ -30,7 +30,7 @@ namespace Gibbed.Avalanche.FileFormats
                     throw new FormatException("doubt there is a file with more than 1024 characters in its name");
                 }
 
-                this.Name = input.ReadString(length, Encoding.ASCII);
+                this.Name = input.ReadString(length, true, Encoding.ASCII);
                 this.Offset = input.ReadValueU32(littleEndian);
                 this.Size = input.ReadValueU32(littleEndian);
             }

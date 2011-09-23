@@ -31,8 +31,8 @@ namespace Gibbed.Avalanche.FileFormats
         {
             return manager.LoadLists(
                     "*.namelist",
-                    s => Path.GetFileName(s).HashJenkins(),
-                    s => s.ToLowerInvariant());
+                    s => s.HashJenkins(),
+                    s => s);
         }
 
         public static ProjectData.HashList<uint> LoadListsPropertyNames(
@@ -40,8 +40,8 @@ namespace Gibbed.Avalanche.FileFormats
         {
             return project.LoadLists(
                     "*.namelist",
-                    s => Path.GetFileName(s).HashJenkins(),
-                    s => s.ToLowerInvariant());
+                    s => s.HashJenkins(),
+                    s => s);
         }
     }
 }

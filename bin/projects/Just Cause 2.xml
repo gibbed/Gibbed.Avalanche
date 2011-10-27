@@ -7,7 +7,6 @@
 	<install_locations>
 		<install_location>
 			<action type="registry" key="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 8190" value="InstallLocation" />
-			<action type="combine">archives_win32</action>
 		</install_location>
 		<install_location>
 			<action type="registry" key="HKEY_CURRENT_USER\Software\Valve\Steam" value="SteamPath" />
@@ -15,7 +14,6 @@
 			<action type="combine">steamapps</action>
 			<action type="combine">common</action>
 			<action type="combine">just cause 2</action>
-			<action type="combine">archives_win32</action>
 		</install_location>
 	</install_locations>
 </project>

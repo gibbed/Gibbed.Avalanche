@@ -1,4 +1,4 @@
-; 2183/2311 (94%)
+; 2184/2311 (94%)
 accomplishments\accomplishment_template.bin
 accomplishments\accomplishments.bin
 accomplishments\count_to_three.bin
@@ -545,6 +545,7 @@ gui\editormain.bl
 gui\main.bl
 gui\patch\patch_text.csvc
 gui\player_info.bl
+gui\sf_fmv.bl
 gui\sf_hud_narrative.bl
 gui\sf_hud_tutorials.bl
 gui\sf_menu.bl

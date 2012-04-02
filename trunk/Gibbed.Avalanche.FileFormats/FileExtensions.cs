@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2011 Rick (rick 'at' gibbed 'dot' us)
+﻿/* Copyright (c) 2012 Rick (rick 'at' gibbed 'dot' us)
  * 
  * This software is provided 'as-is', without any express or implied
  * warranty. In no event will the authors be held liable for any damages
@@ -21,9 +21,8 @@
  */
 
 using System;
-using System.Text;
 using System.Collections.Generic;
-using Gibbed.IO;
+using System.Text;
 
 namespace Gibbed.Avalanche.FileFormats
 {
@@ -36,46 +35,45 @@ namespace Gibbed.Avalanche.FileFormats
                 return new KeyValuePair<string, string>("unknown", "null");
             }
 
-            if (
-                read >= 2 &&
+            if (read >= 2 &&
                 guess[0] == 'M' &&
                 guess[1] == 'Z')
             {
                 return new KeyValuePair<string, string>("executables", "exe");
             }
-            else if (
-                read >= 2 &&
+
+            if (read >= 2 &&
                 guess[0] == 'B' &&
                 guess[1] == 'M')
             {
                 return new KeyValuePair<string, string>("images", "bmp");
             }
-            else if (
-                read >= 3 &&
+
+            if (read >= 3 &&
                 guess[0] == 'F' &&
                 guess[1] == 'S' &&
                 guess[2] == 'B')
             {
                 return new KeyValuePair<string, string>("sounds", "fsb");
             }
-            else if (
-                read >= 3 &&
+
+            if (read >= 3 &&
                 guess[0] == 'F' &&
                 guess[1] == 'E' &&
                 guess[2] == 'V')
             {
                 return new KeyValuePair<string, string>("sounds", "fev");
             }
-            else if (
-                read >= 3 &&
+
+            if (read >= 3 &&
                 guess[0] == 'D' &&
                 guess[1] == 'D' &&
                 guess[2] == 'S')
             {
                 return new KeyValuePair<string, string>("images", "dds");
             }
-            else if (
-                read >= 4 &&
+
+            if (read >= 4 &&
                 guess[0] == 'C' &&
                 guess[1] == 'R' &&
                 guess[2] == 'I' &&
@@ -83,8 +81,17 @@ namespace Gibbed.Avalanche.FileFormats
             {
                 return new KeyValuePair<string, string>("videos", "usm");
             }
-            else if (
-                read >= 4 &&
+
+            if (read >= 4 &&
+                guess[0] == ' ' &&
+                guess[1] == 'F' &&
+                guess[2] == 'D' &&
+                guess[3] == 'A')
+            {
+                return new KeyValuePair<string, string>("effects", "adf");
+            }
+
+            if (read >= 4 &&
                 guess[0] == 0x57 &&
                 guess[1] == 0xE0 &&
                 guess[2] == 0xE0 &&
@@ -92,8 +99,8 @@ namespace Gibbed.Avalanche.FileFormats
             {
                 return new KeyValuePair<string, string>("havok", "unknown");
             }
-            else if (
-                read >= 5 &&
+
+            if (read >= 5 &&
                 guess[0] == '<' &&
                 guess[1] == '?' &&
                 guess[2] == 'x' &&
@@ -102,8 +109,8 @@ namespace Gibbed.Avalanche.FileFormats
             {
                 return new KeyValuePair<string, string>("xml", "xml");
             }
-            else if (
-                read >= 7 &&
+
+            if (read >= 7 &&
                 guess[0] == '<' &&
                 guess[1] == 'o' &&
                 guess[2] == 'b' &&
@@ -114,8 +121,8 @@ namespace Gibbed.Avalanche.FileFormats
             {
                 return new KeyValuePair<string, string>("bins", "xml");
             }
-            else if (
-                read >= 8 + 4 &&
+
+            if (read >= 8 + 4 &&
                 guess[8] == 'C' &&
                 guess[9] == 'T' &&
                 guess[10] == 'A' &&
@@ -123,16 +130,16 @@ namespace Gibbed.Avalanche.FileFormats
             {
                 return new KeyValuePair<string, string>("shaders", "unknown");
             }
-            else if (
-                read >= 3 &&
+
+            if (read >= 3 &&
                 (guess[0] == 1 || guess[0] == 2) &&
                 (guess[1] == 1 || guess[1] == 4 || guess[1] == 5) &&
                 guess[2] == 0)
             {
                 return new KeyValuePair<string, string>("bins", "bin");
             }
-            else if (
-                read >= 8 &&
+
+            if (read >= 8 &&
                 guess[4] == 'S' &&
                 guess[5] == 'A' &&
                 guess[6] == 'R' &&
@@ -140,24 +147,24 @@ namespace Gibbed.Avalanche.FileFormats
             {
                 return new KeyValuePair<string, string>("archives", "sarc");
             }
-            else if (
-                read >= 16 &&
+
+            if (read >= 16 &&
                 BitConverter.ToUInt32(guess, 0) == 0 &&
                 BitConverter.ToUInt32(guess, 4) == 0x1C &&
                 Encoding.ASCII.GetString(guess, 8, 8) == "AnarkBGF")
             {
                 return new KeyValuePair<string, string>("anark", "agui");
             }
-            else if (
-                read >= 3 &&
+
+            if (read >= 3 &&
                 guess[0] == 'A' &&
                 guess[1] == 'D' &&
                 guess[2] == 'F')
             {
                 return new KeyValuePair<string, string>("anark", "cgui");
             }
-            else if (
-                read >= 4 &&
+
+            if (read >= 4 &&
                 (guess[0] == 9 || guess[0] == 12) &&
                 guess[1] == 0 &&
                 guess[2] == 0 &&

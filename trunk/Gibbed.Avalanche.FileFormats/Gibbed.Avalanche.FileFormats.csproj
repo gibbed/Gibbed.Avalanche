@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="AnarkFile.cs" />
     <Compile Include="ArchiveTableFile.cs" />
+    <Compile Include="BlackboardPropertyFile.cs" />
     <Compile Include="DataFormat\Structure.cs" />
     <Compile Include="DataFormat\Definition.cs" />
     <Compile Include="DataFormat\Entry.cs" />
@@ -76,38 +77,29 @@
     <Compile Include="DataFormat\DefinitionValue.cs" />
     <Compile Include="DataFormat\NativeValueType.cs" />
     <Compile Include="FileExtensions.cs" />
-    <Compile Include="IPropertyType.cs" />
-    <Compile Include="JoinHelpers.cs" />
+    <Compile Include="IPropertyFile.cs" />
     <Compile Include="MissionsFile.cs" />
     <Compile Include="ProjectHelpers.cs" />
-    <Compile Include="PropertyTypes\FloatListProperty.cs" />
-    <Compile Include="PropertyTypes\FloatProperty.cs" />
-    <Compile Include="PropertyTypes\IntegerListProperty.cs" />
-    <Compile Include="PropertyTypes\IntegerProperty.cs" />
-    <Compile Include="PropertyTypes\Matrix3x3Property.cs" />
-    <Compile Include="PropertyTypes\Matrix4x3Property.cs" />
-    <Compile Include="PropertyTypes\Matrix4x4Property.cs" />
-    <Compile Include="PropertyTypes\StringProperty.cs" />
-    <Compile Include="PropertyTypes\Vector2Property.cs" />
-    <Compile Include="PropertyTypes\Vector3Property.cs" />
-    <Compile Include="PropertyTypes\Vector4Property.cs" />
-    <Compile Include="RenderBlock\BlockTypes.cs" />
-    <Compile Include="RbModel.cs" />
-    <Compile Include="RenderBlock\BlockTypeHashes.cs" />
-    <Compile Include="RenderBlock\CarPaint.cs" />
-    <Compile Include="RenderBlock\CarPaintSimple.cs" />
-    <Compile Include="RenderBlock\DeformableWindow.cs" />
-    <Compile Include="RenderBlock\General.cs" />
-    <Compile Include="RenderBlock\IRenderBlock.cs" />
-    <Compile Include="RenderBlock\SkinnedGeneral.cs" />
+    <Compile Include="Property\FloatVariant.cs" />
+    <Compile Include="Property\IVariant.cs" />
+    <Compile Include="Property\Matrix4x3Variant.cs" />
+    <Compile Include="Property\Matrix4x4Variant.cs" />
+    <Compile Include="Property\Node.cs" />
     <Compile Include="DataFormatFile.cs" />
+    <Compile Include="Property\FloatsVariant.cs" />
+    <Compile Include="Property\IntegerVariant.cs" />
+    <Compile Include="Property\IntegersVariant.cs" />
+    <Compile Include="Property\Matrix3x3Variant.cs" />
+    <Compile Include="Property\StringVariant.cs" />
+    <Compile Include="Property\VariantFactory.cs" />
+    <Compile Include="Property\Vector2Variant.cs" />
+    <Compile Include="Property\Vector3Variant.cs" />
+    <Compile Include="Property\Vector4Variant.cs" />
+    <Compile Include="RawPropertyFile.cs" />
     <Compile Include="ShaderLibraryFile.cs" />
     <Compile Include="ShaderLibraryFormat.cs" />
     <Compile Include="StreamHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyFile.cs" />
-    <Compile Include="PropertyHelpers.cs" />
-    <Compile Include="PropertyNode.cs" />
     <Compile Include="SmallArchiveFile.cs" />
     <Compile Include="StringHelpers.cs" />
   </ItemGroup>
@@ -137,6 +129,10 @@
       <Project>{F27A289E-3376-4653-89F3-D19C1ECABF33}</Project>
       <Name>Gibbed.ProjectData</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PropertyTypes\" />
+    <Folder Include="RenderBlock\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

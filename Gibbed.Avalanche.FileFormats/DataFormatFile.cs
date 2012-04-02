@@ -1,9 +1,31 @@
-﻿using System;
+﻿/* Copyright (c) 2012 Rick (rick 'at' gibbed 'dot' us)
+ * 
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * 
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would
+ *    be appreciated but is not required.
+ * 
+ * 2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ * 
+ * 3. This notice may not be removed or altered from any source
+ *    distribution.
+ */
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Gibbed.IO;
-using System.IO;
 
 namespace Gibbed.Avalanche.FileFormats
 {
@@ -11,82 +33,79 @@ namespace Gibbed.Avalanche.FileFormats
      * and uses it for their shader bundles. The header of the file is
      * "ADF " (when swapped). I'm guessing this means
      * "Avalanche Data Format". */
+
     public class DataFormatFile
     {
-        public bool LittleEndian = true;
+        public Endian Endian = Endian.Little;
         public uint Version;
 
-        public List<DataFormat.Definition> Definitions =
+        public readonly List<DataFormat.Definition> Definitions =
             new List<DataFormat.Definition>();
-        public List<DataFormat.Entry> Entries =
+
+        public readonly List<DataFormat.Entry> Entries =
             new List<DataFormat.Entry>();
 
         public void Deserialize(Stream input)
         {
             uint magic = input.ReadValueU32();
-            if (magic != 0x41444620 && magic != 0x20464441)
+            if (magic != 0x41444620 &&
+                magic.Swap() != 0x41444620)
             {
                 throw new FormatException("not a ADF file");
             }
 
-            this.LittleEndian = magic == 0x41444620; // " FDA"
-            this.Version = input.ReadValueU32(this.LittleEndian);
+            var endian = magic == 0x41444620 // ' FDA'
+                             ? Endian.Little
+                             : Endian.Big;
+            this.Version = input.ReadValueU32(endian);
 
             if (this.Version != 1)
             {
                 throw new FormatException("unhandled ADF file version");
             }
 
-            uint dataCount = input.ReadValueU32(this.LittleEndian);
-            uint dataOffset = input.ReadValueU32(this.LittleEndian);
-            uint definitionCount = input.ReadValueU32(this.LittleEndian);
-            uint definitionOffset = input.ReadValueU32(this.LittleEndian);
+            uint dataCount = input.ReadValueU32(endian);
+            uint dataOffset = input.ReadValueU32(endian);
+            uint definitionCount = input.ReadValueU32(endian);
+            uint definitionOffset = input.ReadValueU32(endian);
 
+            this.Definitions.Clear();
             if (definitionCount > 0)
             {
                 input.Seek(definitionOffset, SeekOrigin.Begin);
-                this.Definitions.Clear();
                 for (uint i = 0; i < definitionCount; i++)
                 {
                     var definition = new DataFormat.Definition();
-                    definition.Deserialize(input, this.LittleEndian);
+                    definition.Deserialize(input, endian);
                     this.Definitions.Add(definition);
                 }
             }
 
+            this.Entries.Clear();
             if (dataCount > 0)
             {
                 input.Seek(dataOffset, SeekOrigin.Begin);
-                this.Entries.Clear();
                 for (uint i = 0; i < dataCount; i++)
                 {
                     var entry = new DataFormat.Entry();
-                    entry.Deserialize(input, this.LittleEndian);
+                    entry.Deserialize(input, endian);
                     this.Entries.Add(entry);
                 }
             }
+
+            this.Endian = endian;
         }
 
         public DataFormat.Definition FindDefinition(uint typeHash)
         {
-            foreach (var entry in this.Definitions
-                .Where(e => e.TypeHash == typeHash))
-            {
-                return entry;
-            }
-
-            return null;
+            return this.Definitions
+                .FirstOrDefault(e => e.TypeHash == typeHash);
         }
 
         public DataFormat.Entry FindEntry(uint typeHash)
         {
-            foreach (var entry in this.Entries
-                .Where(e => e.TypeHash == typeHash))
-            {
-                return entry;
-            }
-
-            return null;
+            return this.Entries
+                .FirstOrDefault(e => e.TypeHash == typeHash);
         }
 
         private object ParseNativeValue(UInt32 typeHash, UInt32 size, Stream input)
@@ -102,7 +121,7 @@ namespace Gibbed.Avalanche.FileFormats
                         throw new InvalidOperationException("Native UInt32 size must be 4");
                     }
 
-                    return input.ReadValueU32(this.LittleEndian);
+                    return input.ReadValueU32(this.Endian);
                 }
 
                 case DataFormat.NativeValueType.String:
@@ -112,7 +131,7 @@ namespace Gibbed.Avalanche.FileFormats
                         throw new InvalidOperationException("Native String type size must be 4");
                     }
 
-                    uint offset = input.ReadValueU32(this.LittleEndian);
+                    uint offset = input.ReadValueU32(this.Endian);
                     input.Seek(offset, SeekOrigin.Begin);
                     return input.ReadStringZ(Encoding.ASCII);
                 }
@@ -138,14 +157,12 @@ namespace Gibbed.Avalanche.FileFormats
             if (type == DataFormat.NativeValueType.UInt8)
             {
                 input.Seek(baseOffset, SeekOrigin.Begin);
-                byte[] array = new byte[count];
+                var array = new byte[count];
                 input.Read(array, 0, array.Length);
                 return array;
             }
-            else
-            {
-                throw new NotSupportedException("arrays not implemented for native types");
-            }
+
+            throw new NotSupportedException("arrays not implemented for native types");
         }
 
         private static bool IsNativeType(UInt32 typeHash)
@@ -166,7 +183,7 @@ namespace Gibbed.Avalanche.FileFormats
         {
             if (definition.DefinitionType == DataFormat.DefinitionType.Structure)
             {
-                DataFormat.Structure structure = new DataFormat.Structure();
+                var structure = new DataFormat.Structure();
 
                 foreach (var valueDefinition in definition.ValueDefinitions)
                 {
@@ -181,7 +198,8 @@ namespace Gibbed.Avalanche.FileFormats
                         var subDefinition = this.FindDefinition(valueDefinition.TypeHash);
                         if (subDefinition == null)
                         {
-                            throw new InvalidOperationException("missing definition " + valueDefinition.TypeHash.ToString("X8"));
+                            throw new InvalidOperationException("missing definition " +
+                                                                valueDefinition.TypeHash.ToString("X8"));
                         }
 
                         value = this.ParseDefinition(
@@ -195,11 +213,12 @@ namespace Gibbed.Avalanche.FileFormats
 
                 return structure;
             }
-            else if (definition.DefinitionType == DataFormat.DefinitionType.Array)
+
+            if (definition.DefinitionType == DataFormat.DefinitionType.Array)
             {
                 input.Seek(baseOffset, SeekOrigin.Begin);
-                uint offset = input.ReadValueU32(this.LittleEndian);
-                uint count = input.ReadValueU32(this.LittleEndian);
+                uint offset = input.ReadValueU32(this.Endian);
+                uint count = input.ReadValueU32(this.Endian);
                 object value;
 
                 if (IsNativeType(definition.ElementTypeHash) == true)
@@ -214,7 +233,7 @@ namespace Gibbed.Avalanche.FileFormats
                 {
                     var elementDefinition = this.FindDefinition(definition.ElementTypeHash);
 
-                    List<object> elements = new List<object>();
+                    var elements = new List<object>();
                     for (uint i = 0; i < count; i++)
                     {
                         var element = this.ParseDefinition(
@@ -229,10 +248,8 @@ namespace Gibbed.Avalanche.FileFormats
 
                 return value;
             }
-            else
-            {
-                throw new InvalidOperationException("unhandled " + definition.DefinitionType.ToString());
-            }
+
+            throw new InvalidOperationException("unhandled " + definition.DefinitionType.ToString());
         }
 
         public object ParseEntry(DataFormat.Entry entry, Stream input)

@@ -1,4 +1,26 @@
-﻿using System;
+﻿/* Copyright (c) 2012 Rick (rick 'at' gibbed 'dot' us)
+ * 
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * 
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would
+ *    be appreciated but is not required.
+ * 
+ * 2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ * 
+ * 3. This notice may not be removed or altered from any source
+ *    distribution.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Gibbed.Avalanche.FileFormats;
@@ -19,33 +41,40 @@ namespace Gibbed.Avalanche.SmallPack
         public static void Main(string[] args)
         {
             const int alignment = 4;
-            bool littleEndian = true;
+            var endian = Endian.Little;
             bool verbose = false;
             bool compress = false;
             bool showHelp = false;
 
-            OptionSet options = new OptionSet()
+            var options = new OptionSet
             {
                 {
-                    "v|verbose",
-                    "be verbose (list files)",
-                    v => verbose = v != null
-                },
+                    "v|verbose", "be verbose (list files)", v => verbose = v != null
+                    },
                 {
-                    "b|bigendian",
-                    "write in big endian mode",
-                    v => littleEndian = v == null
-                },
+                    "l|little-endian", "write in little endian mode", v =>
+                    {
+                        if (v != null)
+                        {
+                            endian = Endian.Little;
+                        }
+                    }
+                    },
                 {
-                    "c|compress",
-                    "compress small archive with zlib.",
-                    v => compress = v != null
-                },
+                    "b|big-endian", "write in big endian mode", v =>
+                    {
+                        if (v != null)
+                        {
+                            endian = Endian.Big;
+                        }
+                    }
+                    },
                 {
-                    "h|help",
-                    "show this message and exit", 
-                    v => showHelp = v != null
-                },
+                    "c|compress", "compress small archive with zlib.", v => compress = v != null
+                    },
+                {
+                    "h|help", "show this message and exit", v => showHelp = v != null
+                    }
             };
 
             List<string> extra;
@@ -75,70 +104,84 @@ namespace Gibbed.Avalanche.SmallPack
             string inputPath = extra[0];
             string outputPath = extra.Count > 1 ? extra[1] : inputPath + ".sarc";
 
-            Stream output = File.Create(outputPath);
-
-            if (compress == true)
+            using (var output = File.Create(outputPath))
             {
-                output = new DeflaterOutputStream(output, new Deflater(Deflater.BEST_SPEED, false));
-            }
+                Stream data = output;
 
-            List<string> paths = new List<string>();
-            paths.AddRange(Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories));
-            paths.Sort(new NameComparer());
+                if (compress == true)
+                {
+                    data = new DeflaterOutputStream(output, new Deflater(Deflater.BEST_SPEED, false));
+                }
 
-            int headerSize = 0;
-            foreach (string path in paths)
-            {
-                headerSize += 4 + Path.GetFileName(path).Length + 4 + 4;
-            }
-            headerSize = headerSize.Align(16);
+                var paths = new List<string>();
+                paths.AddRange(Directory.GetFiles(inputPath, "*", SearchOption.AllDirectories));
+                paths.Sort(new NameComparer());
 
-            // TODO: rewrite this terrible, terrible code.
-            SmallArchiveFile smallArchive = new SmallArchiveFile();
-            int offset = 16 + headerSize;
-            foreach (string path in paths)
-            {
-                smallArchive.Entries.Add(new SmallArchiveFile.Entry()
+                int headerSize = 0;
+                // ReSharper disable LoopCanBeConvertedToQuery
+                foreach (string path in paths) // ReSharper restore LoopCanBeConvertedToQuery
+                {
+                    headerSize += 4 + (Path.GetFileName(path) ?? "").Length + 4 + 4;
+                }
+                headerSize = headerSize.Align(16);
+
+                // TODO: rewrite this terrible, terrible code.
+                var smallArchive = new SmallArchiveFile();
+                int offset = 16 + headerSize;
+                foreach (string path in paths)
+                {
+                    smallArchive.Entries.Add(new SmallArchiveFile.Entry()
                     {
                         Name = Path.GetFileName(path),
                         Offset = (uint)offset,
                         Size = (uint)((new FileInfo(path)).Length),
                     });
-                offset += (int)((new FileInfo(path)).Length);
-                offset = offset.Align(alignment);
-            }
+                    offset += (int)((new FileInfo(path)).Length);
+                    offset = offset.Align(alignment);
+                }
 
-            smallArchive.LittleEndian = littleEndian;
-            smallArchive.Serialize(output);
+                smallArchive.Endian = endian;
+                smallArchive.Serialize(data);
 
-            byte[] buffer = new byte[0x4000];
-            foreach (string path in paths)
-            {
-                Console.WriteLine("Adding {0}...", Path.GetFileName(path));
-                Stream input = File.OpenRead(path);
-                int total = 0;
-                while (true)
+                var buffer = new byte[0x4000];
+                foreach (string path in paths)
                 {
-                    int read = input.Read(buffer, 0, 0x4000);
-                    if (read == 0)
+                    if (verbose == true)
                     {
-                        break;
+                        Console.WriteLine("Adding {0}...", Path.GetFileName(path));
                     }
-                    output.Write(buffer, 0, read);
-                    total += read;
-                }
-                input.Close();
 
-                int dummySize = total.Align(alignment) - total;
-                if (dummySize > 0)
+                    int total = 0;
+                    using (var input = File.OpenRead(path))
+                    {
+                        while (true)
+                        {
+                            int read = input.Read(buffer, 0, 0x4000);
+                            if (read == 0)
+                            {
+                                break;
+                            }
+                            data.Write(buffer, 0, read);
+                            total += read;
+                        }
+                    }
+
+                    int dummySize = total.Align(alignment) - total;
+                    if (dummySize > 0)
+                    {
+                        var dummyBlock = new byte[dummySize];
+                        data.Write(dummyBlock, 0, dummySize);
+                    }
+                }
+
+                var deflaterOutputStream = data as DeflaterOutputStream;
+                if (deflaterOutputStream != null)
                 {
-                    byte[] dummyBlock = new byte[dummySize];
-                    output.Write(dummyBlock, 0, dummySize);
+                    (deflaterOutputStream).Finish();
                 }
-            }
 
-            output.Flush();
-            output.Close();
+                data.Flush();
+            }
         }
     }
 }

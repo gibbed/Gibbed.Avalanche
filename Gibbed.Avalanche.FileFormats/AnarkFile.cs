@@ -1,9 +1,31 @@
-﻿using System;
+﻿/* Copyright (c) 2012 Rick (rick 'at' gibbed 'dot' us)
+ * 
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * 
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would
+ *    be appreciated but is not required.
+ * 
+ * 2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ * 
+ * 3. This notice may not be removed or altered from any source
+ *    distribution.
+ */
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
+using System.IO;
 using System.Text;
 using Gibbed.IO;
-using System.IO;
 
 namespace Gibbed.Avalanche.FileFormats
 {
@@ -39,13 +61,44 @@ namespace Gibbed.Avalanche.FileFormats
 
                     switch (type)
                     {
-                        case 5: value = input.ReadValueU32(); break;
-                        case 6: value = input.ReadValueS8(); break;
-                        case 7: value = input.ReadValueS16(); break;
-                        case 8: value = input.ReadValueS32(); break;
-                        case 9: value = input.ReadValueF32(); break;
-                        //case 10: value = input.ReadValueU64(); break;
-                        case 10: value = input.ReadValueU32(); break;
+                        case 5:
+                        {
+                            value = input.ReadValueU32();
+                            break;
+                        }
+
+                        case 6:
+                        {
+                            value = input.ReadValueS8();
+                            break;
+                        }
+
+                        case 7:
+                        {
+                            value = input.ReadValueS16();
+                            break;
+                        }
+
+                        case 8:
+                        {
+                            value = input.ReadValueS32();
+                            break;
+                        }
+
+                        case 9:
+                        {
+                            value = input.ReadValueF32();
+                            break;
+                        }
+
+                            //case 10: value = input.ReadValueU64(); break;
+
+                        case 10:
+                        {
+                            value = input.ReadValueU32();
+                            break;
+                        }
+
                         case 14:
                         {
                             uint length = input.ReadValueU32();
@@ -56,12 +109,16 @@ namespace Gibbed.Avalanche.FileFormats
                             value = input.ReadString(length, true, Encoding.ASCII);
                             break;
                         }
-                        default: throw new InvalidOperationException("unhandled attribute type " + type.ToString());
+
+                        default:
+                        {
+                            throw new InvalidOperationException("unhandled attribute type " +
+                                                                type.ToString(CultureInfo.InvariantCulture));
+                        }
                     }
 
                     this.Attributes.Add(index, value);
                 }
-
             }
         }
 
@@ -101,7 +158,7 @@ namespace Gibbed.Avalanche.FileFormats
 
             for (uint i = 0; i < count; i++)
             {
-                Block block = new Block();
+                var block = new Block();
                 block.Deserialize(input);
             }
         }

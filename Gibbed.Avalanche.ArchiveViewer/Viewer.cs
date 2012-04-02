@@ -1,4 +1,26 @@
-﻿using System;
+﻿/* Copyright (c) 2012 Rick (rick 'at' gibbed 'dot' us)
+ * 
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * 
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would
+ *    be appreciated but is not required.
+ * 
+ * 2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ * 
+ * 3. This notice may not be removed or altered from any source
+ *    distribution.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,8 +36,8 @@ namespace Gibbed.Avalanche.ArchiveViewer
             this.InitializeComponent();
         }
 
-        private ProjectData.Manager Manager;
-        private ProjectData.HashList<uint> Hashes;
+        private ProjectData.Manager _Manager;
+        private ProjectData.HashList<uint> _Hashes;
 
         private void OnLoad(object sender, EventArgs e)
         {
@@ -26,16 +48,18 @@ namespace Gibbed.Avalanche.ArchiveViewer
         {
             try
             {
-                this.Manager = ProjectData.Manager.Load();
-                this.projectComboBox.Items.AddRange(this.Manager.ToArray());
-                this.SetProject(this.Manager.ActiveProject);
+                this._Manager = ProjectData.Manager.Load();
+                this.projectComboBox.Items.AddRange(this._Manager
+                                                        .Cast<object>()
+                                                        .ToArray());
+                this.SetProject(this._Manager.ActiveProject);
             }
             catch (Exception e)
             {
                 MessageBox.Show(
                     "There was an error while loading project data." +
                     Environment.NewLine + Environment.NewLine +
-                    e.ToString() +
+                    e +
                     Environment.NewLine + Environment.NewLine +
                     "(You can press Ctrl+C to copy the contents of this dialog)",
                     "Critical Error",
@@ -59,7 +83,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                     MessageBox.Show(
                         "There was an error while loading project data." +
                         Environment.NewLine + Environment.NewLine +
-                        e.ToString() +
+                        e +
                         Environment.NewLine + Environment.NewLine +
                         "(You can press Ctrl+C to copy the contents of this dialog)",
                         "Error",
@@ -68,46 +92,51 @@ namespace Gibbed.Avalanche.ArchiveViewer
                     project = null;
                 }
 
-                this.Hashes = project.LoadListsFileNames();
+                this._Hashes = project.LoadListsFileNames();
             }
 
-            if (project != this.Manager.ActiveProject)
+            // ReSharper disable RedundantCheckBeforeAssignment
+            if (project != this._Manager.ActiveProject) // ReSharper restore RedundantCheckBeforeAssignment
             {
-                this.Manager.ActiveProject = project;
+                this._Manager.ActiveProject = project;
             }
 
             this.projectComboBox.SelectedItem = project;
         }
 
-        private ArchiveTableFile Table;
+        private ArchiveTableFile _Table;
+
         private void BuildFileTree()
         {
             this.fileList.Nodes.Clear();
             this.fileList.BeginUpdate();
 
-            if (this.Table != null)
+            if (this._Table != null)
             {
-                Dictionary<string, TreeNode> dirNodes = new Dictionary<string, TreeNode>();
+                var dirNodes = new Dictionary<string, TreeNode>();
 
-                TreeNode baseNode = new TreeNode(Path.GetFileName(this.openDialog.FileName), 0, 0);
-                TreeNode knownNode = new TreeNode("Known", 1, 1);
-                TreeNode unknownNode = new TreeNode("Unknown", 1, 1);
+                var baseNode = new TreeNode(Path.GetFileName(this.openDialog.FileName), 0, 0);
+                var knownNode = new TreeNode("Known", 1, 1);
+                var unknownNode = new TreeNode("Unknown", 1, 1);
 
-                foreach (uint hash in this.Table.Keys
-                    .OrderBy(k => k, new FileNameHashComparer(this.Hashes)))
+                foreach (uint hash in this._Table.Keys
+                    .OrderBy(k => k, new FileNameHashComparer(this._Hashes)))
                 {
-                    ArchiveTableFile.Entry entry = this.Table[hash];
-                    TreeNode node = null;
+                    ArchiveTableFile.Entry entry = this._Table[hash];
+                    TreeNode node;
 
-                    if (this.Hashes != null && this.Hashes.Contains(hash) == true)
+                    if (this._Hashes != null && this._Hashes.Contains(hash) == true)
                     {
-                        string fileName = this.Hashes[hash];
+                        string fileName = this._Hashes[hash];
                         string pathName = Path.GetDirectoryName(fileName);
                         TreeNodeCollection parentNodes = knownNode.Nodes;
 
-                        if (pathName.Length > 0)
+                        if (string.IsNullOrEmpty(pathName) == false)
                         {
-                            string[] dirs = pathName.Split(new char[] { '\\' });
+                            string[] dirs = pathName.Split(new[]
+                            {
+                                '\\'
+                            });
 
                             foreach (string dir in dirs)
                             {
@@ -141,7 +170,9 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 if (unknownNode.Nodes.Count > 0)
                 {
                     baseNode.Nodes.Add(unknownNode);
-                    unknownNode.Text = "Unknown (" + unknownNode.Nodes.Count.ToString() + ")";
+                    unknownNode.Text = "Unknown (" +
+                                       unknownNode.Nodes.Count.ToString(
+                                           System.Globalization.CultureInfo.InvariantCulture) + ")";
                 }
 
                 if (knownNode.Nodes.Count > 0)
@@ -168,17 +199,18 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 return;
             }
 
-            if (this.openDialog.InitialDirectory != null)
+            // ReSharper disable RedundantCheckBeforeAssignment
+            if (this.openDialog.InitialDirectory != null) // ReSharper restore RedundantCheckBeforeAssignment
             {
                 this.openDialog.InitialDirectory = null;
             }
 
-            Stream input = this.openDialog.OpenFile();
-            ArchiveTableFile table = new ArchiveTableFile();
-            table.Deserialize(input);
-            input.Close();
-
-            this.Table = table;
+            using (var input = this.openDialog.OpenFile())
+            {
+                var table = new ArchiveTableFile();
+                table.Deserialize(input);
+                this._Table = table;
+            }
 
             /*
             TextWriter writer = new StreamWriter("all_file_hashes.txt");
@@ -200,7 +232,6 @@ namespace Gibbed.Avalanche.ArchiveViewer
             }
 
             string basePath;
-            Dictionary<uint, string> lookup;
             List<uint> saving;
 
             SaveProgress.SaveAllSettings settings;
@@ -219,10 +250,14 @@ namespace Gibbed.Avalanche.ArchiveViewer
                     return;
                 }
 
-                saving = new List<uint>();
-                saving.Add((uint)root.Tag);
+                saving = new List<uint>()
+                {
+                    (uint)root.Tag,
+                };
 
-                lookup = new Dictionary<uint, string>();
+                // ReSharper disable UseObjectOrCollectionInitializer
+                var lookup = new Dictionary<uint, string>();
+                // ReSharper restore UseObjectOrCollectionInitializer
                 lookup.Add((uint)root.Tag, Path.GetFileName(this.saveFileDialog.FileName));
                 basePath = Path.GetDirectoryName(this.saveFileDialog.FileName);
 
@@ -236,9 +271,11 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 }
 
                 saving = new List<uint>();
-                
-                List<TreeNode> nodes = new List<TreeNode>();
-                nodes.Add(root);
+
+                var nodes = new List<TreeNode>()
+                {
+                    root,
+                };
 
                 while (nodes.Count > 0)
                 {
@@ -264,20 +301,15 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 basePath = this.saveFilesDialog.SelectedPath;
             }
 
-            Stream input = File.OpenRead(Path.ChangeExtension(this.openDialog.FileName, ".arc"));
+            var input = File.OpenRead(Path.ChangeExtension(this.openDialog.FileName, ".arc"));
 
-            if (input == null)
-            {
-                return;
-            }
-
-            SaveProgress progress = new SaveProgress();
+            var progress = new SaveProgress();
             progress.ShowSaveProgress(
                 this,
                 input,
-                this.Table,
+                this._Table,
                 saving,
-                this.Hashes,
+                this._Hashes,
                 basePath,
                 settings);
 
@@ -291,12 +323,7 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 return;
             }
 
-            Stream input = File.OpenRead(Path.ChangeExtension(this.openDialog.FileName, ".arc"));
-
-            if (input == null)
-            {
-                return;
-            }
+            var input = File.OpenRead(Path.ChangeExtension(this.openDialog.FileName, ".arc"));
 
             string basePath = this.saveFilesDialog.SelectedPath;
 
@@ -306,13 +333,13 @@ namespace Gibbed.Avalanche.ArchiveViewer
             settings.SaveOnlyKnownFiles = this.saveOnlyKnownFilesMenuItem.Checked;
             settings.DontOverwriteFiles = this.dontOverwriteFilesMenuItem.Checked;
 
-            SaveProgress progress = new SaveProgress();
+            var progress = new SaveProgress();
             progress.ShowSaveProgress(
                 this,
                 input,
-                this.Table,
+                this._Table,
                 null,
-                this.Hashes,
+                this._Hashes,
                 basePath,
                 settings);
 
@@ -321,14 +348,9 @@ namespace Gibbed.Avalanche.ArchiveViewer
 
         private void OnReloadLists(object sender, EventArgs e)
         {
-            if (this.Manager.ActiveProject != null)
-            {
-                this.Hashes = this.Manager.ActiveProject.LoadListsFileNames();
-            }
-            else
-            {
-                this.Hashes = null;
-            }
+            this._Hashes = this._Manager.ActiveProject != null
+                               ? this._Manager.ActiveProject.LoadListsFileNames()
+                               : null;
 
             this.BuildFileTree();
         }
@@ -352,18 +374,14 @@ namespace Gibbed.Avalanche.ArchiveViewer
                 return;
             }
 
-            List<string> names = new List<string>();
+            var names = new List<string>();
 
-            if (this.Table != null &&
-                this.Manager.ActiveProject != null)
+            if (this._Table != null &&
+                this._Manager.ActiveProject != null)
             {
-                foreach (uint hash in this.Table.Keys)
-                {
-                    if (this.Hashes.Contains(hash))
-                    {
-                        names.Add(this.Hashes[hash]);
-                    }
-                }
+                names.AddRange(from hash in this._Table.Keys
+                               where this._Hashes.Contains(hash) == true
+                               select this._Hashes[hash]);
             }
 
             names.Sort();

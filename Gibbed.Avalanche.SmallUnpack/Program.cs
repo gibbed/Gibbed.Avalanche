@@ -1,4 +1,26 @@
-﻿using System;
+﻿/* Copyright (c) 2012 Rick (rick 'at' gibbed 'dot' us)
+ * 
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * 
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would
+ *    be appreciated but is not required.
+ * 
+ * 2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ * 
+ * 3. This notice may not be removed or altered from any source
+ *    distribution.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Gibbed.Avalanche.FileFormats;
@@ -29,27 +51,27 @@ namespace Gibbed.Avalanche.SmallUnpack
                     "v|verbose",
                     "be verbose (list files)",
                     v => verbose = v != null
-                },
+                    },
                 {
                     "l|list",
-                    "just list files (don't extract)", 
+                    "just list files (don't extract)",
                     v => listing = v != null
-                },
+                    },
                 {
                     "o|overwrite",
-                    "overwrite files if they already exist", 
+                    "overwrite files if they already exist",
                     v => overwriteFiles = v != null
-                },
+                    },
                 {
                     "d|decompress",
                     "decompress a zlib compressed small archive.",
                     v => decompress = v != null
-                },
+                    },
                 {
                     "h|help",
-                    "show this message and exit", 
+                    "show this message and exit",
                     v => showHelp = v != null
-                },
+                    },
             };
 
             List<string> extra;
@@ -77,14 +99,19 @@ namespace Gibbed.Avalanche.SmallUnpack
             }
 
             string inputPath = extra[0];
-            string outputPath = extra.Count > 1 ?
-                extra[1] : Path.ChangeExtension(inputPath, null) + "_unpack";
+            string outputPath = extra.Count > 1
+                                    ? extra[1]
+                                    : Path.ChangeExtension(inputPath, null) + "_unpack";
 
             using (var input = File.OpenRead(inputPath))
             {
                 if (input.ReadValueU8() == 0x78)
                 {
-                    Console.WriteLine("Detected compressed SARC.");
+                    if (verbose == true)
+                    {
+                        Console.WriteLine("Detected compressed SARC.");
+                    }
+
                     decompress = true;
                 }
                 input.Seek(-1, SeekOrigin.Current);
@@ -101,7 +128,7 @@ namespace Gibbed.Avalanche.SmallUnpack
                     //var zlib = new ZlibStream(input, CompressionMode.Decompress);
                     var zlib = new InflaterInputStream(input);
 
-                    byte[] buffer = new byte[0x4000];
+                    var buffer = new byte[0x4000];
                     while (true)
                     {
                         int read = zlib.Read(buffer, 0, buffer.Length);
@@ -109,10 +136,12 @@ namespace Gibbed.Avalanche.SmallUnpack
                         {
                             throw new InvalidOperationException("zlib error");
                         }
-                        else if (read == 0)
+
+                        if (read == 0)
                         {
                             break;
                         }
+
                         decompressed.Write(buffer, 0, read);
                     }
 
@@ -134,40 +163,53 @@ namespace Gibbed.Avalanche.SmallUnpack
                 long counter = 0;
                 long skipped = 0;
                 long totalCount = smallArchive.Entries.Count;
-                Console.WriteLine("{0} files in small archive.", totalCount);
+
+                if (verbose == true)
                 {
-                    foreach (var entry in smallArchive.Entries)
+                    Console.WriteLine("{0} files in small archive.", totalCount);
+                }
+
+                foreach (var entry in smallArchive.Entries)
+                {
+                    counter++;
+
+                    var entryName = Path.GetFileName(entry.Name);
+                    if (entryName == null)
                     {
-                        counter++;
+                        throw new InvalidOperationException();
+                    }
 
-                        string entryName = Path.GetFileName(entry.Name);
-                        string entryPath = Path.Combine(outputPath, entryName);
+                    var entryPath = Path.Combine(outputPath, entryName);
 
-                        if (overwriteFiles == false && File.Exists(entryPath) == true)
+                    if (overwriteFiles == false && File.Exists(entryPath) == true)
+                    {
+                        if (verbose == true)
                         {
                             Console.WriteLine("{1:D4}/{2:D4} !! {0}", entry.Name, counter, totalCount);
-                            skipped++;
-                            continue;
-                        }
-                        else
-                        {
-                            Console.WriteLine("{1:D4}/{2:D4} => {0}", entry.Name, counter, totalCount);
                         }
 
-                        if (listing == false)
-                        {
-                            using (var output = File.Open(entryPath, FileMode.Create, FileAccess.Write, FileShare.Read))
-                            {
-                                data.Seek(entry.Offset, SeekOrigin.Begin);
-                                output.WriteFromStream(data, entry.Size);
-                            }
-                        }
+                        skipped++;
+                        continue;
                     }
 
-                    if (skipped > 0)
+                    if (verbose == true || listing == true)
                     {
-                        Console.WriteLine("{0} files not overwritten.", skipped);
+                        Console.WriteLine("{1:D4}/{2:D4} => {0}", entry.Name, counter, totalCount);
                     }
+
+                    if (listing == false)
+                    {
+                        using (var output = File.Open(entryPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                        {
+                            data.Seek(entry.Offset, SeekOrigin.Begin);
+                            output.WriteFromStream(data, entry.Size);
+                        }
+                    }
+                }
+
+                if (verbose == true && skipped > 0)
+                {
+                    Console.WriteLine("{0} files not overwritten.", skipped);
                 }
             }
         }

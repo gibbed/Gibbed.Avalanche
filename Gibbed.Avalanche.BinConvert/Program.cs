@@ -198,6 +198,7 @@ namespace Gibbed.Avalanche.BinConvert
                     {
                         Indent = true,
                         IndentChars = "\t",
+                        CheckCharacters = false,
                     };
 
                     var writer = XmlWriter.Create(output, settings);

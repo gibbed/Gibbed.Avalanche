@@ -440,10 +440,10 @@ namespace Gibbed.Avalanche.BinConvert
             }
         }
 
-        private static uint GetIdOrName(XPathNavigator node)
+        private static uint GetIdOrName(XPathNavigator node, out string name)
         {
             string id = node.GetAttribute("id", "");
-            string name = node.GetAttribute("name", "");
+            name = node.GetAttribute("name", "");
 
             if (string.IsNullOrEmpty(id) == false &&
                 string.IsNullOrEmpty(name) == false)
@@ -482,14 +482,30 @@ namespace Gibbed.Avalanche.BinConvert
             while (values.MoveNext() == true)
             {
                 var current = values.Current;
+                if (current == null)
+                {
+                    throw new InvalidOperationException();
+                }
 
-                var id = GetIdOrName(current);
-                // ReSharper disable PossibleNullReferenceException
+                string name;
+                var id = GetIdOrName(current, out name);
                 var type = current.GetAttribute("type", "");
-                // ReSharper restore PossibleNullReferenceException
 
                 var variant = FileFormats.Property.VariantFactory.GetVariant(type);
                 variant.Parse(current.Value);
+
+                if (node.Variants.ContainsKey(id) == true)
+                {
+                    var lineInfo = (IXmlLineInfo)current;
+
+                    if (string.IsNullOrEmpty(name) == true)
+                    {
+                        throw new FormatException(string.Format("duplicate value id 0x{0:X8} at {1}", id, lineInfo));
+                    }
+
+                    throw new FormatException(string.Format("duplicate value id 0x{0:X8} ('{1}') at {2}", id, name, lineInfo));
+                }
+
                 node.Variants.Add(id, variant);
             }
 
@@ -497,8 +513,24 @@ namespace Gibbed.Avalanche.BinConvert
             while (children.MoveNext() == true)
             {
                 var child = children.Current;
-                uint id = GetIdOrName(child);
-                node.Nodes.Add(id, ParseObject(child));
+
+                string name;
+                uint id = GetIdOrName(child, out name);
+                var obj = ParseObject(child);
+
+                if (node.Nodes.ContainsKey(id) == true)
+                {
+                    var lineInfo = (IXmlLineInfo)child;
+
+                    if (string.IsNullOrEmpty(name) == true)
+                    {
+                        throw new FormatException(string.Format("duplicate object id 0x{0:X8} at {1}", id, lineInfo));
+                    }
+
+                    throw new FormatException(string.Format("duplicate object id 0x{0:X8} ('{1}') at {2}", id, name, lineInfo));
+                }
+
+                node.Nodes.Add(id, obj);
             }
 
             return node;

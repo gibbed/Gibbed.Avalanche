@@ -500,10 +500,10 @@ namespace Gibbed.Avalanche.BinConvert
 
                     if (string.IsNullOrEmpty(name) == true)
                     {
-                        throw new FormatException(string.Format("duplicate value id 0x{0:X8} at {1}", id, lineInfo));
+                        throw new FormatException(string.Format("duplicate object id 0x{0:X8} at line {1} position {2}", id, lineInfo.LineNumber, lineInfo.LinePosition));
                     }
 
-                    throw new FormatException(string.Format("duplicate value id 0x{0:X8} ('{1}') at {2}", id, name, lineInfo));
+                    throw new FormatException(string.Format("duplicate object id 0x{0:X8} ('{1}') at line {2} position {3}", id, name, lineInfo.LineNumber, lineInfo.LinePosition));
                 }
 
                 node.Variants.Add(id, variant);
@@ -513,6 +513,10 @@ namespace Gibbed.Avalanche.BinConvert
             while (children.MoveNext() == true)
             {
                 var child = children.Current;
+                if (child == null)
+                {
+                    throw new InvalidOperationException();
+                }
 
                 string name;
                 uint id = GetIdOrName(child, out name);
@@ -524,10 +528,10 @@ namespace Gibbed.Avalanche.BinConvert
 
                     if (string.IsNullOrEmpty(name) == true)
                     {
-                        throw new FormatException(string.Format("duplicate object id 0x{0:X8} at {1}", id, lineInfo));
+                        throw new FormatException(string.Format("duplicate object id 0x{0:X8} at line {1} position {2}", id, lineInfo.LineNumber, lineInfo.LinePosition));
                     }
 
-                    throw new FormatException(string.Format("duplicate object id 0x{0:X8} ('{1}') at {2}", id, name, lineInfo));
+                    throw new FormatException(string.Format("duplicate object id 0x{0:X8} ('{1}') at line {2} position {3}", id, name, lineInfo.LineNumber, lineInfo.LinePosition));
                 }
 
                 node.Nodes.Add(id, obj);

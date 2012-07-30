@@ -1,10 +1,10 @@
 ; 9/9 (100%)
-dlc\pack_3\3_blackmarket.bin
-dlc\pack_3\3_dlcinfo.bin
-dlc\pack_3\3_locator.csv
-dlc\pack_3\3_weapon_location.blz
-dlc\pack_3\3_weapons.bin
-dlc\pack_3\bm_sg.dds
-dlc\pack_3\hud_signaturegun_dif.dds
-dlc\pack_3\mod.heavydrop.siggun.ee
-dlc\pack_3\mod.heavydrop.siggun.eez
+3_blackmarket.bin
+3_dlcinfo.bin
+3_locator.csv
+3_weapon_location.blz
+3_weapons.bin
+bm_sg.dds
+hud_signaturegun_dif.dds
+mod.heavydrop.siggun.ee
+mod.heavydrop.siggun.eez

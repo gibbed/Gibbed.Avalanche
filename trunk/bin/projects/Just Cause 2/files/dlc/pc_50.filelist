@@ -1,10 +1,10 @@
 ; 9/9 (100%)
-dlc\pack_5\5_blackmarket.bin
-dlc\pack_5\5_dlcinfo.bin
-dlc\pack_5\5_locator.csv
-dlc\pack_5\5_weapon_location.blz
-dlc\pack_5\5_weapons.bin
-dlc\pack_5\bm_mrl.dds
-dlc\pack_5\hud_mrl_dif.dds
-dlc\pack_5\mod.heavydrop.multitargetrocketlauncher.ee
-dlc\pack_5\mod.heavydrop.multitargetrocketlauncher.eez
+5_blackmarket.bin
+5_dlcinfo.bin
+5_locator.csv
+5_weapon_location.blz
+5_weapons.bin
+bm_mrl.dds
+hud_mrl_dif.dds
+mod.heavydrop.multitargetrocketlauncher.ee
+mod.heavydrop.multitargetrocketlauncher.eez

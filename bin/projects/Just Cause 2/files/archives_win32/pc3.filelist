@@ -1,10 +1,19 @@
-; 2749/3212 (85%)
+; 2754/3212 (85%)
 bm_ar.dds
+bm_attheliupgrade0.dds
+bm_attheliupgrade1.dds
+bm_atv.dds
 bm_exp.dds
 bm_gl.dds
 bm_grenade.dds
+bm_heliupgrade0.dds
+bm_heliupgrade1.dds
+bm_jeepupgrade0.dds
+bm_jeepupgrade1.dds
 bm_machinegun.dds
 bm_motocross.dds
+bm_musclecarupgrade0.dds
+bm_musclecarupgrade1.dds
 bm_pistol.dds
 bm_revolver.dds
 bm_rl.dds
@@ -57,14 +66,19 @@ str_compl_eng.dds
 str_control_360.dds
 str_load_01.dds
 str_load_02.dds
+str_load_03.dds
 str_load_04.dds
+str_load_05.dds
 str_load_09.dds
+str_load_10.dds
 str_load_11.dds
 str_load_12.dds
 str_load_16.dds
 str_load_17.dds
 str_load_18.dds
+str_load_21.dds
 str_load_25.dds
+str_load_26.dds
 str_load_27.dds
 str_m_m_eng.dds
 terrain\terrain_win32_21_58.dat
@@ -2590,15 +2604,6 @@ terrain\terrain_win32_63_60.dat
 terrain\terrain_win32_63_61.dat
 terrain\terrain_win32_63_62.dat
 terrain\terrain_win32_63_63.dat
-textures\blackmarket\bm_attheliupgrade0.dds
-textures\blackmarket\bm_attheliupgrade1.dds
-textures\blackmarket\bm_atv.dds
-textures\blackmarket\bm_heliupgrade0.dds
-textures\blackmarket\bm_heliupgrade1.dds
-textures\blackmarket\bm_jeepupgrade0.dds
-textures\blackmarket\bm_jeepupgrade1.dds
-textures\blackmarket\bm_musclecarupgrade0.dds
-textures\blackmarket\bm_musclecarupgrade1.dds
 textures\challenge_flag_dif.dds
 textures\decals\blood_splatter_character_dif.dds
 textures\decals\blood_splatter_character_nrm.dds

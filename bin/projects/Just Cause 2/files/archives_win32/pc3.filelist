@@ -1,4 +1,4 @@
-; 2754/3212 (85%)
+; 2756/3212 (85%)
 bm_ar.dds
 bm_attheliupgrade0.dds
 bm_attheliupgrade1.dds
@@ -69,10 +69,12 @@ str_load_02.dds
 str_load_03.dds
 str_load_04.dds
 str_load_05.dds
+str_load_07.dds
 str_load_09.dds
 str_load_10.dds
 str_load_11.dds
 str_load_12.dds
+str_load_14.dds
 str_load_16.dds
 str_load_17.dds
 str_load_18.dds

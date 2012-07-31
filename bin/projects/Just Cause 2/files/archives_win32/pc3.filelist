@@ -1,4 +1,4 @@
-; 2756/3212 (85%)
+; 2768/3212 (86%)
 bm_ar.dds
 bm_attheliupgrade0.dds
 bm_attheliupgrade1.dds
@@ -63,6 +63,12 @@ hud_monster_dif.dds
 hud_signaturegun_dif.dds
 hud_titaniumrifle_dif.dds
 str_compl_eng.dds
+str_compl_fre.dds
+str_compl_ger.dds
+str_compl_ita.dds
+str_compl_pol.dds
+str_compl_rus.dds
+str_compl_spa.dds
 str_control_360.dds
 str_load_01.dds
 str_load_02.dds
@@ -83,6 +89,12 @@ str_load_25.dds
 str_load_26.dds
 str_load_27.dds
 str_m_m_eng.dds
+str_m_m_fre.dds
+str_m_m_ger.dds
+str_m_m_ita.dds
+str_m_m_pol.dds
+str_m_m_rus.dds
+str_m_m_spa.dds
 terrain\terrain_win32_21_58.dat
 terrain\terrain_win32_21_59.dat
 terrain\terrain_win32_21_60.dat

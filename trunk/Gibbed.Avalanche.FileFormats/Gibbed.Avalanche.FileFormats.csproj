@@ -96,6 +96,8 @@
     <Compile Include="Property\Vector3Variant.cs" />
     <Compile Include="Property\Vector4Variant.cs" />
     <Compile Include="RawPropertyFile.cs" />
+    <Compile Include="SaveFile.cs" />
+    <Compile Include="Save\Section.cs" />
     <Compile Include="ShaderLibraryFile.cs" />
     <Compile Include="ShaderLibraryFormat.cs" />
     <Compile Include="StreamHelpers.cs" />

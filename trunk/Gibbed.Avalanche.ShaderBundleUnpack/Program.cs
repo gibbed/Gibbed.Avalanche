@@ -21,14 +21,14 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using Gibbed.Avalanche.FileFormats;
 using Gibbed.IO;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using NDesk.Options;
 
-namespace Gibbed.Avalanche.SmallUnpack
+namespace Gibbed.Avalanche.ShaderBundleUnpack
 {
     internal class Program
     {
@@ -61,11 +61,6 @@ namespace Gibbed.Avalanche.SmallUnpack
                     "o|overwrite",
                     "overwrite files if they already exist",
                     v => overwriteFiles = v != null
-                    },
-                {
-                    "d|decompress",
-                    "decompress a zlib compressed small archive.",
-                    v => decompress = v != null
                     },
                 {
                     "h|help",
@@ -103,114 +98,71 @@ namespace Gibbed.Avalanche.SmallUnpack
                                     ? extra[1]
                                     : Path.ChangeExtension(inputPath, null) + "_unpack";
 
+            var sb = new ShaderLibraryFile();
             using (var input = File.OpenRead(inputPath))
             {
-                if (input.ReadValueU8() == 0x78)
+                sb.Deserialize(input);
+            }
+
+            if (listing == false)
+            {
+                Directory.CreateDirectory(outputPath);
+            }
+
+            long counter = 0;
+            long skipped = 0;
+            long totalCount = sb.VertexShaders.Count + sb.FragmentShaders.Count;
+
+            if (verbose == true)
+            {
+                Console.WriteLine("{0} files in small archive.", totalCount);
+            }
+
+            foreach (var entry in sb.VertexShaders.Concat(sb.FragmentShaders))
+            {
+                counter++;
+
+                var entryName = entry.Name;
+
+                if (sb.VertexShaders.Contains(entry) == true)
+                {
+                    entryName += ".vsh.bin";
+                }
+                else if (sb.FragmentShaders.Contains(entry) == true)
+                {
+                    entryName += ".psh.bin";
+                }
+
+                var entryPath = Path.Combine(outputPath, entryName);
+
+                if (overwriteFiles == false && File.Exists(entryPath) == true)
                 {
                     if (verbose == true)
                     {
-                        Console.WriteLine("Detected compressed SARC.");
+                        Console.WriteLine("{1:D4}/{2:D4} !! {0}", entry.Name, counter, totalCount);
                     }
 
-                    decompress = true;
+                    skipped++;
+                    continue;
                 }
-                input.Seek(-1, SeekOrigin.Current);
 
-                Stream data;
-                if (decompress == false)
+                if (verbose == true || listing == true)
                 {
-                    data = input;
-                }
-                else
-                {
-                    var decompressed = new MemoryStream();
-
-                    //var zlib = new ZlibStream(input, CompressionMode.Decompress);
-                    var zlib = new InflaterInputStream(input);
-
-                    var buffer = new byte[0x4000];
-                    while (true)
-                    {
-                        int read = zlib.Read(buffer, 0, buffer.Length);
-                        if (read < 0)
-                        {
-                            throw new InvalidOperationException("zlib error");
-                        }
-
-                        if (read == 0)
-                        {
-                            break;
-                        }
-
-                        decompressed.Write(buffer, 0, read);
-                    }
-
-                    zlib.Close();
-                    input.Close();
-                    decompressed.Position = 0;
-
-                    data = decompressed;
+                    Console.WriteLine("{1:D4}/{2:D4} => {0}", entry.Name, counter, totalCount);
                 }
 
                 if (listing == false)
                 {
-                    Directory.CreateDirectory(outputPath);
-                }
-
-                var smallArchive = new SmallArchiveFile();
-                smallArchive.Deserialize(data);
-
-                long counter = 0;
-                long skipped = 0;
-                long totalCount = smallArchive.Entries.Count;
-
-                if (verbose == true)
-                {
-                    Console.WriteLine("{0} files in small archive.", totalCount);
-                }
-
-                foreach (var entry in smallArchive.Entries)
-                {
-                    counter++;
-
-                    var entryName = Path.GetFileName(entry.Name);
-                    if (entryName == null)
+                    using (var output = File.Create(entryPath))
                     {
-                        throw new InvalidOperationException();
-                    }
-
-                    var entryPath = Path.Combine(outputPath, entryName);
-
-                    if (overwriteFiles == false && File.Exists(entryPath) == true)
-                    {
-                        if (verbose == true)
-                        {
-                            Console.WriteLine("{1:D4}/{2:D4} !! {0}", entry.Name, counter, totalCount);
-                        }
-
-                        skipped++;
-                        continue;
-                    }
-
-                    if (verbose == true || listing == true)
-                    {
-                        Console.WriteLine("{1:D4}/{2:D4} => {0}", entry.Name, counter, totalCount);
-                    }
-
-                    if (listing == false)
-                    {
-                        using (var output = File.Create(entryPath))
-                        {
-                            data.Seek(entry.Offset, SeekOrigin.Begin);
-                            output.WriteFromStream(data, entry.Size);
-                        }
+                        output.WriteBytes(entry.Data);
                     }
                 }
+            }
 
-                if (verbose == true && skipped > 0)
-                {
-                    Console.WriteLine("{0} files not overwritten.", skipped);
-                }
+            if (verbose == true && skipped > 0)
+            {
+                Console.WriteLine("{0} files not overwritten.", skipped);
             }
         }
     }

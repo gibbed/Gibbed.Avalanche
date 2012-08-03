@@ -32,8 +32,8 @@ namespace Gibbed.Avalanche.FileFormats
     /* Avalanche cooked up what appears to be a "generic" file format
      * and uses it for their shader bundles. The header of the file is
      * "ADF " (when swapped). I'm guessing this means
-     * "Avalanche Data Format". */
-
+     * "Avalanche Data Format".
+     */
     public class DataFormatFile
     {
         public Endian Endian = Endian.Little;

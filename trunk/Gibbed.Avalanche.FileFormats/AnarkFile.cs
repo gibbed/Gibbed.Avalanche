@@ -104,7 +104,7 @@ namespace Gibbed.Avalanche.FileFormats
                             uint length = input.ReadValueU32();
                             if (length > 0x7FFF)
                             {
-                                throw new Exception();
+                                throw new FormatException();
                             }
                             value = input.ReadString(length, true, Encoding.ASCII);
                             break;

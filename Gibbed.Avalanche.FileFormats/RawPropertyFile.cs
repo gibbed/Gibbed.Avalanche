@@ -561,7 +561,7 @@ namespace Gibbed.Avalanche.FileFormats
                             var length = input.ReadValueU32(endian);
                             if (length >= 0x7FFF)
                             {
-                                throw new Exception();
+                                throw new FormatException();
                             }
 
                             var name = input.ReadString(length, true, Encoding.ASCII);
@@ -589,7 +589,7 @@ namespace Gibbed.Avalanche.FileFormats
                             var length = input.ReadValueU32(endian);
                             if (length >= 0x7FFF)
                             {
-                                throw new Exception();
+                                throw new FormatException();
                             }
 
                             var name = input.ReadString(length, true, Encoding.ASCII);

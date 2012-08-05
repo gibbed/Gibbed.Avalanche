@@ -41,7 +41,6 @@ namespace Gibbed.Avalanche.ShaderBundleUnpack
         {
             bool verbose = false;
             bool overwriteFiles = false;
-            bool decompress = false;
             bool listing = false;
             bool showHelp = false;
 

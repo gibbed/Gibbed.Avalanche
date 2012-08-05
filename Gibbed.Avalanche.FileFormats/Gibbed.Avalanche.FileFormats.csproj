@@ -99,7 +99,11 @@
     <Compile Include="SaveFile.cs" />
     <Compile Include="Save\Section.cs" />
     <Compile Include="ShaderLibraryFile.cs" />
-    <Compile Include="ShaderLibraryFormat.cs" />
+    <Compile Include="ShaderLibraryResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ShaderLibraryResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="StreamHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SmallArchiveFile.cs" />
@@ -135,6 +139,15 @@
   <ItemGroup>
     <Folder Include="PropertyTypes\" />
     <Folder Include="RenderBlock\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ShaderLibraryResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ShaderLibraryResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShaderLibraryFormat.adf" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

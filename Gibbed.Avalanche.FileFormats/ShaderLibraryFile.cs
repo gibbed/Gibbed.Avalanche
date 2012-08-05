@@ -82,10 +82,9 @@ namespace Gibbed.Avalanche.FileFormats
         public void Deserialize(Stream input)
         {
             var libraryFormat = new DataFormatFile();
-            using (var libraryFormatData = new MemoryStream(ShaderLibraryFormat.Data))
+            using (var libraryFormatData = new MemoryStream(ShaderLibraryResources.BinaryFormat))
             {
                 libraryFormat.Deserialize(libraryFormatData);
-                libraryFormatData.Close();
             }
 
             var data = new DataFormatFile();

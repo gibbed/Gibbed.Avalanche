@@ -33,7 +33,7 @@
             this.blockListToolStrip = new System.Windows.Forms.ToolStrip();
             this.blockCopyButton = new System.Windows.Forms.ToolStripButton();
             this.blockDeleteButton = new System.Windows.Forms.ToolStripButton();
-            this.renderPanel = new Gibbed.Avalanche.ModelViewer2.RenderPanel();
+            this.Viewport = new Gibbed.Avalanche.ModelViewer2.ViewportControl();
             this.viewportToolStrip = new System.Windows.Forms.ToolStrip();
             this.cameraModeButton = new System.Windows.Forms.ToolStripDropDownButton();
             this.cameraBehaviorSpectatorButton = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,6 +47,7 @@
             this.modelOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.blockStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -69,7 +70,7 @@
             // 
             // splitContainer.Panel2
             // 
-            this.splitContainer.Panel2.Controls.Add(this.renderPanel);
+            this.splitContainer.Panel2.Controls.Add(this.Viewport);
             this.splitContainer.Panel2.Controls.Add(this.viewportToolStrip);
             this.splitContainer.Size = new System.Drawing.Size(800, 433);
             this.splitContainer.SplitterDistance = 240;
@@ -120,18 +121,23 @@
             this.blockDeleteButton.Text = "Delete Block";
             this.blockDeleteButton.Click += new System.EventHandler(this.OnBlockDelete);
             // 
-            // renderPanel
+            // Viewport
             // 
-            this.renderPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.renderPanel.Location = new System.Drawing.Point(0, 0);
-            this.renderPanel.Name = "renderPanel";
-            this.renderPanel.Size = new System.Drawing.Size(556, 408);
-            this.renderPanel.TabIndex = 2;
-            this.renderPanel.Text = "renderPanel1";
-            this.renderPanel.UpdateScene += new Gibbed.Avalanche.ModelViewer2.RenderEventHandler(this.OnViewportUpdateScene);
-            this.renderPanel.Uninitialize += new System.EventHandler(this.OnViewportUnitialize);
-            this.renderPanel.Initialize += new Gibbed.Avalanche.ModelViewer2.RenderEventHandler(this.OnViewportInitialized);
-            this.renderPanel.Render += new Gibbed.Avalanche.ModelViewer2.RenderEventHandler(this.OnViewportRender);
+            this.Viewport.BlockNextKeyRepeats = false;
+            this.Viewport.CameraEnabled = true;
+            this.Viewport.CameraMode = Gibbed.Avalanche.ModelViewer2.ViewportControl.CameraModes.None;
+            this.Viewport.CaptureMouse = false;
+            this.Viewport.CaptureWheel = false;
+            this.Viewport.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Viewport.Location = new System.Drawing.Point(0, 0);
+            this.Viewport.Name = "Viewport";
+            this.Viewport.Size = new System.Drawing.Size(556, 408);
+            this.Viewport.TabIndex = 2;
+            this.Viewport.Text = "renderPanel1";
+            this.Viewport.Initialize += new Gibbed.Avalanche.ModelViewer2.RenderEventHandler(this.OnViewportInitialized);
+            this.Viewport.UpdateScene += new Gibbed.Avalanche.ModelViewer2.UpdateSceneEventHandler(this.OnViewportUpdateScene);
+            this.Viewport.Render += new Gibbed.Avalanche.ModelViewer2.RenderEventHandler(this.OnViewportRender);
+            this.Viewport.Uninitialize += new System.EventHandler(this.OnViewportUnitialize);
             // 
             // viewportToolStrip
             // 
@@ -231,7 +237,7 @@
             // 
             this.modelOpenFileDialog.DefaultExt = "rbm";
             this.modelOpenFileDialog.Filter = "Render Block Model Files (*.rbm, *.rbx360, *.rb3)|*.rbm;*.rbx360;*.rb3|All Files " +
-                "(*.*)|*.*";
+    "(*.*)|*.*";
             // 
             // statusStrip
             // 
@@ -260,10 +266,13 @@
             this.DoubleBuffered = true;
             this.Name = "Viewer";
             this.Text = "Gibbed\'s Avalanche Model Viewer";
+            this.Activated += new System.EventHandler(this.OnActivated);
+            this.Deactivate += new System.EventHandler(this.OnDeactivate);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel1.PerformLayout();
             this.splitContainer.Panel2.ResumeLayout(false);
             this.splitContainer.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
             this.blockListToolStrip.ResumeLayout(false);
             this.blockListToolStrip.PerformLayout();
@@ -298,7 +307,7 @@
         private System.Windows.Forms.ToolStripMenuItem cameraBehaviorOrbitButton;
         private System.Windows.Forms.ToolStripButton cameraResetButton;
         private System.Windows.Forms.ToolStripStatusLabel blockStatusLabel;
-        private RenderPanel renderPanel;
+        internal ViewportControl Viewport;
     }
 }
 

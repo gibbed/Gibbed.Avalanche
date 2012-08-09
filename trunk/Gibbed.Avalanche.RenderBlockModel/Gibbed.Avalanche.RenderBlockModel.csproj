@@ -40,15 +40,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blocks\CarPaintData0.cs" />
+    <Compile Include="Blocks\CarPaintData1.cs" />
     <Compile Include="Blocks\CarPaintSimple.cs" />
     <Compile Include="Blocks\DeformableWindow.cs" />
+    <Compile Include="Blocks\DeformableWindowData0.cs" />
     <Compile Include="Blocks\General.cs" />
+    <Compile Include="Blocks\GeneralData0Big.cs" />
+    <Compile Include="Blocks\GeneralData0Small.cs" />
     <Compile Include="Blocks\SkinnedGeneral.cs" />
+    <Compile Include="Blocks\SkinnedGeneralData1.cs" />
+    <Compile Include="Blocks\SkinnedGeneralData0Big.cs" />
+    <Compile Include="Blocks\SkinnedGeneralData0Small.cs" />
+    <Compile Include="Blocks\SkinnedGeneralSkinBatch.cs" />
     <Compile Include="BlockTypeFactory.cs" />
     <Compile Include="Blocks\CarPaint.cs" />
+    <Compile Include="DeformTable.cs" />
+    <Compile Include="IFormat.cs" />
     <Compile Include="IRenderBlock.cs" />
+    <Compile Include="Material.cs" />
     <Compile Include="ModelFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StreamHelpers.cs" />
+    <Compile Include="UnknownData0.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Gibbed.Avalanche.FileFormats\Gibbed.Avalanche.FileFormats.csproj">

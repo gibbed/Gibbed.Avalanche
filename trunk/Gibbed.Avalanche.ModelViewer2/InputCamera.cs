@@ -1,102 +1,71 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Control = System.Windows.Forms.Control;
+﻿/* Copyright (c) 2012 Rick (rick 'at' gibbed 'dot' us)
+ * 
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * 
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would
+ *    be appreciated but is not required.
+ * 
+ * 2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ * 
+ * 3. This notice may not be removed or altered from any source
+ *    distribution.
+ */
+
+using System;
 using SlimDX;
-using SlimDX.DirectInput;
-using System.Drawing;
+using Control = System.Windows.Forms.Control;
 
 namespace Gibbed.Avalanche.ModelViewer2
 {
     internal class InputCamera : ICamera
     {
-        public enum Actions
-        {
-            FlightYawLeftPrimary,
-            FlightYawLeftAlternate,
-            FlightYawRightPrimary,
-            FlightYawRightAlternate,
+        private const float _DefaultAccelerationX = 8.0f;
+        private const float _DefaultAccelerationY = 8.0f;
+        private const float _DefaultAccelerationZ = 8.0f;
+        private const float _DefaultMouseSmoothingSensitivity = 0.5f;
+        private const float _DefaultSpeedFlightYaw = 100.0f;
+        private const float _DefaultSpeedMouseWheel = 1.0f;
+        private const float _DefaultSpeedOrbitRoll = 100.0f;
+        private const float _DefaultSpeedRotation = 0.3f;
+        private const float _DefaultVelocityX = 1.0f;
+        private const float _DefaultVelocityY = 1.0f;
+        private const float _DefaultVelocityZ = 1.0f;
+        private const int _MouseSmoothingCacheSize = 10;
 
-            MoveForwardsPrimary,
-            MoveForwardsAlternate,
-            MoveBackwardsPrimary,
-            MoveBackwardsAlternate,
+        private readonly Control _Control;
+        private readonly BasicCamera _Camera;
+        private readonly Clock _Clock;
 
-            MoveDownPrimary,
-            MoveDownAlternate,
-            MoveUpPrimary,
-            MoveUpAlternate,
-
-            OrbitRollLeftPrimary,
-            OrbitRollLeftAlternate,
-            OrbitRollRightPrimary,
-            OrbitRollRightAlternate,
-
-            PitchUpPrimary,
-            PitchUpAlternate,
-            PitchDownPrimary,
-            PitchDownAlternate,
-
-            YawLeftPrimary,
-            YawLeftAlternate,
-            YawRightPrimary,
-            YawRightAlternate,
-
-            RollLeftPrimary,
-            RollLeftAlternate,
-            RollRightPrimary,
-            RollRightAlternate,
-
-            StrafeRightPrimary,
-            StrafeRightAlternate,
-            StrafeLeftPrimary,
-            StrafeLeftAlternate
-        };
-
-        private const float DEFAULT_ACCELERATION_X = 8.0f;
-        private const float DEFAULT_ACCELERATION_Y = 8.0f;
-        private const float DEFAULT_ACCELERATION_Z = 8.0f;
-        private const float DEFAULT_MOUSE_SMOOTHING_SENSITIVITY = 0.5f;
-        private const float DEFAULT_SPEED_FLIGHT_YAW = 100.0f;
-        private const float DEFAULT_SPEED_MOUSE_WHEEL = 1.0f;
-        private const float DEFAULT_SPEED_ORBIT_ROLL = 100.0f;
-        private const float DEFAULT_SPEED_ROTATION = 0.3f;
-        private const float DEFAULT_VELOCITY_X = 1.0f;
-        private const float DEFAULT_VELOCITY_Y = 1.0f;
-        private const float DEFAULT_VELOCITY_Z = 1.0f;
-
-        private const int MOUSE_SMOOTHING_CACHE_SIZE = 10;
-
-        private Control control;
-        private BasicCamera camera;
-        private Clock clock;
-
-        private bool movingAlongPosX;
-        private bool movingAlongNegX;
-        private bool movingAlongPosY;
-        private bool movingAlongNegY;
-        private bool movingAlongPosZ;
-        private bool movingAlongNegZ;
-        private int savedMousePosX;
-        private int savedMousePosY;
-        private int mouseIndex;
-        private float rotationSpeed;
-        private float orbitRollSpeed;
-        private float flightYawSpeed;
-        private float mouseSmoothingSensitivity;
-        private float mouseWheelSpeed;
-        private float mouseWheelDelta;
-        private Vector3 acceleration;
-        private Vector3 currentVelocity;
-        private Vector3 velocity;
-        private Vector2[] mouseMovement;
-        private Vector2[] mouseSmoothingCache;
-        private Vector2 smoothedMouseMovement;
-        private MouseState currentMouseState;
-        private MouseState previousMouseState;
-        private KeyboardState currentKeyboardState;
-        private Dictionary<Actions, Key> actionKeys;
+        private bool _MovingAlongPosX;
+        private bool _MovingAlongNegX;
+        private bool _MovingAlongPosY;
+        private bool _MovingAlongNegY;
+        private bool _MovingAlongPosZ;
+        private bool _MovingAlongNegZ;
+        private int _SavedMousePosX;
+        private int _SavedMousePosY;
+        private int _MouseIndex;
+        private float _RotationSpeed;
+        private float _OrbitRollSpeed;
+        private float _FlightYawSpeed;
+        private float _MouseSmoothingSensitivity;
+        private float _MouseWheelSpeed;
+        private float _MouseWheelDelta;
+        private Vector3 _Acceleration;
+        private Vector3 _CurrentVelocity;
+        private Vector3 _Velocity;
+        private readonly Vector2[] _MouseMovement;
+        private readonly Vector2[] _MouseSmoothingCache;
+        private Vector2 _SmoothedMouseMovement;
 
         #region Public Methods
 
@@ -109,84 +78,62 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public InputCamera(Control control)
         {
-            this.control = control;
-            this.clock = new Clock();
-            this.clock.Start();
+            this._Control = control;
+            this._Clock = new Clock();
+            this._Clock.Start();
 
-            this.camera = new BasicCamera();
-            this.camera.CurrentBehavior = BasicCamera.Behavior.Spectator;
+            this._Camera = new BasicCamera();
+            this._Camera.CurrentBehavior = BasicCamera.Behavior.Spectator;
 
-            this.movingAlongPosX = false;
-            this.movingAlongNegX = false;
-            this.movingAlongPosY = false;
-            this.movingAlongNegY = false;
-            this.movingAlongPosZ = false;
-            this.movingAlongNegZ = false;
+            this._MovingAlongPosX = false;
+            this._MovingAlongNegX = false;
+            this._MovingAlongPosY = false;
+            this._MovingAlongNegY = false;
+            this._MovingAlongPosZ = false;
+            this._MovingAlongNegZ = false;
 
-            this.savedMousePosX = -1;
-            this.savedMousePosY = -1;
+            this._SavedMousePosX = -1;
+            this._SavedMousePosY = -1;
 
-            this.rotationSpeed = DEFAULT_SPEED_ROTATION;
-            this.orbitRollSpeed = DEFAULT_SPEED_ORBIT_ROLL;
-            this.flightYawSpeed = DEFAULT_SPEED_FLIGHT_YAW;
-            this.mouseWheelSpeed = DEFAULT_SPEED_MOUSE_WHEEL;
-            this.mouseSmoothingSensitivity = DEFAULT_MOUSE_SMOOTHING_SENSITIVITY;
-            this.acceleration = new Vector3(DEFAULT_ACCELERATION_X, DEFAULT_ACCELERATION_Y, DEFAULT_ACCELERATION_Z);
-            this.velocity = new Vector3(DEFAULT_VELOCITY_X, DEFAULT_VELOCITY_Y, DEFAULT_VELOCITY_Z);
-            this.mouseSmoothingCache = new Vector2[MOUSE_SMOOTHING_CACHE_SIZE];
+            this._RotationSpeed = _DefaultSpeedRotation;
+            this._OrbitRollSpeed = _DefaultSpeedOrbitRoll;
+            this._FlightYawSpeed = _DefaultSpeedFlightYaw;
+            this._MouseWheelSpeed = _DefaultSpeedMouseWheel;
+            this._MouseSmoothingSensitivity = _DefaultMouseSmoothingSensitivity;
+            this._Acceleration = new Vector3(_DefaultAccelerationX, _DefaultAccelerationY, _DefaultAccelerationZ);
+            this._Velocity = new Vector3(_DefaultVelocityX, _DefaultVelocityY, _DefaultVelocityZ);
+            this._MouseSmoothingCache = new Vector2[_MouseSmoothingCacheSize];
 
-            this.mouseIndex = 0;
-            this.mouseMovement = new Vector2[2];
-            this.mouseMovement[0].X = 0.0f;
-            this.mouseMovement[0].Y = 0.0f;
-            this.mouseMovement[1].X = 0.0f;
-            this.mouseMovement[1].Y = 0.0f;
+            this._MouseIndex = 0;
+            this._MouseMovement = new Vector2[2];
+            this._MouseMovement[0].X = 0.0f;
+            this._MouseMovement[0].Y = 0.0f;
+            this._MouseMovement[1].X = 0.0f;
+            this._MouseMovement[1].Y = 0.0f;
 
-            float aspect = (float)this.control.Width / (float)this.control.Height;
+            this.Resized();
+        }
 
-            this.Perspective(
-                BasicCamera.DEFAULT_FOVX,
+        public void Resized()
+        {
+            float aspect = (float)this._Control.Width / this._Control.Height;
+
+            this.Perspective(BasicCamera.DEFAULT_FOVX,
                 aspect,
                 0.01f,/*Camera.DEFAULT_ZNEAR,*/
                 BasicCamera.DEFAULT_ZFAR);
-
-            this.actionKeys = new Dictionary<Actions, Key>();
-            this.actionKeys.Add(Actions.FlightYawLeftPrimary, Key.LeftArrow);
-            this.actionKeys.Add(Actions.FlightYawLeftAlternate, Key.A);
-            this.actionKeys.Add(Actions.FlightYawRightPrimary, Key.RightArrow);
-            this.actionKeys.Add(Actions.FlightYawRightAlternate, Key.D);
-
-            this.actionKeys.Add(Actions.MoveForwardsPrimary, Key.UpArrow);
-            this.actionKeys.Add(Actions.MoveForwardsAlternate, Key.W);
-            this.actionKeys.Add(Actions.MoveBackwardsPrimary, Key.DownArrow);
-            this.actionKeys.Add(Actions.MoveBackwardsAlternate, Key.S);
-
-            this.actionKeys.Add(Actions.MoveDownPrimary, Key.Q);
-            this.actionKeys.Add(Actions.MoveDownAlternate, Key.PageDown);
-            this.actionKeys.Add(Actions.MoveUpPrimary, Key.E);
-            this.actionKeys.Add(Actions.MoveUpAlternate, Key.PageUp);
-
-            this.actionKeys.Add(Actions.OrbitRollLeftPrimary, Key.LeftArrow);
-            this.actionKeys.Add(Actions.OrbitRollLeftAlternate, Key.A);
-            this.actionKeys.Add(Actions.OrbitRollRightPrimary, Key.RightArrow);
-            this.actionKeys.Add(Actions.OrbitRollRightAlternate, Key.D);
-
-            this.actionKeys.Add(Actions.StrafeRightPrimary, Key.RightArrow);
-            this.actionKeys.Add(Actions.StrafeRightAlternate, Key.D);
-            this.actionKeys.Add(Actions.StrafeLeftPrimary, Key.LeftArrow);
-            this.actionKeys.Add(Actions.StrafeLeftAlternate, Key.A);
         }
 
         public void Stop()
         {
-            this.smoothedMouseMovement.X = 0;
-            this.smoothedMouseMovement.Y = 0;
-            this.movingAlongPosX = false;
-            this.movingAlongNegX = false;
-            this.movingAlongPosY = false;
-            this.movingAlongNegY = false;
-            this.movingAlongPosZ = false;
-            this.movingAlongNegZ = false;
+            this._SmoothedMouseMovement.X = 0;
+            this._SmoothedMouseMovement.Y = 0;
+            this._MovingAlongPosX = false;
+            this._MovingAlongNegX = false;
+            this._MovingAlongPosY = false;
+            this._MovingAlongNegY = false;
+            this._MovingAlongPosZ = false;
+            this._MovingAlongNegZ = false;
         }
 
         /// <summary>
@@ -195,7 +142,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="target">The target position to look at.</param>
         public void LookAt(Vector3 target)
         {
-            this.camera.LookAt(target);
+            this._Camera.LookAt(target);
         }
 
         /// <summary>
@@ -206,17 +153,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="up">The up direction.</param>
         public void LookAt(Vector3 eye, Vector3 target, Vector3 up)
         {
-            this.camera.LookAt(eye, target, up);
-        }
-
-        /// <summary>
-        /// Binds an action to a keyboard key.
-        /// </summary>
-        /// <param name="action">The action to bind.</param>
-        /// <param name="key">The key to map the action to.</param>
-        public void MapActionToKey(Actions action, Key key)
-        {
-            this.actionKeys[action] = key;
+            this._Camera.LookAt(eye, target, up);
         }
 
         /// <summary>
@@ -229,7 +166,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="dz">Distance to move forwards or backwards.</param>
         public void Move(float dx, float dy, float dz)
         {
-            this.camera.Move(dx, dy, dz);
+            this._Camera.Move(dx, dy, dz);
         }
 
         /// <summary>
@@ -239,7 +176,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="distance">How far to move.</param>
         public void Move(Vector3 direction, Vector3 distance)
         {
-            this.camera.Move(direction, distance);
+            this._Camera.Move(direction, distance);
         }
 
         /// <summary>
@@ -252,7 +189,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="zfar">The distance to the far clip plane.</param>
         public void Perspective(float fovx, float aspect, float znear, float zfar)
         {
-            this.camera.Perspective(fovx, aspect, znear, zfar);
+            this._Camera.Perspective(fovx, aspect, znear, zfar);
         }
 
         /// <summary>
@@ -265,7 +202,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="rollDegrees">Z axis rotation in degrees.</param>
         public void Rotate(float headingDegrees, float pitchDegrees, float rollDegrees)
         {
-            this.camera.Rotate(headingDegrees, pitchDegrees, rollDegrees);
+            this._Camera.Rotate(headingDegrees, pitchDegrees, rollDegrees);
         }
 
         /// <summary>
@@ -274,16 +211,6 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="gameTime">Time elapsed since the last call to Update.</param>
         public void Update(float elapsedTime, bool handleInput)
         {
-            if (handleInput == true)
-            {
-                this.UpdateInput();
-            }
-            else
-            {
-                this.currentKeyboardState = new KeyboardState();
-                this.currentMouseState = this.previousMouseState = new MouseState();
-            }
-
             this.UpdateCamera(elapsedTime);
         }
 
@@ -294,7 +221,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public void UndoRoll()
         {
-            this.camera.UndoRoll();
+            this._Camera.UndoRoll();
         }
 
         /// <summary>
@@ -324,7 +251,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </param>
         public void Zoom(float zoom, float minZoom, float maxZoom)
         {
-            this.camera.Zoom(zoom, minZoom, maxZoom);
+            this._Camera.Zoom(zoom, minZoom, maxZoom);
         }
 
         #endregion
@@ -338,191 +265,9 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="direction">The movement direction.</param>
         private void GetMovementDirection(out Vector3 direction)
         {
-            direction.X = 0.0f;
+            direction.X = this.LateralInput * this.SpeedFactor;
             direction.Y = 0.0f;
-            direction.Z = 0.0f;
-
-            if (currentKeyboardState.IsPressed(actionKeys[Actions.MoveForwardsPrimary]) ||
-                currentKeyboardState.IsPressed(actionKeys[Actions.MoveForwardsAlternate]))
-            {
-                if (!movingAlongNegZ)
-                {
-                    movingAlongNegZ = true;
-                    currentVelocity.Z = 0.0f;
-                }
-
-                direction.Z += 1.0f;
-            }
-            else
-            {
-                movingAlongNegZ = false;
-            }
-
-            if (currentKeyboardState.IsPressed(actionKeys[Actions.MoveBackwardsPrimary]) ||
-                currentKeyboardState.IsPressed(actionKeys[Actions.MoveBackwardsAlternate]))
-            {
-                if (!movingAlongPosZ)
-                {
-                    movingAlongPosZ = true;
-                    currentVelocity.Z = 0.0f;
-                }
-
-                direction.Z -= 1.0f;
-            }
-            else
-            {
-                movingAlongPosZ = false;
-            }
-
-            if (currentKeyboardState.IsPressed(actionKeys[Actions.MoveUpPrimary]) ||
-                currentKeyboardState.IsPressed(actionKeys[Actions.MoveUpAlternate]))
-            {
-                if (!movingAlongPosY)
-                {
-                    movingAlongPosY = true;
-                    currentVelocity.Y = 0.0f;
-                }
-
-                direction.Y += 1.0f;
-            }
-            else
-            {
-                movingAlongPosY = false;
-            }
-
-            if (currentKeyboardState.IsPressed(actionKeys[Actions.MoveDownPrimary]) ||
-                currentKeyboardState.IsPressed(actionKeys[Actions.MoveDownAlternate]))
-            {
-                if (!movingAlongNegY)
-                {
-                    movingAlongNegY = true;
-                    currentVelocity.Y = 0.0f;
-                }
-
-                direction.Y -= 1.0f;
-            }
-            else
-            {
-                movingAlongNegY = false;
-            }
-
-            switch (CurrentBehavior)
-            {
-                case BasicCamera.Behavior.FirstPerson:
-                case BasicCamera.Behavior.Spectator:
-                {
-                    if (currentKeyboardState.IsPressed(actionKeys[Actions.StrafeRightPrimary]) ||
-                        currentKeyboardState.IsPressed(actionKeys[Actions.StrafeRightAlternate]))
-                    {
-                        if (!movingAlongPosX)
-                        {
-                            movingAlongPosX = true;
-                            currentVelocity.X = 0.0f;
-                        }
-
-                        direction.X += 1.0f;
-                    }
-                    else
-                    {
-                        movingAlongPosX = false;
-                    }
-
-                    if (currentKeyboardState.IsPressed(actionKeys[Actions.StrafeLeftPrimary]) ||
-                        currentKeyboardState.IsPressed(actionKeys[Actions.StrafeLeftAlternate]))
-                    {
-                        if (!movingAlongNegX)
-                        {
-                            movingAlongNegX = true;
-                            currentVelocity.X = 0.0f;
-                        }
-
-                        direction.X -= 1.0f;
-                    }
-                    else
-                    {
-                        movingAlongNegX = false;
-                    }
-
-                    break;
-                }
-
-                case BasicCamera.Behavior.Flight:
-                {
-                    if (currentKeyboardState.IsPressed(actionKeys[Actions.FlightYawLeftPrimary]) ||
-                        currentKeyboardState.IsPressed(actionKeys[Actions.FlightYawLeftAlternate]))
-                    {
-                        if (!movingAlongPosX)
-                        {
-                            movingAlongPosX = true;
-                            currentVelocity.X = 0.0f;
-                        }
-
-                        direction.X += 1.0f;
-                    }
-                    else
-                    {
-                        movingAlongPosX = false;
-                    }
-
-                    if (currentKeyboardState.IsPressed(actionKeys[Actions.FlightYawRightPrimary]) ||
-                        currentKeyboardState.IsPressed(actionKeys[Actions.FlightYawRightAlternate]))
-                    {
-                        if (!movingAlongNegX)
-                        {
-                            movingAlongNegX = true;
-                            currentVelocity.X = 0.0f;
-                        }
-
-                        direction.X -= 1.0f;
-                    }
-                    else
-                    {
-                        movingAlongNegX = false;
-                    }
-                    break;
-                }
-
-                case BasicCamera.Behavior.Orbit:
-                {
-                    if (currentKeyboardState.IsPressed(actionKeys[Actions.OrbitRollLeftPrimary]) ||
-                        currentKeyboardState.IsPressed(actionKeys[Actions.OrbitRollLeftAlternate]))
-                    {
-                        if (!movingAlongPosX)
-                        {
-                            movingAlongPosX = true;
-                            currentVelocity.X = 0.0f;
-                        }
-
-                        direction.X += 1.0f;
-                    }
-                    else
-                    {
-                        movingAlongPosX = false;
-                    }
-
-                    if (currentKeyboardState.IsPressed(actionKeys[Actions.OrbitRollRightPrimary]) ||
-                        currentKeyboardState.IsPressed(actionKeys[Actions.OrbitRollRightAlternate]))
-                    {
-                        if (!movingAlongNegX)
-                        {
-                            movingAlongNegX = true;
-                            currentVelocity.X = 0.0f;
-                        }
-
-                        direction.X -= 1.0f;
-                    }
-                    else
-                    {
-                        movingAlongNegX = false;
-                    }
-                    break;
-                }
-
-                default:
-                {
-                    break;
-                }
-            }
+            direction.Z = this.ForwardInput * this.SpeedFactor;
         }
 
         /// <summary>
@@ -536,7 +281,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </returns>
         private float GetMouseWheelDirection()
         {
-            return this.mouseWheelDelta;
+            return this._MouseWheelDelta;
 
             /*
             int currentWheelValue = currentMouseState.ScrollWheelValue;
@@ -566,15 +311,15 @@ namespace Gibbed.Avalanche.ModelViewer2
         {
             // Shuffle all the entries in the cache.
             // Newer entries at the front. Older entries towards the back.
-            for (int i = mouseSmoothingCache.Length - 1; i > 0; --i)
+            for (int i = this._MouseSmoothingCache.Length - 1; i > 0; --i)
             {
-                mouseSmoothingCache[i].X = mouseSmoothingCache[i - 1].X;
-                mouseSmoothingCache[i].Y = mouseSmoothingCache[i - 1].Y;
+                this._MouseSmoothingCache[i].X = this._MouseSmoothingCache[i - 1].X;
+                this._MouseSmoothingCache[i].Y = this._MouseSmoothingCache[i - 1].Y;
             }
 
             // Store the current mouse movement entry at the front of cache.
-            mouseSmoothingCache[0].X = x;
-            mouseSmoothingCache[0].Y = y;
+            this._MouseSmoothingCache[0].X = x;
+            this._MouseSmoothingCache[0].Y = y;
 
             float averageX = 0.0f;
             float averageY = 0.0f;
@@ -584,17 +329,17 @@ namespace Gibbed.Avalanche.ModelViewer2
             // Filter the mouse movement with the rest of the cache entries.
             // Use a weighted average where newer entries have more effect than
             // older entries (towards the back of the cache).
-            for (int i = 0; i < mouseSmoothingCache.Length; ++i)
+            for (int i = 0; i < this._MouseSmoothingCache.Length; ++i)
             {
-                averageX += mouseSmoothingCache[i].X * currentWeight;
-                averageY += mouseSmoothingCache[i].Y * currentWeight;
+                averageX += this._MouseSmoothingCache[i].X * currentWeight;
+                averageY += this._MouseSmoothingCache[i].Y * currentWeight;
                 averageTotal += 1.0f * currentWeight;
-                currentWeight *= mouseSmoothingSensitivity;
+                currentWeight *= this._MouseSmoothingSensitivity;
             }
 
             // Calculate the new smoothed mouse movement.
-            smoothedMouseMovement.X = averageX / averageTotal;
-            smoothedMouseMovement.Y = averageY / averageTotal;
+            this._SmoothedMouseMovement.X = averageX / averageTotal;
+            this._SmoothedMouseMovement.Y = averageY / averageTotal;
         }
 
         /// <summary>
@@ -605,15 +350,15 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="y">Vertical mouse distance from window center.</param>
         private void PerformMouseSmoothing(float x, float y)
         {
-            mouseMovement[mouseIndex].X = x;
-            mouseMovement[mouseIndex].Y = y;
+            this._MouseMovement[this._MouseIndex].X = x;
+            this._MouseMovement[this._MouseIndex].Y = y;
 
-            smoothedMouseMovement.X = (mouseMovement[0].X + mouseMovement[1].X) * 0.5f;
-            smoothedMouseMovement.Y = (mouseMovement[0].Y + mouseMovement[1].Y) * 0.5f;
+            this._SmoothedMouseMovement.X = (this._MouseMovement[0].X + this._MouseMovement[1].X) * 0.5f;
+            this._SmoothedMouseMovement.Y = (this._MouseMovement[0].Y + this._MouseMovement[1].Y) * 0.5f;
 
-            mouseIndex ^= 1;
-            mouseMovement[mouseIndex].X = 0.0f;
-            mouseMovement[mouseIndex].Y = 0.0f;
+            this._MouseIndex ^= 1;
+            this._MouseMovement[this._MouseIndex].X = 0.0f;
+            this._MouseMovement[this._MouseIndex].Y = 0.0f;
         }
 
         /// <summary>
@@ -624,9 +369,9 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="rollDegrees">Z axis rotation in degrees.</param>
         private void RotateSmoothly(float headingDegrees, float pitchDegrees, float rollDegrees)
         {
-            headingDegrees *= rotationSpeed;
-            pitchDegrees *= rotationSpeed;
-            rollDegrees *= rotationSpeed;
+            headingDegrees *= this._RotationSpeed;
+            pitchDegrees *= this._RotationSpeed;
+            rollDegrees *= this._RotationSpeed;
 
             Rotate(headingDegrees, pitchDegrees, rollDegrees);
         }
@@ -637,23 +382,25 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         private void UpdateInput()
         {
+            /*
             // TODO: FIX ME
             this.currentKeyboardState = new KeyboardState(); //Keyboard.GetState();
 
             // TODO: FIX ME
+
             this.previousMouseState = this.currentMouseState;
             this.currentMouseState = new MouseState();//Mouse.GetState();
-            this.mouseWheelDelta = 0.0f;
+            this._MouseWheelDelta = 0.0f;
 
             if (currentMouseState.IsPressed(0) == true)
             {
-                var position = this.control.PointToScreen(this.control.Location);
-                var rectangle = new Rectangle(0, 0, control.Width, control.Height);
+                var position = this._Control.PointToScreen(this._Control.Location);
+                var rectangle = new Rectangle(0, 0, this._Control.Width, this._Control.Height);
 
                 if (rectangle.Contains(currentMouseState.X, currentMouseState.Y) == true)
                 {
-                    int centerX = (control.Width / 2);
-                    int centerY = (control.Height / 2);
+                    int centerX = (this._Control.Width / 2);
+                    int centerY = (this._Control.Height / 2);
                     // TODO: FIX ME
                     //Mouse.SetPosition(centerX, centerY);
 
@@ -663,10 +410,10 @@ namespace Gibbed.Avalanche.ModelViewer2
                         int deltaY = centerY - currentMouseState.Y;
 
                         PerformMouseFiltering((float)deltaX, (float)deltaY);
-                        PerformMouseSmoothing(smoothedMouseMovement.X, smoothedMouseMovement.Y);
+                        PerformMouseSmoothing(this._SmoothedMouseMovement.X, this._SmoothedMouseMovement.Y);
 
                         // TODO: FIXME
-                        /*
+                        /x
                         if (currentMouseState.ScrollWheelValue != previousMouseState.ScrollWheelValue)
                         {
                             this.mouseWheelDelta = 
@@ -674,10 +421,11 @@ namespace Gibbed.Avalanche.ModelViewer2
                                 previousMouseState.ScrollWheelValue ?
                                 -1.0f : 1.0f;
                         }
-                        */
+                        x/
                     }
                 }
             }
+            */
         }
 
         /// <summary>
@@ -694,27 +442,27 @@ namespace Gibbed.Avalanche.ModelViewer2
                 // Camera is moving along the x axis.
                 // Linearly accelerate up to the camera's max speed.
 
-                currentVelocity.X += direction.X * acceleration.X * elapsedTimeSec;
+                this._CurrentVelocity.X += direction.X * this._Acceleration.X * elapsedTimeSec;
 
-                if (currentVelocity.X > velocity.X)
-                    currentVelocity.X = velocity.X;
-                else if (currentVelocity.X < -velocity.X)
-                    currentVelocity.X = -velocity.X;
+                if (this._CurrentVelocity.X > this._Velocity.X)
+                    this._CurrentVelocity.X = this._Velocity.X;
+                else if (this._CurrentVelocity.X < -this._Velocity.X)
+                    this._CurrentVelocity.X = -this._Velocity.X;
             }
             else
             {
                 // Camera is no longer moving along the x axis.
                 // Linearly decelerate back to stationary state.
 
-                if (currentVelocity.X > 0.0f)
+                if (this._CurrentVelocity.X > 0.0f)
                 {
-                    if ((currentVelocity.X -= acceleration.X * elapsedTimeSec) < 0.0f)
-                        currentVelocity.X = 0.0f;
+                    if ((this._CurrentVelocity.X -= this._Acceleration.X * elapsedTimeSec) < 0.0f)
+                        this._CurrentVelocity.X = 0.0f;
                 }
                 else
                 {
-                    if ((currentVelocity.X += acceleration.X * elapsedTimeSec) > 0.0f)
-                        currentVelocity.X = 0.0f;
+                    if ((this._CurrentVelocity.X += this._Acceleration.X * elapsedTimeSec) > 0.0f)
+                        this._CurrentVelocity.X = 0.0f;
                 }
             }
 
@@ -723,27 +471,27 @@ namespace Gibbed.Avalanche.ModelViewer2
                 // Camera is moving along the y axis.
                 // Linearly accelerate up to the camera's max speed.
 
-                currentVelocity.Y += direction.Y * acceleration.Y * elapsedTimeSec;
+                this._CurrentVelocity.Y += direction.Y * this._Acceleration.Y * elapsedTimeSec;
 
-                if (currentVelocity.Y > velocity.Y)
-                    currentVelocity.Y = velocity.Y;
-                else if (currentVelocity.Y < -velocity.Y)
-                    currentVelocity.Y = -velocity.Y;
+                if (this._CurrentVelocity.Y > this._Velocity.Y)
+                    this._CurrentVelocity.Y = this._Velocity.Y;
+                else if (this._CurrentVelocity.Y < -this._Velocity.Y)
+                    this._CurrentVelocity.Y = -this._Velocity.Y;
             }
             else
             {
                 // Camera is no longer moving along the y axis.
                 // Linearly decelerate back to stationary state.
 
-                if (currentVelocity.Y > 0.0f)
+                if (this._CurrentVelocity.Y > 0.0f)
                 {
-                    if ((currentVelocity.Y -= acceleration.Y * elapsedTimeSec) < 0.0f)
-                        currentVelocity.Y = 0.0f;
+                    if ((this._CurrentVelocity.Y -= this._Acceleration.Y * elapsedTimeSec) < 0.0f)
+                        this._CurrentVelocity.Y = 0.0f;
                 }
                 else
                 {
-                    if ((currentVelocity.Y += acceleration.Y * elapsedTimeSec) > 0.0f)
-                        currentVelocity.Y = 0.0f;
+                    if ((this._CurrentVelocity.Y += this._Acceleration.Y * elapsedTimeSec) > 0.0f)
+                        this._CurrentVelocity.Y = 0.0f;
                 }
             }
 
@@ -752,27 +500,27 @@ namespace Gibbed.Avalanche.ModelViewer2
                 // Camera is moving along the z axis.
                 // Linearly accelerate up to the camera's max speed.
 
-                currentVelocity.Z += direction.Z * acceleration.Z * elapsedTimeSec;
+                this._CurrentVelocity.Z += direction.Z * this._Acceleration.Z * elapsedTimeSec;
 
-                if (currentVelocity.Z > velocity.Z)
-                    currentVelocity.Z = velocity.Z;
-                else if (currentVelocity.Z < -velocity.Z)
-                    currentVelocity.Z = -velocity.Z;
+                if (this._CurrentVelocity.Z > this._Velocity.Z)
+                    this._CurrentVelocity.Z = this._Velocity.Z;
+                else if (this._CurrentVelocity.Z < -this._Velocity.Z)
+                    this._CurrentVelocity.Z = -this._Velocity.Z;
             }
             else
             {
                 // Camera is no longer moving along the z axis.
                 // Linearly decelerate back to stationary state.
 
-                if (currentVelocity.Z > 0.0f)
+                if (this._CurrentVelocity.Z > 0.0f)
                 {
-                    if ((currentVelocity.Z -= acceleration.Z * elapsedTimeSec) < 0.0f)
-                        currentVelocity.Z = 0.0f;
+                    if ((this._CurrentVelocity.Z -= this._Acceleration.Z * elapsedTimeSec) < 0.0f)
+                        this._CurrentVelocity.Z = 0.0f;
                 }
                 else
                 {
-                    if ((currentVelocity.Z += acceleration.Z * elapsedTimeSec) > 0.0f)
-                        currentVelocity.Z = 0.0f;
+                    if ((this._CurrentVelocity.Z += this._Acceleration.Z * elapsedTimeSec) > 0.0f)
+                        this._CurrentVelocity.Z = 0.0f;
                 }
             }
         }
@@ -784,14 +532,14 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="elapsedTimeSec">Elapsed game time.</param>
         private void UpdatePosition(ref Vector3 direction, float elapsedTimeSec)
         {
-            if (currentVelocity.LengthSquared() != 0.0f)
+            if (this._CurrentVelocity.LengthSquared() != 0.0f)
             {
                 // Only move the camera if the velocity vector is not of zero
                 // length. Doing this guards against the camera slowly creeping
                 // around due to floating point rounding errors.
 
-                Vector3 displacement = (currentVelocity * elapsedTimeSec) +
-                    (0.5f * acceleration * elapsedTimeSec * elapsedTimeSec);
+                Vector3 displacement = (this._CurrentVelocity * elapsedTimeSec) +
+                    (0.5f * this._Acceleration * elapsedTimeSec * elapsedTimeSec);
 
                 // Floating point rounding errors will slowly accumulate and
                 // cause the camera to move along each axis. To prevent any
@@ -802,13 +550,13 @@ namespace Gibbed.Avalanche.ModelViewer2
                 // camera is no longer moving along that direction. To account
                 // for this the camera's current velocity is also checked.
 
-                if (direction.X == 0.0f && (float)Math.Abs(currentVelocity.X) < 1e-6f)
+                if (direction.X == 0.0f && (float)Math.Abs(this._CurrentVelocity.X) < 1e-6f)
                     displacement.X = 0.0f;
 
-                if (direction.Y == 0.0f && (float)Math.Abs(currentVelocity.Y) < 1e-6f)
+                if (direction.Y == 0.0f && (float)Math.Abs(this._CurrentVelocity.Y) < 1e-6f)
                     displacement.Y = 0.0f;
 
-                if (direction.Z == 0.0f && (float)Math.Abs(currentVelocity.Z) < 1e-6f)
+                if (direction.Z == 0.0f && (float)Math.Abs(this._CurrentVelocity.Z) < 1e-6f)
                     displacement.Z = 0.0f;
 
                 Move(displacement.X, displacement.Y, displacement.Z);
@@ -828,21 +576,18 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// <param name="gameTime">Elapsed game time.</param>
         private void UpdateCamera(float elapsedTime)
         {
-            Vector3 direction = new Vector3();
-
+            Vector3 direction;
             this.GetMovementDirection(out direction);
 
-            float dx = 0.0f;
-            float dy = 0.0f;
-            float dz = 0.0f;
+            float dx, dy, dz;
 
-            switch (camera.CurrentBehavior)
+            switch (this._Camera.CurrentBehavior)
             {
                 case BasicCamera.Behavior.FirstPerson:
                 case BasicCamera.Behavior.Spectator:
                 {
-                    dx = smoothedMouseMovement.X;
-                    dy = smoothedMouseMovement.Y;
+                    dx = this._SmoothedMouseMovement.X;
+                    dy = this._SmoothedMouseMovement.Y;
 
                     RotateSmoothly(dx, dy, 0.0f);
                     UpdatePosition(ref direction, elapsedTime);
@@ -851,13 +596,13 @@ namespace Gibbed.Avalanche.ModelViewer2
 
                 case BasicCamera.Behavior.Flight:
                 {
-                    dy = -smoothedMouseMovement.Y;
-                    dz = smoothedMouseMovement.X;
+                    dy = -this._SmoothedMouseMovement.Y;
+                    dz = this._SmoothedMouseMovement.X;
 
                     RotateSmoothly(0.0f, dy, dz);
 
-                    if ((dx = direction.X * flightYawSpeed * elapsedTime) != 0.0f)
-                        camera.Rotate(dx, 0.0f, 0.0f);
+                    if ((dx = direction.X * this._FlightYawSpeed * elapsedTime) != 0.0f)
+                        this._Camera.Rotate(dx, 0.0f, 0.0f);
 
                     direction.X = 0.0f; // ignore yaw motion when updating camera's velocity
                     UpdatePosition(ref direction, elapsedTime);
@@ -866,19 +611,19 @@ namespace Gibbed.Avalanche.ModelViewer2
 
                 case BasicCamera.Behavior.Orbit:
                 {
-                    dx = -smoothedMouseMovement.X;
-                    dy = -smoothedMouseMovement.Y;
+                    dx = -this._SmoothedMouseMovement.X;
+                    dy = -this._SmoothedMouseMovement.Y;
 
                     RotateSmoothly(dx, dy, 0.0f);
 
-                    if (!camera.PreferTargetYAxisOrbiting)
+                    if (this._Camera.PreferTargetYAxisOrbiting == false)
                     {
-                        if ((dz = direction.X * orbitRollSpeed * elapsedTime) != 0.0f)
-                            camera.Rotate(0.0f, 0.0f, dz);
+                        if ((dz = direction.X * this._OrbitRollSpeed * elapsedTime) != 0.0f)
+                            this._Camera.Rotate(0.0f, 0.0f, dz);
                     }
 
-                    if ((dz = GetMouseWheelDirection() * mouseWheelSpeed) != 0.0f)
-                        camera.Zoom(dz, camera.OrbitMinZoom, camera.OrbitMaxZoom);
+                    if ((dz = GetMouseWheelDirection() * this._MouseWheelSpeed) != 0.0f)
+                        this._Camera.Zoom(dz, this._Camera.OrbitMinZoom, this._Camera.OrbitMaxZoom);
 
                     break;
                 }
@@ -894,13 +639,31 @@ namespace Gibbed.Avalanche.ModelViewer2
 
         #region Properties
 
+        public float ForwardInput
+        {
+            get;
+            set;
+        }
+
+        public float LateralInput
+        {
+            get;
+            set;
+        }
+
+        public float SpeedFactor
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Property to get and set the camera's acceleration.
         /// </summary>
         public Vector3 Acceleration
         {
-            get { return acceleration; }
-            set { acceleration = value; }
+            get { return this._Acceleration; }
+            set { this._Acceleration = value; }
         }
 
         /// <summary>
@@ -908,8 +671,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public BasicCamera.Behavior CurrentBehavior
         {
-            get { return camera.CurrentBehavior; }
-            set { camera.CurrentBehavior = value; }
+            get { return this._Camera.CurrentBehavior; }
+            set { this._Camera.CurrentBehavior = value; }
         }
 
         /// <summary>
@@ -917,7 +680,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Vector3 CurrentVelocity
         {
-            get { return currentVelocity; }
+            get { return this._CurrentVelocity; }
         }
 
         /// <summary>
@@ -925,8 +688,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public float FlightYawSpeed
         {
-            get { return flightYawSpeed; }
-            set { flightYawSpeed = value; }
+            get { return this._FlightYawSpeed; }
+            set { this._FlightYawSpeed = value; }
         }
 
         /// <summary>
@@ -935,8 +698,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public float MouseSmoothingSensitivity
         {
-            get { return mouseSmoothingSensitivity; }
-            set { mouseSmoothingSensitivity = value; }
+            get { return this._MouseSmoothingSensitivity; }
+            set { this._MouseSmoothingSensitivity = value; }
         }
 
         /// <summary>
@@ -945,8 +708,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public float MouseWheelSpeed
         {
-            get { return mouseWheelSpeed; }
-            set { mouseWheelSpeed = value; }
+            get { return this._MouseWheelSpeed; }
+            set { this._MouseWheelSpeed = value; }
         }
 
         /// <summary>
@@ -954,8 +717,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public float OrbitMaxZoom
         {
-            get { return camera.OrbitMaxZoom; }
-            set { camera.OrbitMaxZoom = value; }
+            get { return this._Camera.OrbitMaxZoom; }
+            set { this._Camera.OrbitMaxZoom = value; }
         }
 
         /// <summary>
@@ -963,8 +726,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public float OrbitMinZoom
         {
-            get { return camera.OrbitMinZoom; }
-            set { camera.OrbitMinZoom = value; }
+            get { return this._Camera.OrbitMinZoom; }
+            set { this._Camera.OrbitMinZoom = value; }
         }
 
         /// <summary>
@@ -972,8 +735,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public float OrbitOffsetDistance
         {
-            get { return camera.OrbitOffsetDistance; }
-            set { camera.OrbitOffsetDistance = value; }
+            get { return this._Camera.OrbitOffsetDistance; }
+            set { this._Camera.OrbitOffsetDistance = value; }
         }
 
         /// <summary>
@@ -984,8 +747,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public float OrbitRollSpeed
         {
-            get { return orbitRollSpeed; }
-            set { orbitRollSpeed = value; }
+            get { return this._OrbitRollSpeed; }
+            set { this._OrbitRollSpeed = value; }
         }
 
         /// <summary>
@@ -993,8 +756,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Vector3 OrbitTarget
         {
-            get { return camera.OrbitTarget; }
-            set { camera.OrbitTarget = value; }
+            get { return this._Camera.OrbitTarget; }
+            set { this._Camera.OrbitTarget = value; }
         }
 
         /// <summary>
@@ -1002,8 +765,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Quaternion Orientation
         {
-            get { return camera.Orientation; }
-            set { camera.Orientation = value; }
+            get { return this._Camera.Orientation; }
+            set { this._Camera.Orientation = value; }
         }
 
         /// <summary>
@@ -1011,8 +774,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Vector3 Position
         {
-            get { return camera.Position; }
-            set { camera.Position = value; }
+            get { return this._Camera.Position; }
+            set { this._Camera.Position = value; }
         }
 
         /// <summary>
@@ -1022,8 +785,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public bool PreferTargetYAxisOrbiting
         {
-            get { return camera.PreferTargetYAxisOrbiting; }
-            set { camera.PreferTargetYAxisOrbiting = value; }
+            get { return this._Camera.PreferTargetYAxisOrbiting; }
+            set { this._Camera.PreferTargetYAxisOrbiting = value; }
         }
 
         /// <summary>
@@ -1031,7 +794,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Matrix ProjectionMatrix
         {
-            get { return camera.ProjectionMatrix; }
+            get { return this._Camera.ProjectionMatrix; }
         }
 
         /// <summary>
@@ -1039,8 +802,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public float RotationSpeed
         {
-            get { return rotationSpeed; }
-            set { rotationSpeed = value; }
+            get { return this._RotationSpeed; }
+            set { this._RotationSpeed = value; }
         }
 
         /// <summary>
@@ -1048,8 +811,8 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Vector3 Velocity
         {
-            get { return velocity; }
-            set { velocity = value; }
+            get { return this._Velocity; }
+            set { this._Velocity = value; }
         }
 
         /// <summary>
@@ -1057,7 +820,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Vector3 ViewDirection
         {
-            get { return camera.ViewDirection; }
+            get { return this._Camera.ViewDirection; }
         }
 
         /// <summary>
@@ -1065,7 +828,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Matrix ViewMatrix
         {
-            get { return camera.ViewMatrix; }
+            get { return this._Camera.ViewMatrix; }
         }
 
         /// <summary>
@@ -1073,7 +836,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Matrix ViewProjectionMatrix
         {
-            get { return camera.ViewProjectionMatrix; }
+            get { return this._Camera.ViewProjectionMatrix; }
         }
 
         /// <summary>
@@ -1081,7 +844,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Vector3 XAxis
         {
-            get { return camera.XAxis; }
+            get { return this._Camera.XAxis; }
         }
 
         /// <summary>
@@ -1089,7 +852,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Vector3 YAxis
         {
-            get { return camera.YAxis; }
+            get { return this._Camera.YAxis; }
         }
 
         /// <summary>
@@ -1097,7 +860,7 @@ namespace Gibbed.Avalanche.ModelViewer2
         /// </summary>
         public Vector3 ZAxis
         {
-            get { return camera.ZAxis; }
+            get { return this._Camera.ZAxis; }
         }
 
         #endregion

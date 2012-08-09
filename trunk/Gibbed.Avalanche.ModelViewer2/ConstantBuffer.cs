@@ -1,27 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿/* Copyright (c) 2012 Rick (rick 'at' gibbed 'dot' us)
+ * 
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * 
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would
+ *    be appreciated but is not required.
+ * 
+ * 2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ * 
+ * 3. This notice may not be removed or altered from any source
+ *    distribution.
+ */
+
+using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using D3D10 = SlimDX.Direct3D10;
-using DXGI = SlimDX.DXGI;
+using Gibbed.IO;
+using SlimDX.Direct3D10;
+using Buffer = SlimDX.Direct3D10.Buffer;
 
 namespace Gibbed.Avalanche.ModelViewer2
 {
     internal class ConstantBuffer<TStructure> : IDisposable
-        where TStructure: struct
+        where TStructure : struct
     {
-        public D3D10.Buffer Buffer;
+        public Buffer Buffer;
 
-        public ConstantBuffer(D3D10.Device device)
+        public ConstantBuffer(Device device)
         {
-            this.Buffer = new D3D10.Buffer(
-                device,
-                Marshal.SizeOf(typeof(TStructure)),
-                D3D10.ResourceUsage.Dynamic,
-                D3D10.BindFlags.ConstantBuffer,
-                D3D10.CpuAccessFlags.Write,
-                D3D10.ResourceOptionFlags.None);
+            var size = Marshal.SizeOf(typeof(TStructure));
+            this.Buffer = new Buffer(device,
+                                     size.Align(16),
+                                     ResourceUsage.Dynamic,
+                                     BindFlags.ConstantBuffer,
+                                     CpuAccessFlags.Write,
+                                     ResourceOptionFlags.None);
         }
 
         public void Update(TStructure structure)
@@ -38,10 +58,12 @@ namespace Gibbed.Avalanche.ModelViewer2
             Marshal.StructureToPtr(structure, handle.AddrOfPinnedObject(), false);
             handle.Free();
 
-            SlimDX.DataStream stream = this.Buffer.Map(
-                D3D10.MapMode.WriteDiscard, D3D10.MapFlags.None);
-            stream.Write(buffer, 0, buffer.Length);
-            this.Buffer.Unmap();
+            using (var stream = this.Buffer.Map(MapMode.WriteDiscard,
+                                                MapFlags.None))
+            {
+                stream.Write(buffer, 0, buffer.Length);
+                this.Buffer.Unmap();
+            }
         }
 
         public void Dispose()

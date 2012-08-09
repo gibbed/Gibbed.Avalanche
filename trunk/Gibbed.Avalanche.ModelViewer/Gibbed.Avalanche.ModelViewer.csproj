@@ -31,7 +31,8 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -108,6 +109,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -122,6 +124,10 @@
     <ProjectReference Include="..\Gibbed.Avalanche.FileFormats\Gibbed.Avalanche.FileFormats.csproj">
       <Project>{B37ED973-5452-434E-9330-C13B14FBED6F}</Project>
       <Name>Gibbed.Avalanche.FileFormats</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Gibbed.Avalanche.RenderBlockModel\Gibbed.Avalanche.RenderBlockModel.csproj">
+      <Project>{E37FBAD0-E98D-402B-84B5-177EF66F3290}</Project>
+      <Name>Gibbed.Avalanche.RenderBlockModel</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -4,8 +4,8 @@ using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using RbModel = Gibbed.Avalanche.FileFormats.RbModel;
-using RenderBlock = Gibbed.Avalanche.FileFormats.RenderBlock;
+using Gibbed.Avalanche.RenderBlockModel;
+using Gibbed.Avalanche.RenderBlockModel.Blocks;
 using XInput = Microsoft.Xna.Framework.Input;
 using XnaColor = Microsoft.Xna.Framework.Graphics.Color;
 
@@ -18,8 +18,8 @@ namespace Gibbed.Avalanche.ModelViewer
         public ModelViewCamera Camera;
         private Control Control;
         private Dictionary<Type, Type> RendererTypes = new Dictionary<Type, Type>();
-        private Dictionary<RenderBlock.IRenderBlock, Renderers.IBlockRenderer>
-            BlockRenderers = new Dictionary<RenderBlock.IRenderBlock, Renderers.IBlockRenderer>();
+        private Dictionary<IRenderBlock, Renderers.IBlockRenderer>
+            BlockRenderers = new Dictionary<IRenderBlock, Renderers.IBlockRenderer>();
 
         public ModelViewRenderer(Control control)
         {
@@ -64,16 +64,16 @@ namespace Gibbed.Avalanche.ModelViewer
             this.BasicEffect.Projection = this.Camera.ProjectionMatrix;
 
             this.RendererTypes.Clear();
-            this.AddRendererType<RenderBlock.CarPaint, Renderers.CarPaintRenderer>();
-            this.AddRendererType<RenderBlock.CarPaintSimple, Renderers.CarPaintSimpleRenderer>();
-            this.AddRendererType<RenderBlock.DeformableWindow, Renderers.DeformableWindowRenderer>();
-            this.AddRendererType<RenderBlock.General, Renderers.GeneralRenderer>();
-            this.AddRendererType<RenderBlock.SkinnedGeneral, Renderers.SkinnedGeneralRenderer>();
+            this.AddRendererType<CarPaint, Renderers.CarPaintRenderer>();
+            this.AddRendererType<CarPaintSimple, Renderers.CarPaintSimpleRenderer>();
+            this.AddRendererType<DeformableWindow, Renderers.DeformableWindowRenderer>();
+            this.AddRendererType<General, Renderers.GeneralRenderer>();
+            this.AddRendererType<SkinnedGeneral, Renderers.SkinnedGeneralRenderer>();
             this.BlockRenderers.Clear();
         }
 
         private void AddRendererType<TRenderBlock, TBlockRenderer>()
-            where TRenderBlock : RenderBlock.IRenderBlock
+            where TRenderBlock : IRenderBlock
             where TBlockRenderer : Renderers.IBlockRenderer, new()
         {
             this.RendererTypes.Add(typeof(TRenderBlock), typeof(TBlockRenderer));
@@ -98,7 +98,7 @@ namespace Gibbed.Avalanche.ModelViewer
             this.CreateDevice();
         }
 
-        public void UpdateScene(string basePath, RbModel model, List<RenderBlock.IRenderBlock> selectedBlocks)
+        public void UpdateScene(string basePath, ModelFile model, List<IRenderBlock> selectedBlocks)
         {
             this.Device.Clear(XnaColor.SteelBlue);
             this.Device.RenderState.CullMode = CullMode.CullClockwiseFace;
@@ -114,7 +114,7 @@ namespace Gibbed.Avalanche.ModelViewer
                 {
                     pass.Begin();
 
-                    foreach (RenderBlock.IRenderBlock block in model.Blocks)
+                    foreach (IRenderBlock block in model.Blocks)
                     {
                         if (this.BlockRenderers.ContainsKey(block) == false)
                         {

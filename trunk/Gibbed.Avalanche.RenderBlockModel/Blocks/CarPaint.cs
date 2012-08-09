@@ -30,178 +30,64 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 {
     public class CarPaint : IRenderBlock
     {
-        public struct Vertex
-        {
-            public float PositionX;
-            public float PositionY;
-            public float PositionZ;
-            public float PositionW;
-
-            public short TexCoordA;
-            public short TexCoordB;
-            public short TexCoordC;
-            public short TexCoordD;
-
-            public void Deserialize(Stream input)
-            {
-                this.PositionX = input.ReadValueF32();
-                this.PositionY = input.ReadValueF32();
-                this.PositionZ = input.ReadValueF32();
-                this.PositionW = input.ReadValueF32();
-
-                this.TexCoordA = input.ReadValueS16();
-                this.TexCoordB = input.ReadValueS16();
-                this.TexCoordC = input.ReadValueS16();
-                this.TexCoordD = input.ReadValueS16();
-            }
-
-            public void Serialize(Stream output)
-            {
-                output.WriteValueF32(this.PositionX);
-                output.WriteValueF32(this.PositionY);
-                output.WriteValueF32(this.PositionZ);
-                output.WriteValueF32(this.PositionW);
-
-                output.WriteValueS16(this.TexCoordA);
-                output.WriteValueS16(this.TexCoordB);
-                output.WriteValueS16(this.TexCoordC);
-                output.WriteValueS16(this.TexCoordD);
-            }
-
-            public override string ToString()
-            {
-                return string.Format("{0},{1},{2}",
-                                     this.PositionX,
-                                     this.PositionY,
-                                     this.PositionZ);
-            }
-        }
-
-        public struct ExtraData
-        {
-            public float TexCoord1A;
-            public float TexCoord1B;
-            public float TexCoord1C;
-            public float TexCoord2A;
-            public float TexCoord2B;
-            public float TexCoord2C;
-            public float TexCoord2D;
-
-            public void Deserialize(Stream input)
-            {
-                this.TexCoord1A = input.ReadValueF32();
-                this.TexCoord1B = input.ReadValueF32();
-                this.TexCoord1C = input.ReadValueF32();
-                this.TexCoord2A = input.ReadValueF32();
-                this.TexCoord2B = input.ReadValueF32();
-                this.TexCoord2C = input.ReadValueF32();
-                this.TexCoord2D = input.ReadValueF32();
-            }
-        }
-
         public byte Version;
-        public float Unknown01;
-        public float Unknown02;
-        public float Unknown03;
-        public float Unknown04;
-        public float Unknown05;
-        public float Unknown06;
-        public float Unknown07;
-        public float Unknown08;
-        public float Unknown09;
-        public uint Unknown10;
-        public uint Unknown11;
-        public uint Unknown12;
-        public uint Unknown13;
-        public uint Unknown14;
-        public List<string> Textures = new List<string>();
-        public uint Unknown16;
-        public List<Vertex> Vertices = new List<Vertex>();
-        public List<ExtraData> Unknown18 = new List<ExtraData>();
-        public List<short> Faces = new List<short>();
 
-        public void Serialize(Stream output)
+        public UnknownData0 Unknown1;
+        public Material Material;
+        public List<CarPaintData0> Vertices = new List<CarPaintData0>();
+        public List<CarPaintData1> Unknown18 = new List<CarPaintData1>();
+        public List<short> Faces = new List<short>();
+        public DeformTable DeformTable = new DeformTable();
+
+        public void Serialize(Stream output, Endian endian)
         {
             throw new NotImplementedException();
         }
 
-        public void Deserialize(Stream input)
+        public void Deserialize(Stream input, Endian endian)
         {
-            this.Version = input.ReadValueU8();
-            if (this.Version < 1 || this.Version > 4)
+            var version = input.ReadValueU8();
+            if (version < 1 || version > 4)
             {
                 throw new FormatException("unhandled version for CarPaint");
             }
 
-            this.Unknown01 = input.ReadValueF32();
-            this.Unknown02 = input.ReadValueF32();
-            this.Unknown03 = input.ReadValueF32();
-            this.Unknown04 = input.ReadValueF32();
-            this.Unknown05 = input.ReadValueF32();
-            this.Unknown06 = input.ReadValueF32();
-            this.Unknown07 = input.ReadValueF32();
-            this.Unknown08 = input.ReadValueF32();
-            this.Unknown09 = input.ReadValueF32();
-            this.Unknown10 = input.ReadValueU32();
-            this.Unknown11 = input.ReadValueU32();
-            this.Unknown12 = input.ReadValueU32();
-            this.Unknown13 = input.ReadValueU32();
-            this.Unknown14 = input.ReadValueU32();
+            this.Version = version;
+            this.Unknown1.Deserialize(input, endian);
 
-            this.Textures.Clear();
-            for (int i = 0; i < 8; i++)
+            if (version >= 4)
             {
-                this.Textures.Add(input.ReadStringASCIIUInt32());
+                this.DeformTable.Deserialize(input, endian);
             }
-            this.Unknown16 = input.ReadValueU32();
 
-            if (this.Version == 1 || this.Version == 2)
+            this.Material.Deserialize(input, endian);
+
+            if (version == 1)
             {
-                // 52 * count
-                // faces
+                // TODO: upgrade old vertex data into new format
                 throw new NotImplementedException();
             }
-
-            if (this.Version == 3 || this.Version == 4)
+            else if (version == 2)
             {
-                this.Vertices.Clear();
-                {
-                    uint count = input.ReadValueU32();
-                    for (uint i = 0; i < count; i++)
-                    {
-                        var data = new Vertex();
-                        data.Deserialize(input);
-                        this.Vertices.Add(data);
-                    }
-                }
-
-                this.Unknown18.Clear();
-                {
-                    uint count = input.ReadValueU32();
-                    for (uint i = 0; i < count; i++)
-                    {
-                        var data = new ExtraData();
-                        data.Deserialize(input);
-                        this.Unknown18.Add(data);
-                    }
-                }
+                // TODO: upgrade old vertex data into new format
+                throw new NotImplementedException();
+            }
+            else if (version >= 3)
+            {
+                input.ReadArray(this.Vertices, endian);
+                input.ReadArray(this.Unknown18, endian);
             }
             else
             {
-                throw new InvalidOperationException();
+                throw new FormatException();
             }
 
-            this.Faces.Clear();
+            input.ReadFaces(this.Faces, endian);
+            
+            if (version <= 3)
             {
-                uint count = input.ReadValueU32();
-                for (uint i = 0; i < count; i++)
-                {
-                    this.Faces.Add(input.ReadValueS16());
-                }
+                this.DeformTable.Deserialize(input, endian);
             }
-
-            // mystic array of crap
-            input.Seek(256 * 4, SeekOrigin.Current);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.IO;
-using Gibbed.Avalanche.FileFormats.RenderBlock;
+using Gibbed.Avalanche.RenderBlockModel;
+using Gibbed.Avalanche.RenderBlockModel.Blocks;
 using Microsoft.Xna.Framework.Graphics;
 
 

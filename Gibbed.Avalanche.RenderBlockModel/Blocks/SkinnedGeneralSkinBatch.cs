@@ -21,19 +21,37 @@
  */
 
 using System;
-using Gibbed.Avalanche.RenderBlockModel;
-using SlimDX.Direct3D10;
-using ShaderLibrary = Gibbed.Avalanche.FileFormats.ShaderLibraryFile;
+using System.Collections.Generic;
+using System.IO;
+using Gibbed.Avalanche.FileFormats;
+using Gibbed.IO;
 
-namespace Gibbed.Avalanche.ModelViewer2.Renderers
+
+namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 {
-    public interface IRenderer : IDisposable
+    public class SkinnedGeneralSkinBatch : IFormat
     {
-        void Setup(Device device,
-                   IRenderBlock block,
-                   ShaderLibrary shaderLibrary,
-                   string basePath);
+        public int FaceCount;
+        public int FaceIndex;
+        public List<short> BoneIndices = new List<short>();
 
-        void Render(Device device, SlimDX.Matrix viewMatrix);
+        public void Serialize(Stream output, Endian endian)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Deserialize(Stream input, Endian endian)
+        {
+            this.FaceCount = input.ReadValueS32(endian);
+            this.FaceIndex = input.ReadValueS32(endian);
+
+            var count = input.ReadValueS32(endian);
+            this.BoneIndices.Clear();
+            this.BoneIndices.Capacity = count;
+            for (int i = 0; i < count; i++)
+            {
+                this.BoneIndices.Add(input.ReadValueS16(endian));
+            }
+        }
     }
 }

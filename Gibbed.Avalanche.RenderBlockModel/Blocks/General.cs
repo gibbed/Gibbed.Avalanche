@@ -23,90 +23,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Gibbed.Avalanche.FileFormats;
 using Gibbed.IO;
 
 namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 {
     public class General : IRenderBlock
     {
-        public struct SmallVertex
-        {
-            public short TexCoord1A;
-            public short TexCoord1B;
-            public short TexCoord1C;
-            public short TexCoord1D;
-            public float TexCoord2A;
-            public float TexCoord2B;
-            public float TexCoord2C;
-            public short PositionX;
-            public short PositionY;
-            public short PositionZ;
-            public short PositionW;
-
-            public void Deserialize(Stream input)
-            {
-                this.TexCoord1A = input.ReadValueS16();
-                this.TexCoord1B = input.ReadValueS16();
-                this.TexCoord1C = input.ReadValueS16();
-                this.TexCoord1D = input.ReadValueS16();
-                this.TexCoord2A = input.ReadValueF32();
-                this.TexCoord2B = input.ReadValueF32();
-                this.TexCoord2C = input.ReadValueF32();
-                this.PositionX = input.ReadValueS16();
-                this.PositionY = input.ReadValueS16();
-                this.PositionZ = input.ReadValueS16();
-                this.PositionW = input.ReadValueS16();
-            }
-
-            public override string ToString()
-            {
-                return string.Format("{0},{1},{2}",
-                                     this.PositionX,
-                                     this.PositionY,
-                                     this.PositionZ);
-            }
-        }
-
-        public struct BigVertex
-        {
-            public float PositionX;
-            public float PositionY;
-            public float PositionZ;
-            public float TexCoord1A;
-            public float TexCoord1B;
-            public float TexCoord1C;
-            public float TexCoord1D;
-            public float TexCoord2A;
-            public float TexCoord2B;
-            public float TexCoord2C;
-
-            public void Deserialize(Stream input)
-            {
-                this.PositionX = input.ReadValueF32();
-                this.PositionY = input.ReadValueF32();
-                this.PositionZ = input.ReadValueF32();
-                this.TexCoord1A = input.ReadValueF32();
-                this.TexCoord1B = input.ReadValueF32();
-                this.TexCoord1C = input.ReadValueF32();
-                this.TexCoord1D = input.ReadValueF32();
-                this.TexCoord2A = input.ReadValueF32();
-                this.TexCoord2B = input.ReadValueF32();
-                this.TexCoord2C = input.ReadValueF32();
-            }
-        }
-
-        public struct HackToFixDumbVertex
-        {
-            public float PositionX;
-            public float PositionY;
-            public float PositionZ;
-            public float TexCoordA;
-            public float TexCoordB;
-        }
-
         public byte Version;
-        public uint Flags;
 
         public bool HasBigVertices
         {
@@ -135,15 +58,12 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
         public int Unknown18;
         public int Unknown19;
 
-        public List<string> Textures = new List<string>();
-        public uint Unknown20;
-
-        public List<SmallVertex> SmallVertices = new List<SmallVertex>();
-        public List<HackToFixDumbVertex> HackToFixDumbVertices = new List<HackToFixDumbVertex>();
-        public List<BigVertex> BigVertices = new List<BigVertex>();
+        public Material Material;
+        public List<GeneralData0Small> SmallVertices = new List<GeneralData0Small>();
+        public List<GeneralData0Big> BigVertices = new List<GeneralData0Big>();
         public List<short> Faces = new List<short>();
 
-        public void Serialize(Stream output)
+        public void Serialize(Stream output, Endian endian)
         {
             throw new NotImplementedException();
         }
@@ -158,56 +78,53 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
             return c * (1.0f / 32767);
         }
 
-        public void Deserialize(Stream input)
+        public void Deserialize(Stream input, Endian endian)
         {
             this.Version = input.ReadValueU8();
-            if (this.Version != 2 && this.Version != 3)
+            if (this.Version < 2 || this.Version > 3)
             {
                 throw new FormatException("unhandled version for General");
             }
 
-            this.Unknown01 = input.ReadValueF32();
-            this.Unknown02 = input.ReadValueF32();
-            this.Unknown03 = input.ReadValueF32();
-            this.Unknown04 = input.ReadValueF32();
-            this.Unknown05 = input.ReadValueF32();
-            this.Unknown06 = input.ReadValueF32();
-            this.Unknown07 = input.ReadValueF32();
-            this.Unknown08 = input.ReadValueF32();
-            this.Unknown09 = input.ReadValueF32();
-            this.Unknown10 = input.ReadValueF32();
+            this.Unknown01 = input.ReadValueF32(endian);
+            this.Unknown02 = input.ReadValueF32(endian);
+            this.Unknown03 = input.ReadValueF32(endian);
+            this.Unknown04 = input.ReadValueF32(endian);
+            this.Unknown05 = input.ReadValueF32(endian);
+            this.Unknown06 = input.ReadValueF32(endian);
+            this.Unknown07 = input.ReadValueF32(endian);
+            this.Unknown08 = input.ReadValueF32(endian);
+            this.Unknown09 = input.ReadValueF32(endian);
+            this.Unknown10 = input.ReadValueF32(endian);
 
-            this.Unknown11 = input.ReadValueU32();
+            this.Unknown11 = input.ReadValueU32(endian);
 
-            this.Unknown12 = input.ReadValueF32();
-            this.Unknown13 = input.ReadValueF32();
-            this.Unknown14 = input.ReadValueF32();
-            this.Unknown15 = input.ReadValueF32();
-            this.Unknown16 = input.ReadValueF32();
-            this.Unknown17 = input.ReadValueF32();
+            this.Unknown12 = input.ReadValueF32(endian);
+            this.Unknown13 = input.ReadValueF32(endian);
+            this.Unknown14 = input.ReadValueF32(endian);
+            this.Unknown15 = input.ReadValueF32(endian);
+            this.Unknown16 = input.ReadValueF32(endian);
+            this.Unknown17 = input.ReadValueF32(endian);
 
             if (this.Version == 3)
             {
-                this.Unknown18 = input.ReadValueS32();
-                this.Unknown19 = input.ReadValueS32();
+                this.Unknown18 = input.ReadValueS32(endian);
+                this.Unknown19 = input.ReadValueS32(endian);
             }
 
-            this.Textures.Clear();
-            for (int i = 0; i < 8; i++)
-            {
-                this.Textures.Add(input.ReadStringASCIIUInt32());
-            }
-            this.Unknown20 = input.ReadValueU32();
+            this.Material.Deserialize(input, endian);
 
             if (this.HasBigVertices == false)
             {
-                this.SmallVertices.Clear();
+                input.ReadArray(this.SmallVertices, endian);
+
+                /*
                 this.HackToFixDumbVertices.Clear();
                 {
                     uint count = input.ReadValueU32();
                     for (uint i = 0; i < count; i++)
                     {
-                        var data = new SmallVertex();
+                        var data = new GeneralData0Small();
                         data.Deserialize(input);
                         this.SmallVertices.Add(data);
 
@@ -222,29 +139,14 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
                         this.HackToFixDumbVertices.Add(hack);
                     }
                 }
+                */
             }
             else
             {
-                this.BigVertices.Clear();
-                {
-                    uint count = input.ReadValueU32();
-                    for (uint i = 0; i < count; i++)
-                    {
-                        var data = new BigVertex();
-                        data.Deserialize(input);
-                        this.BigVertices.Add(data);
-                    }
-                }
+                input.ReadArray(this.BigVertices, endian);
             }
 
-            this.Faces.Clear();
-            {
-                uint count = input.ReadValueU32();
-                for (uint i = 0; i < count; i++)
-                {
-                    this.Faces.Add(input.ReadValueS16());
-                }
-            }
+            input.ReadFaces(this.Faces, endian);
         }
     }
 }

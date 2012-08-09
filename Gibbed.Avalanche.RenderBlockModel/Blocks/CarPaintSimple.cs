@@ -82,12 +82,12 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
         public List<Vertex> Vertices = new List<Vertex>();
         public List<short> Faces = new List<short>();
 
-        public void Serialize(Stream output)
+        public void Serialize(Stream output, Endian endian)
         {
             throw new NotImplementedException();
         }
 
-        public void Deserialize(Stream input)
+        public void Deserialize(Stream input, Endian endian)
         {
             this.Version = input.ReadValueU8();
             if (this.Version != 1)
@@ -113,7 +113,7 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
             this.Textures.Clear();
             for (int i = 0; i < 8; i++)
             {
-                this.Textures.Add(input.ReadStringASCIIUInt32());
+                this.Textures.Add(input.ReadStringU32(endian));
             }
             this.Unknown16 = input.ReadValueU32();
 

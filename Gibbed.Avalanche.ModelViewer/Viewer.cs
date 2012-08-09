@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using RbModel = Gibbed.Avalanche.FileFormats.RbModel;
-using RenderBlock = Gibbed.Avalanche.FileFormats.RenderBlock;
+using Gibbed.Avalanche.RenderBlockModel;
+using Gibbed.Avalanche.RenderBlockModel.Blocks;
 using GameTime = Microsoft.Xna.Framework.GameTime;
 using Mouse = Microsoft.Xna.Framework.Input.Mouse;
 
@@ -26,10 +26,10 @@ namespace Gibbed.Avalanche.ModelViewer
         private bool HandlingViewportInput = false;
 
         private ModelViewRenderer Renderer;
-        private RbModel Model = new RbModel();
+        private ModelFile Model = new ModelFile();
         private string ModelPath;
-        private List<RenderBlock.IRenderBlock> SelectedBlocks =
-            new List<RenderBlock.IRenderBlock>();
+        private List<IRenderBlock> SelectedBlocks =
+            new List<IRenderBlock>();
 
         private void RenderViewport()
         {
@@ -72,14 +72,14 @@ namespace Gibbed.Avalanche.ModelViewer
             this.ModelPath = Path.GetDirectoryName(this.modelOpenFileDialog.FileName);
 
             Stream input = File.Open(this.modelOpenFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            this.Model = new RbModel();
+            this.Model = new ModelFile();
             this.Model.Deserialize(input);
             input.Close();
 
             this.blockListView.Items.Clear();
 
             int i = 0;
-            foreach (RenderBlock.IRenderBlock block in this.Model.Blocks)
+            foreach (IRenderBlock block in this.Model.Blocks)
             {
                 ListViewItem item = new ListViewItem();
                 item.Text = i.ToString() + ": " + block.GetType().Name;
@@ -102,12 +102,12 @@ namespace Gibbed.Avalanche.ModelViewer
             this.ModelPath = Path.GetDirectoryName(this.modelOpenFileDialog.FileName);
 
             Stream input = File.Open(this.modelOpenFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var model = new RbModel();
+            var model = new ModelFile();
             model.Deserialize(input);
             input.Close();
 
             int i = this.Model.Blocks.Count;
-            foreach (RenderBlock.IRenderBlock block in model.Blocks)
+            foreach (IRenderBlock block in model.Blocks)
             {
                 this.Model.Blocks.Add(block);
 
@@ -155,11 +155,11 @@ namespace Gibbed.Avalanche.ModelViewer
         {
             if (e.Item.Checked == true)
             {
-                this.SelectedBlocks.Add((RenderBlock.IRenderBlock)e.Item.Tag);
+                this.SelectedBlocks.Add((IRenderBlock)e.Item.Tag);
             }
             else
             {
-                this.SelectedBlocks.Remove((RenderBlock.IRenderBlock)e.Item.Tag);
+                this.SelectedBlocks.Remove((IRenderBlock)e.Item.Tag);
             }
         }
 
@@ -171,25 +171,25 @@ namespace Gibbed.Avalanche.ModelViewer
             }
 
             var item = this.blockListView.SelectedItems[0];
-            var block = item.Tag as RenderBlock.IRenderBlock;
+            var block = item.Tag as IRenderBlock;
             
             if (block == null)
             {
                 return;
             }
 
-            if (this.Model.DebugInfos.ContainsKey(block) == false)
+            /*if (this.Model.DebugInfos.ContainsKey(block) == false)
             {
                 return;
             }
 
-            var debugInfo = this.Model.DebugInfos[block];
+            var debugInfo = this.Model.DebugInfos[block];*/
 
             this.blockStatusLabel.Text = string.Format(
                 "{0} @ offset {1} (0x{1:X}), size {2}",
                 item.Text,
-                debugInfo.Offset,
-                debugInfo.Size);
+                0,/*debugInfo.Offset,*/
+                0/*debugInfo.Size*/);
         }
 
         private void SetCameraBehavior(Camera.Behavior behavior)
@@ -247,7 +247,7 @@ namespace Gibbed.Avalanche.ModelViewer
             var selectedItems = this.blockListView.SelectedItems;
             foreach (ListViewItem item in selectedItems)
             {
-                var block = item.Tag as RenderBlock.IRenderBlock;
+                var block = item.Tag as IRenderBlock;
                 if (block == null)
                 {
                     continue;

@@ -1,5 +1,6 @@
 ﻿using System.IO;
-using Gibbed.Avalanche.FileFormats.RenderBlock;
+using Gibbed.Avalanche.RenderBlockModel;
+using Gibbed.Avalanche.RenderBlockModel.Blocks;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Gibbed.Avalanche.ModelViewer.Renderers
@@ -42,7 +43,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
             
             string texturePath;
 
-            texturePath = Path.Combine(basePath, block.Textures[0]);
+            texturePath = Path.Combine(basePath, block.Material.DiffuseTexture);
             if (File.Exists(texturePath) == false)
             {
                 this.TextureDif = null;
@@ -52,7 +53,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                 this.TextureDif = Texture.FromFile(device, texturePath);
             }
 
-            texturePath = Path.Combine(basePath, block.Textures[1]);
+            texturePath = Path.Combine(basePath, block.Material.NormalMap);
             if (File.Exists(texturePath) == false)
             {
                 this.TextureNrm = null;
@@ -70,7 +71,6 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
 
             if (block.HasBigVertices == false)
             {
-                /*
                 vertexSize = 28;
                 device.VertexDeclaration = this.SmallVertexDeclaration;
                 vertices = new VertexBuffer(
@@ -78,7 +78,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                     block.SmallVertices.Count * vertexSize,
                     BufferUsage.WriteOnly);
                 vertices.SetData(block.SmallVertices.ToArray());
-                */
+                /*
                 vertexSize = 20;
                 device.VertexDeclaration = this.HackToFixDumbVertexDeclaration;
                 vertices = new VertexBuffer(
@@ -86,6 +86,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                     block.HackToFixDumbVertices.Count * vertexSize,
                     BufferUsage.WriteOnly);
                 vertices.SetData(block.HackToFixDumbVertices.ToArray());
+                */
             }
             else
             {

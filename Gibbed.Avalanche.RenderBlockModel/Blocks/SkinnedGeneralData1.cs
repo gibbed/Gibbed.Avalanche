@@ -21,19 +21,33 @@
  */
 
 using System;
-using Gibbed.Avalanche.RenderBlockModel;
-using SlimDX.Direct3D10;
-using ShaderLibrary = Gibbed.Avalanche.FileFormats.ShaderLibraryFile;
+using System.Collections.Generic;
+using System.IO;
+using Gibbed.Avalanche.FileFormats;
+using Gibbed.IO;
 
-namespace Gibbed.Avalanche.ModelViewer2.Renderers
+namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 {
-    public interface IRenderer : IDisposable
+    public struct SkinnedGeneralData1 : IFormat
     {
-        void Setup(Device device,
-                   IRenderBlock block,
-                   ShaderLibrary shaderLibrary,
-                   string basePath);
+        public uint Color1;
+        public uint Color2;
+        public uint Color3;
+        public float U;
+        public float V;
 
-        void Render(Device device, SlimDX.Matrix viewMatrix);
+        public void Serialize(Stream output, Endian endian)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Deserialize(Stream input, Endian endian)
+        {
+            this.Color1 = input.ReadValueU32(endian);
+            this.Color2 = input.ReadValueU32(endian);
+            this.Color3 = input.ReadValueU32(endian);
+            this.U = input.ReadValueF32(endian);
+            this.V = input.ReadValueF32(endian);
+        }
     }
 }

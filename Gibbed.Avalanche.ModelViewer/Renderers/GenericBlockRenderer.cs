@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
-using Gibbed.Avalanche.FileFormats.RenderBlock;
+using Gibbed.Avalanche.RenderBlockModel;
+using Gibbed.Avalanche.RenderBlockModel.Blocks;
 
 namespace Gibbed.Avalanche.ModelViewer.Renderers
 {

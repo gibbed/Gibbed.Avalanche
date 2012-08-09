@@ -21,28 +21,37 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using Gibbed.Avalanche.FileFormats;
 using Gibbed.IO;
 
-namespace Gibbed.Avalanche.FileFormats
+namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 {
-    public static class StreamHelpers
+    public struct CarPaintData1 : IFormat
     {
-        public static string ReadStringU32(this Stream input, Endian endian)
+        public float TexCoord1A;
+        public float TexCoord1B;
+        public float TexCoord1C;
+        public float TexCoord2A;
+        public float TexCoord2B;
+        public float TexCoord2C;
+        public float TexCoord2D;
+
+        public void Serialize(Stream output, Endian endian)
         {
-            var length = input.ReadValueU32(endian);
-            if (length >= 0x7FFF)
-            {
-                throw new FormatException();
-            }
-            return input.ReadString(length, Encoding.ASCII);
+            throw new NotImplementedException();
         }
 
-        public static void WriteStringU32(this Stream output, string value, Endian endian)
+        public void Deserialize(Stream input, Endian endian)
         {
-            output.WriteValueS32(value.Length, endian);
-            output.WriteString(value, Encoding.ASCII);
+            this.TexCoord1A = input.ReadValueF32(endian);
+            this.TexCoord1B = input.ReadValueF32(endian);
+            this.TexCoord1C = input.ReadValueF32(endian);
+            this.TexCoord2A = input.ReadValueF32(endian);
+            this.TexCoord2B = input.ReadValueF32(endian);
+            this.TexCoord2C = input.ReadValueF32(endian);
+            this.TexCoord2D = input.ReadValueF32(endian);
         }
     }
 }

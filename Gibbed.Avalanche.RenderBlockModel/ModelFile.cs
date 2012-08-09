@@ -23,13 +23,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Gibbed.Avalanche.FileFormats;
+using System.Text;
 using Gibbed.IO;
 
 namespace Gibbed.Avalanche.RenderBlockModel
 {
     public class ModelFile
     {
+        public Version Version;
         public float MinX;
         public float MinY;
         public float MinZ;
@@ -37,76 +38,69 @@ namespace Gibbed.Avalanche.RenderBlockModel
         public float MaxY;
         public float MaxZ;
 
-        public class DebugInfo
-        {
-            public long Offset;
-            public long Size;
-        }
-
-        public List<IRenderBlock> Blocks =
-            new List<IRenderBlock>();
-
-        public Dictionary<IRenderBlock, DebugInfo> DebugInfos =
-            new Dictionary<IRenderBlock, DebugInfo>();
-
-        public void Deserialize(Stream input)
-        {
-            if (input.ReadStringASCIIUInt32() != "RBMDL")
-            {
-                throw new FormatException();
-            }
-
-            uint unk0 = input.ReadValueU32();
-            uint unk1 = input.ReadValueU32();
-            uint unk2 = input.ReadValueU32();
-
-            if (unk0 != 1 || unk1 != 13)
-            {
-                throw new FormatException();
-            }
-
-            this.MinX = input.ReadValueF32();
-            this.MinY = input.ReadValueF32();
-            this.MinZ = input.ReadValueF32();
-            this.MaxX = input.ReadValueF32();
-            this.MaxY = input.ReadValueF32();
-            this.MaxZ = input.ReadValueF32();
-
-            this.Blocks.Clear();
-            this.DebugInfos.Clear();
-            uint count = input.ReadValueU32();
-            for (uint i = 0; i < count; i++)
-            {
-                var debugInfo = new DebugInfo
-                {
-                    Offset = input.Position,
-                };
-
-                uint type = input.ReadValueU32();
-
-                var block = BlockTypeFactory.GetBlock(type);
-                if (block == null)
-                {
-                    throw new Exception("unknown block type " + type.ToString("X8"));
-                }
-
-                block.Deserialize(input);
-
-                if (input.ReadValueU32() != 0x89ABCDEF)
-                {
-                    throw new Exception("failed to read block properly");
-                }
-
-                this.Blocks.Add(block);
-
-                debugInfo.Size = input.Position - debugInfo.Offset;
-                this.DebugInfos.Add(block, debugInfo);
-            }
-        }
+        public readonly List<IRenderBlock> Blocks = new List<IRenderBlock>();
 
         public void Serialize(Stream output)
         {
             throw new NotImplementedException();
+        }
+
+        public void Deserialize(Stream input)
+        {
+            var magicLength = input.ReadValueU32(Endian.Little);
+            if (magicLength != 5 &&
+                magicLength.Swap() != 5)
+            {
+                throw new FormatException("invalid magic length");
+            }
+            var endian = magicLength == 5 ? Endian.Little : Endian.Big;
+
+            var magic = input.ReadString(5, Encoding.ASCII);
+            if (magic != "RBMDL")
+            {
+                throw new FormatException("invalid magic");
+            }
+
+            var versionMajor = input.ReadValueS32(endian);
+            var versionMinor = input.ReadValueS32(endian);
+            var versionRevision = input.ReadValueS32(endian);
+
+            if (versionMajor != 1 || versionMinor != 13)
+            {
+                throw new FormatException("unsupported RBMDL version");
+            }
+
+            this.Version = new Version(versionMajor, versionMinor, 0, versionRevision);
+
+            this.MinX = input.ReadValueF32(endian);
+            this.MinY = input.ReadValueF32(endian);
+            this.MinZ = input.ReadValueF32(endian);
+            this.MaxX = input.ReadValueF32(endian);
+            this.MaxY = input.ReadValueF32(endian);
+            this.MaxZ = input.ReadValueF32(endian);
+
+            var count = input.ReadValueS32(endian);
+            this.Blocks.Clear();
+            this.Blocks.Capacity = count;
+            for (int i = 0; i < count; i++)
+            {
+                uint typeHash = input.ReadValueU32(endian);
+
+                var block = BlockTypeFactory.Create(typeHash);
+                if (block == null)
+                {
+                    throw new Exception("unknown block type 0x" + typeHash.ToString("X8"));
+                }
+
+                block.Deserialize(input, endian);
+
+                if (input.ReadValueU32(endian) != 0x89ABCDEF)
+                {
+                    throw new Exception("invalid block footer (data corrupt? or misread?)");
+                }
+
+                this.Blocks.Add(block);
+            }
         }
     }
 }

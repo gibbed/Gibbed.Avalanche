@@ -41,12 +41,12 @@ namespace Gibbed.Avalanche.RenderBlockModel
             _Types.Add(name.HashJenkins(), typeof(TBlockType));
         }
 
-        public static IRenderBlock GetBlock(string type)
+        public static IRenderBlock Create(string type)
         {
-            return GetBlock(type.HashJenkins());
+            return Create(type.HashJenkins());
         }
 
-        public static IRenderBlock GetBlock(uint type)
+        public static IRenderBlock Create(uint type)
         {
             if (_Types.ContainsKey(type) == false)
             {

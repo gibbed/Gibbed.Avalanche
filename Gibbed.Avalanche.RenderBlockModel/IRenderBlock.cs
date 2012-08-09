@@ -21,12 +21,13 @@
  */
 
 using System.IO;
+using Gibbed.IO;
 
 namespace Gibbed.Avalanche.RenderBlockModel
 {
     public interface IRenderBlock
     {
-        void Serialize(Stream output);
-        void Deserialize(Stream input);
+        void Serialize(Stream output, Endian endian);
+        void Deserialize(Stream input, Endian endian);
     }
 }

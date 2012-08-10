@@ -22,128 +22,147 @@
 
 using System.IO;
 using Gibbed.Avalanche.RenderBlockModel;
+using System.Runtime.InteropServices;
+using SlimDX.Direct3D10;
 using Gibbed.Avalanche.RenderBlockModel.Blocks;
 using ShaderLibrary = Gibbed.Avalanche.FileFormats.ShaderLibraryFile;
+using DXGI = SlimDX.DXGI;
+using IC = SlimDX.Direct3D10.InputClassification;
 
 namespace Gibbed.Avalanche.ModelViewer2.Renderers
 {
     internal class GeneralRenderer : GenericBlockRenderer<General>
     {
-        /*
-        #region Vertex Elements
-        public static VertexElement[] SmallVertexElements =
+        private readonly ShaderLoader _ShaderLoader = new ShaderLoader();
+        private readonly MaterialLoader _MaterialLoader = new MaterialLoader();
+
+        private Buffer _VertexData0Buffer;
+        private Buffer _IndexBuffer;
+
+        private ConstantBuffer<VertexShaderGlobals> _VertexShaderConstantBuffer1;
+
+        public override void Setup(Device device,
+                                   ShaderLibrary shaderLibrary,
+                                   string basePath)
         {
-            new VertexElement(0, 0, VertexElementFormat.NormalizedShort4, VertexElementMethod.Default, VertexElementUsage.TextureCoordinate, 0),
-            new VertexElement(0, 8, VertexElementFormat.Vector3, VertexElementMethod.Default, VertexElementUsage.TextureCoordinate, 1),
-            new VertexElement(0, 20, VertexElementFormat.NormalizedShort4, VertexElementMethod.Default, VertexElementUsage.Position, 0),
-        };
+            this._MaterialLoader.Setup(device, basePath, this.Block.Material);
 
-        public static VertexElement[] HackToFixDumbVertexElements =
-        {
-            new VertexElement(0, 0, VertexElementFormat.Vector3, VertexElementMethod.Default, VertexElementUsage.Position, 0),
-            new VertexElement(0, 12, VertexElementFormat.Vector2, VertexElementMethod.Default, VertexElementUsage.TextureCoordinate, 0),
-        };
+            string vertexShaderName = "general";
+            string pixelShaderName = "general";
 
-        public static VertexElement[] BigVertexElements =
-        {
-            new VertexElement(0, 0, VertexElementFormat.Vector3, VertexElementMethod.Default, VertexElementUsage.Position, 0),
-            new VertexElement(0, 12, VertexElementFormat.Vector4, VertexElementMethod.Default, VertexElementUsage.TextureCoordinate, 0),
-            new VertexElement(0, 28, VertexElementFormat.Vector3, VertexElementMethod.Default, VertexElementUsage.TextureCoordinate, 1),
-        };
-        #endregion
-
-        private Texture TextureDif;
-        private Texture TextureNrm;
-        private VertexDeclaration SmallVertexDeclaration;
-        private VertexDeclaration BigVertexDeclaration;
-        private VertexDeclaration HackToFixDumbVertexDeclaration;
-        */
-
-        public override void Setup(
-            SlimDX.Direct3D10.Device device,
-            ShaderLibrary shaderLibrary,
-            string basePath)
-        {
-            /*
-            this.SmallVertexDeclaration = new VertexDeclaration(device, SmallVertexElements);
-            this.BigVertexDeclaration = new VertexDeclaration(device, BigVertexElements);
-            this.HackToFixDumbVertexDeclaration = new VertexDeclaration(device, HackToFixDumbVertexElements);
-            
-            string texturePath;
-
-            texturePath = Path.Combine(basePath, block.Textures[0]);
-            if (File.Exists(texturePath) == false)
+            if (this.Block.HasBigVertices == false)
             {
-                this.TextureDif = null;
+                this._ShaderLoader.Setup(
+                    device,
+                    shaderLibrary.GetVertexShaderData(vertexShaderName),
+                    shaderLibrary.GetFragmentShaderData(pixelShaderName),
+                    new[]
+                    {
+                        new InputElement("TEXCOORD", 0, DXGI.Format.R16G16B16A16_SNorm, 0, 0, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 1, DXGI.Format.R32G32B32_Float, 8, 0, IC.PerVertexData, 0),
+                        new InputElement("POSITION", 0, DXGI.Format.R16G16B16A16_SNorm, 20, 0, IC.PerVertexData, 0),
+                    });
+
+                var vertexBuffer = new Buffer(device,
+                                              28 * this.Block.VertexData0Small.Count,
+                                              ResourceUsage.Dynamic,
+                                              BindFlags.VertexBuffer,
+                                              CpuAccessFlags.Write,
+                                              ResourceOptionFlags.None);
+                using (var stream = vertexBuffer.Map(MapMode.WriteDiscard,
+                                                     MapFlags.None))
+                {
+                    stream.WriteRange(this.Block.VertexData0Small.ToArray());
+                    vertexBuffer.Unmap();
+                }
+                this._VertexData0Buffer = vertexBuffer;
             }
             else
             {
-                this.TextureDif = Texture.FromFile(device, texturePath);
+                this._ShaderLoader.Setup(
+                    device,
+                    shaderLibrary.GetVertexShaderData(vertexShaderName),
+                    shaderLibrary.GetFragmentShaderData(pixelShaderName),
+                    new[]
+                    {
+                        new InputElement("POSITION", 0, DXGI.Format.R32G32B32_Float, 0, 0, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 0, DXGI.Format.R32G32B32A32_Float, 12, 0, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 1, DXGI.Format.R32G32B32_Float, 28, 0, IC.PerVertexData, 0),
+                    });
+
+                var vertexBuffer = new Buffer(device,
+                                              40 * this.Block.VertexData0Big.Count,
+                                              ResourceUsage.Dynamic,
+                                              BindFlags.VertexBuffer,
+                                              CpuAccessFlags.Write,
+                                              ResourceOptionFlags.None);
+                using (var stream = vertexBuffer.Map(MapMode.WriteDiscard,
+                                                     MapFlags.None))
+                {
+                    stream.WriteRange(this.Block.VertexData0Big.ToArray());
+                    vertexBuffer.Unmap();
+                }
+                this._VertexData0Buffer = vertexBuffer;
             }
 
-            texturePath = Path.Combine(basePath, block.Textures[1]);
-            if (File.Exists(texturePath) == false)
+            // Index Buffer
             {
-                this.TextureNrm = null;
+                var indexBuffer = new Buffer(device,
+                                             2 * this.Block.Faces.Count,
+                                             ResourceUsage.Dynamic,
+                                             BindFlags.IndexBuffer,
+                                             CpuAccessFlags.Write,
+                                             ResourceOptionFlags.None);
+                using (var stream = indexBuffer.Map(MapMode.WriteDiscard,
+                                                    MapFlags.None))
+                {
+                    stream.WriteRange(this.Block.Faces.ToArray());
+                    indexBuffer.Unmap();
+                }
+                this._IndexBuffer = indexBuffer;
             }
-            else
+
+            // Constant Buffer
             {
-                this.TextureNrm = Texture.FromFile(device, texturePath);
+                this._VertexShaderConstantBuffer1 = new ConstantBuffer<VertexShaderGlobals>(device);
             }
-            */
         }
 
-        public override void Render(SlimDX.Direct3D10.Device device, SlimDX.Matrix viewMatrix)
+        public override void Render(Device device,
+                                    SlimDX.Matrix viewMatrix)
         {
-            /*
-            VertexBuffer vertices;
-            int vertexSize;
+            var globals = new VertexShaderGlobals();
+            globals.WorldViewProj = viewMatrix;
+            globals.World = SlimDX.Matrix.Identity;
+            this._VertexShaderConstantBuffer1.Update(globals);
 
-            if (block.HasBigVertices == false)
+            device.InputAssembler.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
+
+            device.VertexShader.Set(this._ShaderLoader.VertexShader);
+            device.VertexShader.SetConstantBuffer(this._VertexShaderConstantBuffer1.Buffer, 1);
+
+            device.PixelShader.Set(this._ShaderLoader.PixelShader);
+            this._MaterialLoader.SetShaderResource(device);
+            device.InputAssembler.SetInputLayout(this._ShaderLoader.InputLayout);
+
+            if (this.Block.HasBigVertices == false)
             {
-                *
-                vertexSize = 28;
-                device.VertexDeclaration = this.SmallVertexDeclaration;
-                vertices = new VertexBuffer(
-                    device,
-                    block.SmallVertices.Count * vertexSize,
-                    BufferUsage.WriteOnly);
-                vertices.SetData(block.SmallVertices.ToArray());
-                *
-                vertexSize = 20;
-                device.VertexDeclaration = this.HackToFixDumbVertexDeclaration;
-                vertices = new VertexBuffer(
-                    device,
-                    block.HackToFixDumbVertices.Count * vertexSize,
-                    BufferUsage.WriteOnly);
-                vertices.SetData(block.HackToFixDumbVertices.ToArray());
+                device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this._VertexData0Buffer, 28, 0));
             }
             else
             {
-                vertexSize = 40;
-                device.VertexDeclaration = this.BigVertexDeclaration;
-                vertices = new VertexBuffer(
-                    device,
-                    block.BigVertices.Count * vertexSize,
-                    BufferUsage.WriteOnly);
-                vertices.SetData(block.BigVertices.ToArray());
+                device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this._VertexData0Buffer, 40, 0));
             }
 
-            device.Vertices[0].SetSource(vertices, 0, vertexSize);
+            device.InputAssembler.SetIndexBuffer(this._IndexBuffer, DXGI.Format.R16_UInt, 0);
+            device.DrawIndexed(this.Block.Faces.Count, 0, 0);
+        }
 
-            var indices = new IndexBuffer(
-                    device,
-                    typeof(short),
-                    block.Faces.Count,
-                    BufferUsage.WriteOnly);
-            indices.SetData(block.Faces.ToArray(), 0, block.Faces.Count);
-            device.Indices = indices;
-
-            device.Textures[0] = this.TextureDif;
-            device.Textures[1] = this.TextureNrm; // not "working" yet (needs shader~)
-
-            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, block.Faces.Count, 0, block.Faces.Count / 3);
-            */
+        [StructLayout(LayoutKind.Sequential, Size = 992)]
+        private struct VertexShaderGlobals
+        {
+            public ShaderNatives.float4x4 WorldViewProj;
+            public ShaderNatives.float4x4 World;
         }
 
         public override void Dispose()

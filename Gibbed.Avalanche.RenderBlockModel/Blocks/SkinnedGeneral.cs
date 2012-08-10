@@ -50,9 +50,9 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
         public float Unknown05;
         public float Unknown06;
         public Material Material;
-        public readonly List<SkinnedGeneralData0Small> SmallVertices = new List<SkinnedGeneralData0Small>();
-        public readonly List<SkinnedGeneralData0Big> BigVertices = new List<SkinnedGeneralData0Big>();
-        public readonly List<SkinnedGeneralData1> Extras = new List<SkinnedGeneralData1>();
+        public readonly List<SkinnedGeneralData0Small> VertexData0Small = new List<SkinnedGeneralData0Small>();
+        public readonly List<SkinnedGeneralData0Big> VertexData0Big = new List<SkinnedGeneralData0Big>();
+        public readonly List<SkinnedGeneralData1> VertexData1 = new List<SkinnedGeneralData1>();
         public readonly List<SkinnedGeneralSkinBatch> SkinBatches = new List<SkinnedGeneralSkinBatch>();
         public readonly List<short> Faces = new List<short>();
 
@@ -80,14 +80,14 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 
             if (this.HasBigVertices == false)
             {
-                input.ReadArray(this.SmallVertices, endian);
+                input.ReadArray(this.VertexData0Small, endian);
             }
             else
             {
-                input.ReadArray(this.BigVertices, endian);
+                input.ReadArray(this.VertexData0Big, endian);
             }
 
-            input.ReadArray(this.Extras, endian);
+            input.ReadArray(this.VertexData1, endian);
             input.ReadArray(this.SkinBatches, endian);
             input.ReadFaces(this.Faces, endian);
         }

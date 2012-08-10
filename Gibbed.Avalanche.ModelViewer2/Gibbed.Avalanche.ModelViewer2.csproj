@@ -56,7 +56,10 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SlimDX, Version=4.0.13.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9" />
+    <Reference Include="SlimDX, Version=4.0.13.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\other\SlimDX\trunk\x86\SlimDX.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -92,6 +95,7 @@
     <Compile Include="Renderers\DeformableWindowRenderer.cs" />
     <Compile Include="Renderers\GeneralRenderer.cs" />
     <Compile Include="MaterialLoader.cs" />
+    <Compile Include="Renderers\LambertRenderer.cs" />
     <Compile Include="RendererTypes.cs" />
     <Compile Include="ViewportControl.cs">
       <SubType>UserControl</SubType>

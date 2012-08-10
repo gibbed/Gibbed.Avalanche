@@ -303,10 +303,9 @@ namespace Gibbed.Avalanche.ModelViewer2
         {
             var rsd = new RasterizerStateDescription();
             rsd.FillMode = FillMode.Solid;
-            rsd.CullMode = CullMode.Back;
+            rsd.CullMode = CullMode.None;
             rsd.IsDepthClipEnabled = true;
             rsd.IsMultisampleEnabled = true;
-
             e.Device.Rasterizer.State = RasterizerState.FromDescription(
                 e.Device, rsd);
         }
@@ -319,34 +318,66 @@ namespace Gibbed.Avalanche.ModelViewer2
         {
             foreach (IRenderBlock block in this._Model.Blocks)
             {
-                var oldState = e.Device.Rasterizer.State.Description;
-                var state = e.Device.Rasterizer.State.Description;
-                state.FillMode = _SelectedBlocks.Contains(block) == true ?
-                    FillMode.Wireframe : FillMode.Solid;
-                state.CullMode = CullMode.None;
-                e.Device.Rasterizer.State = RasterizerState.FromDescription(e.Device, state);
-
-                if (this._BlockRenderers.ContainsKey(block) == false)
+                using (var stateBlock = new StateBlock(e.Device, StateBlockMask.EnableAll()))
                 {
-                    var renderer = RendererTypes.Instantiate(block);
-                    if (renderer == null)
+                    stateBlock.Capture();
+
+                    var dssd = new DepthStencilStateDescription();
+                    dssd.IsDepthEnabled = true;
+                    dssd.DepthWriteMask = DepthWriteMask.All;
+                    dssd.DepthComparison = Comparison.Less;
+                    dssd.IsStencilEnabled = true;
+                    dssd.StencilReadMask = 0xFF;
+                    dssd.StencilWriteMask = 0xFF;
+                    
+                    var frontFace = new DepthStencilOperationDescription();
+                    frontFace.FailOperation = StencilOperation.Keep;
+                    frontFace.DepthFailOperation = StencilOperation.Increment;
+                    frontFace.PassOperation = StencilOperation.Keep;
+                    frontFace.Comparison = Comparison.Always;
+                    dssd.FrontFace = frontFace;
+
+                    var backFace = new DepthStencilOperationDescription();
+                    backFace.FailOperation = StencilOperation.Keep;
+                    backFace.DepthFailOperation = StencilOperation.Decrement;
+                    backFace.PassOperation = StencilOperation.Keep;
+                    backFace.Comparison = Comparison.Always;
+                    dssd.BackFace = backFace;
+
+                    e.Device.OutputMerger.DepthStencilState = DepthStencilState.FromDescription(e.Device, dssd);
+
+                    var oldState = e.Device.Rasterizer.State.Description;
+                    var state = e.Device.Rasterizer.State.Description;
+                    state.FillMode = _SelectedBlocks.Contains(block) == true
+                                         ? FillMode.Wireframe
+                                         : FillMode.Solid;
+                    state.CullMode = CullMode.None;
+                    e.Device.Rasterizer.State = RasterizerState.FromDescription(e.Device, state);
+
+                    if (this._BlockRenderers.ContainsKey(block) == false)
                     {
-                        continue;
+                        var renderer = RendererTypes.Instantiate(block);
+                        if (renderer == null)
+                        {
+                            continue;
+                        }
+
+                        renderer.Setup(e.Device,
+                                       block,
+                                       this._ShaderBundle,
+                                       this._ModelPath);
+                        this._BlockRenderers.Add(block, renderer);
+                        this._BlockRenderers[block].Render(e.Device, e.ViewProjectionMatrix);
+                    }
+                    else
+                    {
+                        this._BlockRenderers[block].Render(e.Device, e.ViewProjectionMatrix);
                     }
 
-                    renderer.Setup(e.Device,
-                                   block,
-                                   this._ShaderBundle,
-                                   this._ModelPath);
-                    this._BlockRenderers.Add(block, renderer);
-                    this._BlockRenderers[block].Render(e.Device, e.ViewProjectionMatrix);
-                }
-                else
-                {
-                    this._BlockRenderers[block].Render(e.Device, e.ViewProjectionMatrix);
-                }
+                    e.Device.Rasterizer.State = RasterizerState.FromDescription(e.Device, oldState);
 
-                e.Device.Rasterizer.State = RasterizerState.FromDescription(e.Device, oldState);
+                    stateBlock.Apply();
+                }
             }
         }
 
@@ -363,6 +394,32 @@ namespace Gibbed.Avalanche.ModelViewer2
         private void OnDeactivate(object sender, EventArgs e)
         {
             this.Viewport.UpdateFocus();
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            //var path = @"v109_lod1-door_bl1.rbm";
+            var path = @"seagull_lod1-body.rbm";
+
+            var model = new ModelFile();
+            this._ModelPath = Path.GetDirectoryName(path);
+            using (var input = File.OpenRead(path))
+            {
+                model.Deserialize(input);
+            }
+
+            this._Model = model;
+            int i = this._Model.Blocks.Count;
+            foreach (var block in model.Blocks)
+            {
+                ListViewItem item = new ListViewItem();
+                item.Text = i.ToString(System.Globalization.CultureInfo.InvariantCulture) + ": " + block.GetType().Name;
+                item.Tag = block;
+                this.blockListView.Items.Add(item);
+                i++;
+            }
+
+            this.SetupCamera();
         }
     }
 }

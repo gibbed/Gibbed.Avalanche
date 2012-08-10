@@ -29,20 +29,29 @@ namespace Gibbed.Avalanche.ModelViewer2
 {
     internal class MaterialLoader : IDisposable
     {
-        private Texture2D _TextureDiffuseTexture;
-        private Texture2D _TextureNormalMap;
-        private Texture2D _TexturePropertiesMap;
+        private Texture2D _TextureUndamagedDiffuseTexture;
+        private Texture2D _TextureUndamagedNormalMap;
+        private Texture2D _TextureUndamagedPropertiesMap;
+        private Texture2D _TextureDamagedDiffuseTexture;
+        private Texture2D _TextureDamagedNormalMap;
+        private Texture2D _TextureDamagedPropertiesMap;
 
-        private ShaderResourceView _ResourceDiffuseTexture;
-        private ShaderResourceView _ResourceNormalMap;
-        private ShaderResourceView _ResourcePropertiesMap;
+        private ShaderResourceView _ResourceUndamagedDiffuseTexture;
+        private ShaderResourceView _ResourceUndamagedNormalMap;
+        private ShaderResourceView _ResourceUndamagedPropertiesMap;
+        private ShaderResourceView _ResourceDamagedDiffuseTexture;
+        private ShaderResourceView _ResourceDamagedNormalMap;
+        private ShaderResourceView _ResourceDamagedPropertiesMap;
 
         private static Texture2D LoadTextureFrom(Device device, string basePath, string fileName)
         {
-            string filePath = Path.Combine(basePath, fileName);
+            if (string.IsNullOrEmpty(fileName) == true)
+            {
+                return null;
+            }
 
-            if (string.IsNullOrEmpty(fileName) == true ||
-                File.Exists(filePath) == false)
+            string filePath = Path.Combine(basePath, fileName);
+            if (File.Exists(filePath) == false)
             {
                 return null;
             }
@@ -52,69 +61,85 @@ namespace Gibbed.Avalanche.ModelViewer2
 
         public void Setup(Device device, string basePath, Material material)
         {
-            this._TextureDiffuseTexture = LoadTextureFrom(device, basePath, material.DiffuseTexture);
-            this._TextureNormalMap = LoadTextureFrom(device, basePath, material.NormalMap);
-            this._TexturePropertiesMap = LoadTextureFrom(device, basePath, material.PropertiesMap);
+            this._TextureUndamagedDiffuseTexture = LoadTextureFrom(device, basePath, material.UndeformedDiffuseTexture);
+            this._TextureUndamagedNormalMap = LoadTextureFrom(device, basePath, material.UndeformedNormalMap);
+            this._TextureUndamagedPropertiesMap = LoadTextureFrom(device, basePath, material.UndeformedPropertiesMap);
+            
+            this._TextureDamagedDiffuseTexture = LoadTextureFrom(device, basePath, material.DeformedDiffuseTexture);
+            this._TextureDamagedNormalMap = LoadTextureFrom(device, basePath, material.DeformedNormalMap);
+            this._TextureDamagedPropertiesMap = LoadTextureFrom(device, basePath, material.DeformedPropertiesMap);
 
-            if (this._TextureDiffuseTexture != null)
+            if (this._TextureUndamagedDiffuseTexture != null)
             {
-                this._ResourceDiffuseTexture = new ShaderResourceView(device, this._TextureDiffuseTexture);
+                this._ResourceUndamagedDiffuseTexture = new ShaderResourceView(device, this._TextureUndamagedDiffuseTexture);
             }
 
-            if (this._TextureNormalMap != null)
+            if (this._TextureUndamagedNormalMap != null)
             {
-                this._ResourceNormalMap = new ShaderResourceView(device, this._TextureNormalMap);
+                this._ResourceUndamagedNormalMap = new ShaderResourceView(device, this._TextureUndamagedNormalMap);
             }
 
-            if (this._TexturePropertiesMap != null)
+            if (this._TextureUndamagedPropertiesMap != null)
             {
-                this._ResourcePropertiesMap = new ShaderResourceView(device, this._TexturePropertiesMap);
+                this._ResourceUndamagedPropertiesMap = new ShaderResourceView(device, this._TextureUndamagedPropertiesMap);
+            }
+
+            if (this._TextureDamagedDiffuseTexture != null)
+            {
+                this._ResourceDamagedDiffuseTexture = new ShaderResourceView(device, this._TextureDamagedDiffuseTexture);
+            }
+
+            if (this._TextureDamagedNormalMap != null)
+            {
+                this._ResourceDamagedNormalMap = new ShaderResourceView(device, this._TextureDamagedNormalMap);
+            }
+
+            if (this._TextureDamagedPropertiesMap != null)
+            {
+                this._ResourceDamagedPropertiesMap = new ShaderResourceView(device, this._TextureDamagedPropertiesMap);
             }
         }
 
         public void SetShaderResource(Device device)
         {
-            device.PixelShader.SetShaderResource(this._ResourceDiffuseTexture, 0);
-            device.PixelShader.SetShaderResource(this._ResourceNormalMap, 1);
-            device.PixelShader.SetShaderResource(this._ResourcePropertiesMap, 2);
-            /*device.PixelShader.SetShaderResource(this._ResourceDiffuseTexture, 3);
-            device.PixelShader.SetShaderResource(this._ResourceNormalMap, 4);
-            device.PixelShader.SetShaderResource(this._ResourcePropertiesMap, 5);
-            device.PixelShader.SetShaderResource(this._ResourceDiffuseTexture, 6);
-            device.PixelShader.SetShaderResource(this._ResourceNormalMap, 7);
-            device.PixelShader.SetShaderResource(this._ResourcePropertiesMap, 8);*/
+            device.PixelShader.SetShaderResource(this._ResourceUndamagedDiffuseTexture, 0);
+            device.PixelShader.SetShaderResource(this._ResourceUndamagedNormalMap, 1);
+            device.PixelShader.SetShaderResource(this._ResourceUndamagedPropertiesMap, 2);
+            device.PixelShader.SetShaderResource(this._ResourceDamagedDiffuseTexture, 3);
+            device.PixelShader.SetShaderResource(this._ResourceDamagedNormalMap, 4);
+            device.PixelShader.SetShaderResource(this._ResourceDamagedPropertiesMap, 5);
         }
 
         public void Dispose()
         {
-            if (this._ResourcePropertiesMap != null)
+            if (this._ResourceUndamagedPropertiesMap != null)
             {
-                this._ResourcePropertiesMap.Dispose();
+                this._ResourceUndamagedPropertiesMap.Dispose();
             }
 
-            if (this._ResourceNormalMap != null)
+            if (this._ResourceUndamagedNormalMap != null)
             {
-                this._ResourceNormalMap.Dispose();
+                this._ResourceUndamagedNormalMap.Dispose();
             }
 
-            if (this._ResourceDiffuseTexture != null)
+            if (this._ResourceUndamagedDiffuseTexture != null)
             {
-                this._ResourceDiffuseTexture.Dispose();
+                this._ResourceUndamagedDiffuseTexture.Dispose();
             }
 
-            if (this._TexturePropertiesMap != null)
+            if (this._TextureUndamagedPropertiesMap != null)
             {
-                this._TexturePropertiesMap.Dispose();
+                this._TextureUndamagedPropertiesMap.Dispose();
             }
 
-            if (this._TextureNormalMap != null)
+            if (this._TextureUndamagedNormalMap != null)
             {
-                this._TextureNormalMap.Dispose();
+                this._TextureUndamagedNormalMap.Dispose();
             }
 
-            if (this._TextureDiffuseTexture != null)
+            if (this._TextureUndamagedDiffuseTexture != null)
             {
-                this._TextureDiffuseTexture.Dispose();
+                this._TextureUndamagedDiffuseTexture.Dispose();
             }
 
         }

@@ -47,7 +47,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
 
             string texturePath;
             
-            texturePath = Path.Combine(basePath, block.Material.DiffuseTexture);
+            texturePath = Path.Combine(basePath, block.Material.UndeformedDiffuseTexture);
             if (File.Exists(texturePath) == false)
             {
                 this.TextureDif = null;
@@ -57,7 +57,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                 this.TextureDif = Texture.FromFile(device, texturePath);
             }
 
-            texturePath = Path.Combine(basePath, block.Material.NormalMap);
+            texturePath = Path.Combine(basePath, block.Material.UndeformedNormalMap);
             if (File.Exists(texturePath) == false)
             {
                 this.TextureNrm = null;
@@ -79,9 +79,9 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                 device.VertexDeclaration = this.SmallVertexDeclaration;
                 vertices = new VertexBuffer(
                     device,
-                    block.SmallVertices.Count * vertexSize,
+                    block.VertexData0Small.Count * vertexSize,
                     BufferUsage.WriteOnly);
-                vertices.SetData(block.SmallVertices.ToArray());
+                vertices.SetData(block.VertexData0Small.ToArray());
             }
             else
             {
@@ -89,13 +89,13 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                 device.VertexDeclaration = this.BigVertexDeclaration;
                 vertices = new VertexBuffer(
                     device,
-                    block.BigVertices.Count * vertexSize,
+                    block.VertexData0Big.Count * vertexSize,
                     BufferUsage.WriteOnly);
-                vertices.SetData(block.BigVertices.ToArray());
+                vertices.SetData(block.VertexData0Big.ToArray());
             }
 
-            VertexBuffer extras = new VertexBuffer(device, block.Extras.Count * 20, BufferUsage.WriteOnly);
-            extras.SetData(block.Extras.ToArray());
+            VertexBuffer extras = new VertexBuffer(device, block.VertexData1.Count * 20, BufferUsage.WriteOnly);
+            extras.SetData(block.VertexData1.ToArray());
 
             device.Vertices[0].SetSource(vertices, 0, vertexSize);
             device.Vertices[1].SetSource(extras, 0, 20);

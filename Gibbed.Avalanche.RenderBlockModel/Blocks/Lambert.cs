@@ -23,19 +23,17 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Gibbed.Avalanche.FileFormats;
 using Gibbed.IO;
 
 namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 {
-    public class DeformableWindow : IRenderBlock
+    public class Lambert : IRenderBlock
     {
-        public byte Version;
+        public uint Unknown28;
         public Material Material;
-        public DeformTable DeformTable = new DeformTable();
-        public readonly List<DeformableWindowData0> VertexData0 = new List<DeformableWindowData0>();
-        public List<short> Faces = new List<short>();
-        public uint Unknown24C;
+        public readonly List<LambertData0Small> VertexData0Small = new List<LambertData0Small>();
+        public readonly List<LambertData0Big> VertexData0Big = new List<LambertData0Big>();
+        public readonly List<short> Faces = new List<short>();
 
         public void Serialize(Stream output, Endian endian)
         {
@@ -45,32 +43,33 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
         public void Deserialize(Stream input, Endian endian)
         {
             var version = input.ReadValueU8();
-            if (version > 2)
+            if (version != 4)
             {
-                throw new FormatException("unhandled version for DeformableWindow");
+                throw new FormatException();
             }
 
-            this.Version = version;
+            if (version == 4)
+            {
+                this.Unknown28 = input.ReadValueU32(endian);
+                input.ReadBytes(40);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+
             this.Material.Deserialize(input, endian);
 
-            if (version >= 2)
+            if (this.Unknown28 == 0)
             {
-                this.Unknown24C = input.ReadValueU32(endian);
-                this.DeformTable.Deserialize(input, endian);
+                input.ReadArray(this.VertexData0Big, endian);
+            }
+            else if (this.Unknown28 == 1)
+            {
+                input.ReadArray(this.VertexData0Small, endian);
             }
 
-            input.ReadArray(this.VertexData0, endian);
             input.ReadFaces(this.Faces, endian);
-
-            if (version >= 0 && version <= 1)
-            {
-                this.DeformTable.Deserialize(input, endian);
-            }
-
-            if (version == 1)
-            {
-                this.Unknown24C = input.ReadValueU32(endian);
-            }
         }
     }
 }

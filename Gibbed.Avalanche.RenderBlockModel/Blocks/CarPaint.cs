@@ -23,7 +23,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Gibbed.Avalanche.FileFormats;
 using Gibbed.IO;
 
 namespace Gibbed.Avalanche.RenderBlockModel.Blocks
@@ -34,8 +33,8 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 
         public UnknownData0 Unknown1;
         public Material Material;
-        public List<CarPaintData0> Vertices = new List<CarPaintData0>();
-        public List<CarPaintData1> Unknown18 = new List<CarPaintData1>();
+        public List<CarPaintData0> VertexData0 = new List<CarPaintData0>();
+        public List<CarPaintData1> VertexData1 = new List<CarPaintData1>();
         public List<short> Faces = new List<short>();
         public DeformTable DeformTable = new DeformTable();
 
@@ -74,8 +73,8 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
             }
             else if (version >= 3)
             {
-                input.ReadArray(this.Vertices, endian);
-                input.ReadArray(this.Unknown18, endian);
+                input.ReadArray(this.VertexData0, endian);
+                input.ReadArray(this.VertexData1, endian);
             }
             else
             {

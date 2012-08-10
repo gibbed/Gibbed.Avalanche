@@ -59,8 +59,8 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
         public int Unknown19;
 
         public Material Material;
-        public List<GeneralData0Small> SmallVertices = new List<GeneralData0Small>();
-        public List<GeneralData0Big> BigVertices = new List<GeneralData0Big>();
+        public List<GeneralData0Small> VertexData0Small = new List<GeneralData0Small>();
+        public List<GeneralData0Big> VertexData0Big = new List<GeneralData0Big>();
         public List<short> Faces = new List<short>();
 
         public void Serialize(Stream output, Endian endian)
@@ -116,7 +116,7 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 
             if (this.HasBigVertices == false)
             {
-                input.ReadArray(this.SmallVertices, endian);
+                input.ReadArray(this.VertexData0Small, endian);
 
                 /*
                 this.HackToFixDumbVertices.Clear();
@@ -143,7 +143,7 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
             }
             else
             {
-                input.ReadArray(this.BigVertices, endian);
+                input.ReadArray(this.VertexData0Big, endian);
             }
 
             input.ReadFaces(this.Faces, endian);

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Viewer));
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.blockListView = new System.Windows.Forms.ListView();
             this.blockListToolStrip = new System.Windows.Forms.ToolStrip();
@@ -47,6 +48,7 @@
             this.modelOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.blockStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -133,7 +135,6 @@
             this.Viewport.Name = "Viewport";
             this.Viewport.Size = new System.Drawing.Size(556, 408);
             this.Viewport.TabIndex = 2;
-            this.Viewport.Text = "renderPanel1";
             this.Viewport.Initialize += new Gibbed.Avalanche.ModelViewer2.RenderEventHandler(this.OnViewportInitialized);
             this.Viewport.UpdateScene += new Gibbed.Avalanche.ModelViewer2.UpdateSceneEventHandler(this.OnViewportUpdateScene);
             this.Viewport.Render += new Gibbed.Avalanche.ModelViewer2.RenderEventHandler(this.OnViewportRender);
@@ -208,7 +209,8 @@
             // mainToolStrip
             // 
             this.mainToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.modelOpenFileButton});
+            this.modelOpenFileButton,
+            this.toolStripButton1});
             this.mainToolStrip.Location = new System.Drawing.Point(0, 0);
             this.mainToolStrip.Name = "mainToolStrip";
             this.mainToolStrip.Size = new System.Drawing.Size(800, 25);
@@ -254,6 +256,16 @@
             this.blockStatusLabel.Name = "blockStatusLabel";
             this.blockStatusLabel.Size = new System.Drawing.Size(79, 17);
             this.blockStatusLabel.Text = "Select a block";
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButton1.Text = "toolStripButton1";
+            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
             // Viewer
             // 
@@ -308,6 +320,7 @@
         private System.Windows.Forms.ToolStripButton cameraResetButton;
         private System.Windows.Forms.ToolStripStatusLabel blockStatusLabel;
         internal ViewportControl Viewport;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
     }
 }
 

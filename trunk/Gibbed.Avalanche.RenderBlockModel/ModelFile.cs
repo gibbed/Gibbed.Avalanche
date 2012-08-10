@@ -89,14 +89,20 @@ namespace Gibbed.Avalanche.RenderBlockModel
                 var block = BlockTypeFactory.Create(typeHash);
                 if (block == null)
                 {
-                    throw new Exception("unknown block type 0x" + typeHash.ToString("X8"));
+                    var typeName = BlockTypeFactory.GetName(typeHash);
+                    if (string.IsNullOrEmpty(typeName) == false)
+                    {
+                        throw new NotSupportedException("unhandled block type " + typeName + " (0x" + typeHash.ToString("X8") + ")");
+                    }
+
+                    throw new NotSupportedException("unknown block type 0x" + typeHash.ToString("X8"));
                 }
 
                 block.Deserialize(input, endian);
 
                 if (input.ReadValueU32(endian) != 0x89ABCDEF)
                 {
-                    throw new Exception("invalid block footer (data corrupt? or misread?)");
+                    throw new FormatException("invalid block footer (data corrupt? or misread?)");
                 }
 
                 this.Blocks.Add(block);

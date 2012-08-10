@@ -29,7 +29,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
 
             string texturePath;
 
-            texturePath = Path.Combine(basePath, block.Material.DiffuseTexture);
+            texturePath = Path.Combine(basePath, block.Material.UndeformedDiffuseTexture);
             if (File.Exists(texturePath) == false)
             {
                 this.TextureDif = null;
@@ -39,7 +39,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                 this.TextureDif = Texture.FromFile(device, texturePath);
             }
 
-            texturePath = Path.Combine(basePath, block.Material.NormalMap);
+            texturePath = Path.Combine(basePath, block.Material.UndeformedNormalMap);
             if (File.Exists(texturePath) == false)
             {
                 this.TextureNrm = null;
@@ -57,9 +57,9 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
             device.VertexDeclaration = this.VertexDeclaration;
             vertices = new VertexBuffer(
                 device,
-                block.Vertices.Count * 48,
+                block.VertexData0.Count * 48,
                 BufferUsage.WriteOnly);
-            vertices.SetData(block.Vertices.ToArray());
+            vertices.SetData(block.VertexData0.ToArray());
 
             device.Vertices[0].SetSource(vertices, 0, 48);
 

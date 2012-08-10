@@ -23,19 +23,23 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Gibbed.Avalanche.FileFormats;
 using Gibbed.IO;
 
 namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 {
-    public class DeformableWindow : IRenderBlock
+    public struct LambertData0Small : IFormat
     {
-        public byte Version;
-        public Material Material;
-        public DeformTable DeformTable = new DeformTable();
-        public readonly List<DeformableWindowData0> VertexData0 = new List<DeformableWindowData0>();
-        public List<short> Faces = new List<short>();
-        public uint Unknown24C;
+        public short TexCoord1A;
+        public short TexCoord1B;
+        public short TexCoord1C;
+        public short TexCoord1D;
+        public float TexCoord2A;
+        public float TexCoord2B;
+        public float TexCoord2C;
+        public short PositionX;
+        public short PositionY;
+        public short PositionZ;
+        public short PositionW;
 
         public void Serialize(Stream output, Endian endian)
         {
@@ -44,33 +48,17 @@ namespace Gibbed.Avalanche.RenderBlockModel.Blocks
 
         public void Deserialize(Stream input, Endian endian)
         {
-            var version = input.ReadValueU8();
-            if (version > 2)
-            {
-                throw new FormatException("unhandled version for DeformableWindow");
-            }
-
-            this.Version = version;
-            this.Material.Deserialize(input, endian);
-
-            if (version >= 2)
-            {
-                this.Unknown24C = input.ReadValueU32(endian);
-                this.DeformTable.Deserialize(input, endian);
-            }
-
-            input.ReadArray(this.VertexData0, endian);
-            input.ReadFaces(this.Faces, endian);
-
-            if (version >= 0 && version <= 1)
-            {
-                this.DeformTable.Deserialize(input, endian);
-            }
-
-            if (version == 1)
-            {
-                this.Unknown24C = input.ReadValueU32(endian);
-            }
+            this.TexCoord1A = input.ReadValueS16(endian);
+            this.TexCoord1B = input.ReadValueS16(endian);
+            this.TexCoord1C = input.ReadValueS16(endian);
+            this.TexCoord1D = input.ReadValueS16(endian);
+            this.TexCoord2A = input.ReadValueF32(endian);
+            this.TexCoord2B = input.ReadValueF32(endian);
+            this.TexCoord2C = input.ReadValueF32(endian);
+            this.PositionX = input.ReadValueS16(endian);
+            this.PositionY = input.ReadValueS16(endian);
+            this.PositionZ = input.ReadValueS16(endian);
+            this.PositionW = input.ReadValueS16(endian);
         }
     }
 }

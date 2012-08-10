@@ -71,10 +71,11 @@ namespace Gibbed.Avalanche.ModelViewer
 
             this.ModelPath = Path.GetDirectoryName(this.modelOpenFileDialog.FileName);
 
-            Stream input = File.Open(this.modelOpenFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            this.Model = new ModelFile();
-            this.Model.Deserialize(input);
-            input.Close();
+            using (var input = File.OpenRead(this.modelOpenFileDialog.FileName))
+            {
+                this.Model = new ModelFile();
+                this.Model.Deserialize(input);
+            }
 
             this.blockListView.Items.Clear();
 
@@ -101,10 +102,11 @@ namespace Gibbed.Avalanche.ModelViewer
 
             this.ModelPath = Path.GetDirectoryName(this.modelOpenFileDialog.FileName);
 
-            Stream input = File.Open(this.modelOpenFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Read);
             var model = new ModelFile();
-            model.Deserialize(input);
-            input.Close();
+            using (var input = File.OpenRead(this.modelOpenFileDialog.FileName))
+            {
+                model.Deserialize(input);
+            }
 
             int i = this.Model.Blocks.Count;
             foreach (IRenderBlock block in model.Blocks)

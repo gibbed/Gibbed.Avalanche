@@ -10,24 +10,24 @@ namespace Gibbed.Avalanche.RenderBlockModel
 {
     public struct Material : IFormat
     {
-        public string DiffuseTexture;
-        public string NormalMap;
-        public string PropertiesMap;
-        public string NormalMapEx0;
-        public string NormalMapEx1;
-        public string NormalMapEx2;
+        public string UndeformedDiffuseTexture;
+        public string UndeformedNormalMap;
+        public string UndeformedPropertiesMap;
+        public string DeformedDiffuseTexture;
+        public string DeformedNormalMap;
+        public string DeformedPropertiesMap;
         public string NormalMapEx3;
         public string ShadowMapTexture;
         public uint Unknown8;
 
         public void Serialize(Stream output, Endian endian)
         {
-            output.WriteStringU32(this.DiffuseTexture, endian);
-            output.WriteStringU32(this.NormalMap, endian);
-            output.WriteStringU32(this.PropertiesMap, endian);
-            output.WriteStringU32(this.NormalMapEx0, endian);
-            output.WriteStringU32(this.NormalMapEx1, endian);
-            output.WriteStringU32(this.NormalMapEx2, endian);
+            output.WriteStringU32(this.UndeformedDiffuseTexture, endian);
+            output.WriteStringU32(this.UndeformedNormalMap, endian);
+            output.WriteStringU32(this.UndeformedPropertiesMap, endian);
+            output.WriteStringU32(this.DeformedDiffuseTexture, endian);
+            output.WriteStringU32(this.DeformedNormalMap, endian);
+            output.WriteStringU32(this.DeformedPropertiesMap, endian);
             output.WriteStringU32(this.NormalMapEx3, endian);
             output.WriteStringU32(this.ShadowMapTexture, endian);
             output.WriteValueU32(this.Unknown8, endian);
@@ -35,12 +35,12 @@ namespace Gibbed.Avalanche.RenderBlockModel
 
         public void Deserialize(Stream input, Endian endian)
         {
-            this.DiffuseTexture = input.ReadStringU32(endian);
-            this.NormalMap = input.ReadStringU32(endian);
-            this.PropertiesMap = input.ReadStringU32(endian);
-            this.NormalMapEx0 = input.ReadStringU32(endian);
-            this.NormalMapEx1 = input.ReadStringU32(endian);
-            this.NormalMapEx2 = input.ReadStringU32(endian);
+            this.UndeformedDiffuseTexture = input.ReadStringU32(endian);
+            this.UndeformedNormalMap = input.ReadStringU32(endian);
+            this.UndeformedPropertiesMap = input.ReadStringU32(endian);
+            this.DeformedDiffuseTexture = input.ReadStringU32(endian);
+            this.DeformedNormalMap = input.ReadStringU32(endian);
+            this.DeformedPropertiesMap = input.ReadStringU32(endian);
             this.NormalMapEx3 = input.ReadStringU32(endian);
             this.ShadowMapTexture = input.ReadStringU32(endian);
             this.Unknown8 = input.ReadValueU32(endian);

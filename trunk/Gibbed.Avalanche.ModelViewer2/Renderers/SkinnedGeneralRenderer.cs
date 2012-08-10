@@ -1,12 +1,35 @@
-﻿using System;
+﻿/* Copyright (c) 2012 Rick (rick 'at' gibbed 'dot' us)
+ * 
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * 
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would
+ *    be appreciated but is not required.
+ * 
+ * 2. Altered source versions must be plainly marked as such, and must not
+ *    be misrepresented as being the original software.
+ * 
+ * 3. This notice may not be removed or altered from any source
+ *    distribution.
+ */
+
+using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Gibbed.Avalanche.RenderBlockModel;
 using Gibbed.Avalanche.RenderBlockModel.Blocks;
-using D3D10 = SlimDX.Direct3D10;
+using SlimDX.Direct3D10;
+using Buffer = SlimDX.Direct3D10.Buffer;
 using DXGI = SlimDX.DXGI;
-using System.Runtime.InteropServices;
-using ShaderLibrary = Gibbed.Avalanche.FileFormats.ShaderLibraryFile;
 using IC = SlimDX.Direct3D10.InputClassification;
+using ShaderLibrary = Gibbed.Avalanche.FileFormats.ShaderLibraryFile;
 
 namespace Gibbed.Avalanche.ModelViewer2.Renderers
 {
@@ -15,9 +38,9 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
         private readonly ShaderLoader _ShaderLoader = new ShaderLoader();
         private readonly MaterialLoader _MaterialLoader = new MaterialLoader();
 
-        private D3D10.Buffer _VertexBuffer;
-        private D3D10.Buffer _ExtraBuffer;
-        private D3D10.Buffer _IndexBuffer;
+        private Buffer _VertexData0Buffer;
+        private Buffer _VertexData1Buffer;
+        private Buffer _IndexBuffer;
 
         private ConstantBuffer<VertexShaderGlobals> _VertexShaderConstantBuffer1;
         private ConstantBuffer<PixelShaderGlobalConstants> _PixelShaderConstantBuffer0;
@@ -25,53 +48,7 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
         private ConstantBuffer<PixelShaderMaterialConstants> _PixelShaderConstantBuffer2;
         private ConstantBuffer<PixelShaderBooleans> _PixelShaderConstantBuffer4;
 
-        public override void Dispose()
-        {
-            if (this._PixelShaderConstantBuffer4 != null)
-            {
-                this._PixelShaderConstantBuffer4.Dispose();
-            }
-
-            if (this._PixelShaderConstantBuffer2 != null)
-            {
-                this._PixelShaderConstantBuffer2.Dispose();
-            }
-
-            if (this._PixelShaderConstantBuffer1 != null)
-            {
-                this._PixelShaderConstantBuffer1.Dispose();
-            }
-
-            if (this._PixelShaderConstantBuffer0 != null)
-            {
-                this._PixelShaderConstantBuffer0.Dispose();
-            }
-
-            if (this._VertexShaderConstantBuffer1 != null)
-            {
-                this._VertexShaderConstantBuffer1.Dispose();
-            }
-
-            if (this._IndexBuffer != null)
-            {
-                this._IndexBuffer.Dispose();
-            }
-
-            if (this._ExtraBuffer != null)
-            {
-                this._ExtraBuffer.Dispose();
-            }
-
-            if (this._VertexBuffer != null)
-            {
-                this._VertexBuffer.Dispose();
-            }
-
-            this._MaterialLoader.Dispose();
-            this._ShaderLoader.Dispose();
-        }
-
-        public override void Setup(D3D10.Device device,
+        public override void Setup(Device device,
                                    ShaderLibrary shaderLibrary,
                                    string basePath)
         {
@@ -106,28 +83,28 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
                     shaderLibrary.GetFragmentShaderData(pixelShaderName),
                     new[]
                     {
-                        new D3D10.InputElement("POSITION", 0, DXGI.Format.R32G32B32_Float, 0, 0, IC.PerVertexData, 0),
-                        new D3D10.InputElement("TEXCOORD", 1, DXGI.Format.R8G8B8A8_UNorm, 12, 0, IC.PerVertexData, 0),
-                        new D3D10.InputElement("TEXCOORD", 2, DXGI.Format.R8G8B8A8_UInt, 16, 0, IC.PerVertexData, 0),
-                        new D3D10.InputElement("COLOR", 0, DXGI.Format.R8G8B8A8_UNorm, 0, 1, IC.PerVertexData, 0),
-                        new D3D10.InputElement("COLOR", 1, DXGI.Format.R8G8B8A8_UNorm, 4, 1, IC.PerVertexData, 0),
-                        new D3D10.InputElement("COLOR", 2, DXGI.Format.R8G8B8A8_UNorm, 8, 1, IC.PerVertexData, 0),
-                        new D3D10.InputElement("TEXCOORD", 0, DXGI.Format.R32G32_Float, 12, 1, IC.PerVertexData, 0),
+                        new InputElement("POSITION", 0, DXGI.Format.R32G32B32_Float, 0, 0, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 1, DXGI.Format.R8G8B8A8_UNorm, 12, 0, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 2, DXGI.Format.R8G8B8A8_UInt, 16, 0, IC.PerVertexData, 0),
+                        new InputElement("COLOR", 0, DXGI.Format.R8G8B8A8_UNorm, 0, 1, IC.PerVertexData, 0),
+                        new InputElement("COLOR", 1, DXGI.Format.R8G8B8A8_UNorm, 4, 1, IC.PerVertexData, 0),
+                        new InputElement("COLOR", 2, DXGI.Format.R8G8B8A8_UNorm, 8, 1, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 0, DXGI.Format.R32G32_Float, 12, 1, IC.PerVertexData, 0),
                     });
 
-                var vertexBuffer = new D3D10.Buffer(device,
-                                                    20 * this.Block.SmallVertices.Count,
-                                                    D3D10.ResourceUsage.Dynamic,
-                                                    D3D10.BindFlags.VertexBuffer,
-                                                    D3D10.CpuAccessFlags.Write,
-                                                    D3D10.ResourceOptionFlags.None);
-                using (var stream = vertexBuffer.Map(D3D10.MapMode.WriteDiscard,
-                                                     D3D10.MapFlags.None))
+                var vertexBuffer = new Buffer(device,
+                                                    20 * this.Block.VertexData0Small.Count,
+                                                    ResourceUsage.Dynamic,
+                                                    BindFlags.VertexBuffer,
+                                                    CpuAccessFlags.Write,
+                                                    ResourceOptionFlags.None);
+                using (var stream = vertexBuffer.Map(MapMode.WriteDiscard,
+                                                     MapFlags.None))
                 {
-                    stream.WriteRange(this.Block.SmallVertices.ToArray());
+                    stream.WriteRange(this.Block.VertexData0Small.ToArray());
                     vertexBuffer.Unmap();
                 }
-                this._VertexBuffer = vertexBuffer;
+                this._VertexData0Buffer = vertexBuffer;
             }
             else
             {
@@ -137,60 +114,59 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
                     shaderLibrary.GetFragmentShaderData(pixelShaderName),
                     new[]
                     {
-                        new D3D10.InputElement("POSITION", 0, DXGI.Format.R32G32B32_Float, 0, 0, IC.PerVertexData, 0),
-                        new D3D10.InputElement("TEXCOORD", 1, DXGI.Format.R8G8B8A8_UNorm, 12, 0, IC.PerVertexData, 0),
-                        new D3D10.InputElement("TEXCOORD", 2, DXGI.Format.R8G8B8A8_UNorm, 16, 0, IC.PerVertexData, 0),
-                        new D3D10.InputElement("TEXCOORD", 3, DXGI.Format.R8G8B8A8_UInt, 20, 0, IC.PerVertexData, 0),
-                        new D3D10.InputElement("TEXCOORD", 4, DXGI.Format.R8G8B8A8_UInt, 24, 0, IC.PerVertexData, 0),
-                        new D3D10.InputElement("COLOR", 0, DXGI.Format.R8G8B8A8_UNorm, 0, 1, IC.PerVertexData, 0),
-                        new D3D10.InputElement("COLOR", 1, DXGI.Format.R8G8B8A8_UNorm, 4, 1, IC.PerVertexData, 0),
-                        new D3D10.InputElement("COLOR", 2, DXGI.Format.R8G8B8A8_UNorm, 8, 1, IC.PerVertexData, 0),
-                        new D3D10.InputElement("TEXCOORD", 0, DXGI.Format.R32G32_Float, 12, 1, IC.PerVertexData, 0),
+                        new InputElement("POSITION", 0, DXGI.Format.R32G32B32_Float, 0, 0, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 1, DXGI.Format.R8G8B8A8_UNorm, 12, 0, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 2, DXGI.Format.R8G8B8A8_UNorm, 16, 0, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 3, DXGI.Format.R8G8B8A8_UInt, 20, 0, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 4, DXGI.Format.R8G8B8A8_UInt, 24, 0, IC.PerVertexData, 0),
+                        new InputElement("COLOR", 0, DXGI.Format.R8G8B8A8_UNorm, 0, 1, IC.PerVertexData, 0),
+                        new InputElement("COLOR", 1, DXGI.Format.R8G8B8A8_UNorm, 4, 1, IC.PerVertexData, 0),
+                        new InputElement("COLOR", 2, DXGI.Format.R8G8B8A8_UNorm, 8, 1, IC.PerVertexData, 0),
+                        new InputElement("TEXCOORD", 0, DXGI.Format.R32G32_Float, 12, 1, IC.PerVertexData, 0),
                     });
 
-                var vertexBuffer = new D3D10.Buffer(
-                    device,
-                    28 * this.Block.BigVertices.Count,
-                    D3D10.ResourceUsage.Dynamic,
-                    D3D10.BindFlags.VertexBuffer,
-                    D3D10.CpuAccessFlags.Write,
-                    D3D10.ResourceOptionFlags.None);
-                using (var stream = vertexBuffer.Map(
-                    D3D10.MapMode.WriteDiscard, D3D10.MapFlags.None))
+                var vertexBuffer = new Buffer(device,
+                    28 * this.Block.VertexData0Big.Count,
+                    ResourceUsage.Dynamic,
+                    BindFlags.VertexBuffer,
+                    CpuAccessFlags.Write,
+                    ResourceOptionFlags.None);
+                using (var stream = vertexBuffer.Map(MapMode.WriteDiscard,
+                    MapFlags.None))
                 {
-                    stream.WriteRange(this.Block.BigVertices.ToArray());
+                    stream.WriteRange(this.Block.VertexData0Big.ToArray());
                     vertexBuffer.Unmap();
                 }
-                this._VertexBuffer = vertexBuffer;
+                this._VertexData0Buffer = vertexBuffer;
             }
 
             // Extra Buffer
             {
-                var extraBuffer = new D3D10.Buffer(device,
-                                                   20 * this.Block.Extras.Count,
-                                                   D3D10.ResourceUsage.Dynamic,
-                                                   D3D10.BindFlags.VertexBuffer,
-                                                   D3D10.CpuAccessFlags.Write,
-                                                   D3D10.ResourceOptionFlags.None);
-                using (var stream = extraBuffer.Map(D3D10.MapMode.WriteDiscard,
-                                                    D3D10.MapFlags.None))
+                var extraBuffer = new Buffer(device,
+                                                   20 * this.Block.VertexData1.Count,
+                                                   ResourceUsage.Dynamic,
+                                                   BindFlags.VertexBuffer,
+                                                   CpuAccessFlags.Write,
+                                                   ResourceOptionFlags.None);
+                using (var stream = extraBuffer.Map(MapMode.WriteDiscard,
+                                                    MapFlags.None))
                 {
-                    stream.WriteRange(this.Block.Extras.ToArray());
+                    stream.WriteRange(this.Block.VertexData1.ToArray());
                     extraBuffer.Unmap();
                 }
-                this._ExtraBuffer = extraBuffer;
+                this._VertexData1Buffer = extraBuffer;
             }
 
             // Index Buffer
             {
-                var indexBuffer = new D3D10.Buffer(device,
+                var indexBuffer = new Buffer(device,
                                                    2 * this.Block.Faces.Count,
-                                                   D3D10.ResourceUsage.Dynamic,
-                                                   D3D10.BindFlags.IndexBuffer,
-                                                   D3D10.CpuAccessFlags.Write,
-                                                   D3D10.ResourceOptionFlags.None);
-                using (var stream = indexBuffer.Map(D3D10.MapMode.WriteDiscard,
-                                                    D3D10.MapFlags.None))
+                                                   ResourceUsage.Dynamic,
+                                                   BindFlags.IndexBuffer,
+                                                   CpuAccessFlags.Write,
+                                                   ResourceOptionFlags.None);
+                using (var stream = indexBuffer.Map(MapMode.WriteDiscard,
+                                                    MapFlags.None))
                 {
                     stream.WriteRange(this.Block.Faces.ToArray());
                     indexBuffer.Unmap();
@@ -208,7 +184,7 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
             }
         }
 
-        public override void Render(D3D10.Device device, SlimDX.Matrix viewMatrix)
+        public override void Render(Device device, SlimDX.Matrix viewMatrix)
         {
             foreach (var batch in this.Block.SkinBatches)
             {
@@ -229,8 +205,8 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
                 globals.WorldViewProj = viewMatrix;
                 this._VertexShaderConstantBuffer1.Update(globals);
 
-                device.InputAssembler.SetPrimitiveTopology(D3D10.PrimitiveTopology.TriangleList);
-                device.InputAssembler.SetVertexBuffers(1, new D3D10.VertexBufferBinding(this._ExtraBuffer, 20, 0));
+                device.InputAssembler.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
+                device.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(this._VertexData1Buffer, 20, 0));
 
                 device.VertexShader.Set(this._ShaderLoader.VertexShader);
                 //device.VertexShader.SetConstantBuffer(this.ConstantBuffer, 0);
@@ -278,8 +254,8 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
                 this._PixelShaderConstantBuffer0.Update(globalConsts);
 
                 var instanceConsts = new PixelShaderInstanceConstants();
-                instanceConsts.InstanceConstants = new ShaderNatives.float4[16];
-                for (int i = 0; i < 16; i++)
+                instanceConsts.InstanceConstants = new ShaderNatives.float4[6];
+                for (int i = 0; i < 6; i++)
                 {
                     instanceConsts.InstanceConstants[i] = new ShaderNatives.float4(1.0f, 1.0f, 1.0f, 1.0f);
                 }
@@ -287,8 +263,8 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
                 this._PixelShaderConstantBuffer1.Update(instanceConsts);
 
                 var materialConsts = new PixelShaderMaterialConstants();
-                materialConsts.MaterialConstants = new ShaderNatives.float4[16];
-                for (int i = 0; i < 16; i++)
+                materialConsts.MaterialConstants = new ShaderNatives.float4[1];
+                for (int i = 0; i < 1; i++)
                 {
                     materialConsts.MaterialConstants[i] = new ShaderNatives.float4(1.0f, 1.0f, 1.0f, 1.0f);
                 }
@@ -314,11 +290,11 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
 
                 if (this.Block.HasBigVertices == false)
                 {
-                    device.InputAssembler.SetVertexBuffers(0, new D3D10.VertexBufferBinding(this._VertexBuffer, 20, 0));
+                    device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this._VertexData0Buffer, 20, 0));
                 }
                 else
                 {
-                    device.InputAssembler.SetVertexBuffers(0, new D3D10.VertexBufferBinding(this._VertexBuffer, 28, 0));
+                    device.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(this._VertexData0Buffer, 28, 0));
                 }
 
                 device.InputAssembler.SetIndexBuffer(this._IndexBuffer, DXGI.Format.R16_UInt, 0);
@@ -349,17 +325,17 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
             public ShaderNatives.float4[] LightColors;
         }
 
-        [StructLayout(LayoutKind.Sequential, Size = 256)]
+        [StructLayout(LayoutKind.Sequential, Size = 96)]
         private struct PixelShaderInstanceConstants
         {
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
             public ShaderNatives.float4[] InstanceConstants;
         }
 
-        [StructLayout(LayoutKind.Sequential, Size = 256)]
+        [StructLayout(LayoutKind.Sequential, Size = 16)]
         private struct PixelShaderMaterialConstants
         {
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
             public ShaderNatives.float4[] MaterialConstants;
         }
 
@@ -370,6 +346,52 @@ namespace Gibbed.Avalanche.ModelViewer2.Renderers
             public ShaderNatives.bool4[] Bools;
 
             public float AlphaRef;
+        }
+
+        public override void Dispose()
+        {
+            if (this._PixelShaderConstantBuffer4 != null)
+            {
+                this._PixelShaderConstantBuffer4.Dispose();
+            }
+
+            if (this._PixelShaderConstantBuffer2 != null)
+            {
+                this._PixelShaderConstantBuffer2.Dispose();
+            }
+
+            if (this._PixelShaderConstantBuffer1 != null)
+            {
+                this._PixelShaderConstantBuffer1.Dispose();
+            }
+
+            if (this._PixelShaderConstantBuffer0 != null)
+            {
+                this._PixelShaderConstantBuffer0.Dispose();
+            }
+
+            if (this._VertexShaderConstantBuffer1 != null)
+            {
+                this._VertexShaderConstantBuffer1.Dispose();
+            }
+
+            if (this._IndexBuffer != null)
+            {
+                this._IndexBuffer.Dispose();
+            }
+
+            if (this._VertexData1Buffer != null)
+            {
+                this._VertexData1Buffer.Dispose();
+            }
+
+            if (this._VertexData0Buffer != null)
+            {
+                this._VertexData0Buffer.Dispose();
+            }
+
+            this._MaterialLoader.Dispose();
+            this._ShaderLoader.Dispose();
         }
     }
 }

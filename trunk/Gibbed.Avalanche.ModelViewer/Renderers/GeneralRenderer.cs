@@ -43,7 +43,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
             
             string texturePath;
 
-            texturePath = Path.Combine(basePath, block.Material.DiffuseTexture);
+            texturePath = Path.Combine(basePath, block.Material.UndeformedDiffuseTexture);
             if (File.Exists(texturePath) == false)
             {
                 this.TextureDif = null;
@@ -53,7 +53,7 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                 this.TextureDif = Texture.FromFile(device, texturePath);
             }
 
-            texturePath = Path.Combine(basePath, block.Material.NormalMap);
+            texturePath = Path.Combine(basePath, block.Material.UndeformedNormalMap);
             if (File.Exists(texturePath) == false)
             {
                 this.TextureNrm = null;
@@ -75,9 +75,9 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                 device.VertexDeclaration = this.SmallVertexDeclaration;
                 vertices = new VertexBuffer(
                     device,
-                    block.SmallVertices.Count * vertexSize,
+                    block.VertexData0Small.Count * vertexSize,
                     BufferUsage.WriteOnly);
-                vertices.SetData(block.SmallVertices.ToArray());
+                vertices.SetData(block.VertexData0Small.ToArray());
                 /*
                 vertexSize = 20;
                 device.VertexDeclaration = this.HackToFixDumbVertexDeclaration;
@@ -94,9 +94,9 @@ namespace Gibbed.Avalanche.ModelViewer.Renderers
                 device.VertexDeclaration = this.BigVertexDeclaration;
                 vertices = new VertexBuffer(
                     device,
-                    block.BigVertices.Count * vertexSize,
+                    block.VertexData0Big.Count * vertexSize,
                     BufferUsage.WriteOnly);
-                vertices.SetData(block.BigVertices.ToArray());
+                vertices.SetData(block.VertexData0Big.ToArray());
             }
 
             device.Vertices[0].SetSource(vertices, 0, vertexSize);

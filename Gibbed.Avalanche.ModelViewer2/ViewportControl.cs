@@ -410,7 +410,7 @@ namespace Gibbed.Avalanche.ModelViewer2
             Device.CreateWithSwapChain(
                 null,
                 DriverType.Hardware,
-                DeviceCreationFlags.Debug,
+                DeviceCreationFlags.None,
                 sd,
                 out this._Device,
                 out this._SwapChain);

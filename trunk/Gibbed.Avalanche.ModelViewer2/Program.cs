@@ -38,24 +38,20 @@ namespace Gibbed.Avalanche.ModelViewer2
             Application.SetCompatibleTextRenderingDefault(false);
             Application.CurrentCulture = CultureInfo.InvariantCulture;
 
-            using (var viewer = new Viewer())
-            {
-                viewer.Show();
-                while (viewer.IsDisposed == false)
-                {
-                    if (viewer.WindowState != FormWindowState.Minimized)
-                    {
-                        viewer.Viewport.DoUpdateScene();
-                        viewer.Viewport.DoRender();
-                    }
-                    else
-                    {
-                        System.Threading.Thread.Sleep(50);
-                    }
-
-                    Application.DoEvents();
-                }
-            }
+            var viewer = new Viewer();
+            SlimDX.Windows.MessagePump.Run(viewer,
+                                           () =>
+                                           {
+                                               if (Native.IsWindowActive(viewer.Handle) == true)
+                                               {
+                                                   viewer.Viewport.DoUpdateScene();
+                                                   viewer.Viewport.DoRender();
+                                               }
+                                               else
+                                               {
+                                                   //System.Threading.Thread.Sleep(50);
+                                               }
+                                           });
         }
     }
 }

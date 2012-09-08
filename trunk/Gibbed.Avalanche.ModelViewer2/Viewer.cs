@@ -60,16 +60,16 @@ namespace Gibbed.Avalanche.ModelViewer2
 
                 if (gamePath == null)
                 {
-                    throw new InvalidOperationException("could not find Just Cause 2 install location");
+                    //throw new InvalidOperationException("could not find Just Cause 2 install location");
                 }
 
-                string shaderBundlePath = Path.Combine(gamePath, "DX10_Shaders_F.shader_bundle");
+                var shaderBundlePath = Path.Combine(gamePath, "DX10_Shaders_F.shader_bundle");
                 if (File.Exists(shaderBundlePath) == false)
                 {
                     throw new FileNotFoundException("shader bundle is missing", shaderBundlePath);
                 }
 
-                string specialShaderBundlePath = Path.Combine(gamePath, "DX10_SpecialShaders_F.shader_bundle");
+                var specialShaderBundlePath = Path.Combine(gamePath, "DX10_SpecialShaders_F.shader_bundle");
                 if (File.Exists(specialShaderBundlePath) == false)
                 {
                     throw new FileNotFoundException("special shader bundle is missing", specialShaderBundlePath);

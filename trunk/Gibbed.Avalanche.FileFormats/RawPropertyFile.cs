@@ -651,8 +651,6 @@ namespace Gibbed.Avalanche.FileFormats
 
         public void Deserialize(Stream input)
         {
-            input.Seek(0, SeekOrigin.Begin);
-
             this.Nodes.Clear();
             while (input.Position < input.Length)
             {

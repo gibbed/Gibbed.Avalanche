@@ -749,8 +749,6 @@ namespace Gibbed.Avalanche.FileFormats
         {
             var endian = this.Endian;
 
-            input.Seek(0, SeekOrigin.Begin);
-
             this.Nodes.Clear();
             while (input.Position < input.Length)
             {
@@ -772,6 +770,49 @@ namespace Gibbed.Avalanche.FileFormats
             }
 
             if (input.Position != input.Length)
+            {
+                throw new FormatException();
+            }
+        }
+
+        public void Deserialize(Stream input, int length)
+        {
+            if (input == null)
+            {
+                throw new ArgumentNullException("input");
+            }
+
+            if (length < 0 ||
+                input.Position + length > input.Length)
+            {
+                throw new ArgumentOutOfRangeException("length");
+            }
+
+            var endian = this.Endian;
+
+            var end = input.Position + length;
+
+            this.Nodes.Clear();
+            while (input.Position < end)
+            {
+                if (CheckMagic(input) == false)
+                {
+                    throw new FormatException();
+                }
+
+                uint objectLength = input.ReadValueU32(endian);
+                if (input.Position + objectLength > input.Length)
+                {
+                    throw new EndOfStreamException("object size greater than input size");
+                }
+
+                using (var memory = input.ReadToMemoryStream(objectLength))
+                {
+                    this.Nodes.Add(this.DeserializeNode(memory));
+                }
+            }
+
+            if (input.Position != end)
             {
                 throw new FormatException();
             }

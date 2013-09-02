@@ -651,6 +651,8 @@ namespace Gibbed.Avalanche.FileFormats
 
         public void Deserialize(Stream input)
         {
+            input.Seek(0, SeekOrigin.Begin);
+
             this.Nodes.Clear();
             while (input.Position < input.Length)
             {
@@ -658,6 +660,33 @@ namespace Gibbed.Avalanche.FileFormats
             }
 
             if (input.Position != input.Length)
+            {
+                throw new FormatException();
+            }
+        }
+
+        public void Deserialize(Stream input, int length)
+        {
+            if (input == null)
+            {
+                throw new ArgumentNullException("input");
+            }
+
+            if (length < 0 ||
+                input.Position + length > input.Length)
+            {
+                throw new ArgumentOutOfRangeException("length");
+            }
+
+            var end = input.Position + length;
+
+            this.Nodes.Clear();
+            while (input.Position < end)
+            {
+                this.Nodes.Add(this.DeserializeNode(input));
+            }
+
+            if (input.Position != end)
             {
                 throw new FormatException();
             }
